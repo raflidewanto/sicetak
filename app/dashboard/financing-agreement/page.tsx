@@ -1,6 +1,7 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import PageContainer from '@/components/layout/page-container';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import CetakIsi from '@/features/financing-agreement/components/cetak-isi';
 import FinancingAgreementTable from '@/features/financing-agreement/components/table';
 
 const breadCrumbsItems = [
@@ -24,9 +25,19 @@ const FinancingAgreementPage = () => {
           <TabsTrigger value="isi">Isi</TabsTrigger>
         </TabsList>
         <TabsContent value="template">
-          <FinancingAgreementTable />
+          <FinancingAgreementTable
+            actionLabel1="Cetak Dokumen"
+            actionLabel2="Cetak Dokumen"
+            productName="Formulir Permohonan Pembiayaan Laporan Survei Analisa Pembiayaan"
+            tableCaption="Fasilitas Dana"
+            tableHeader1="Nama Produk"
+            tableHeader2="Cetak Perseorangan"
+            tableHeader3="Cetak Perusahaan"
+          />
         </TabsContent>
-        <TabsContent value="isi">Cetak Isi</TabsContent>
+        <TabsContent value="isi">
+          <CetakIsi />
+        </TabsContent>
       </Tabs>
     </PageContainer>
   );

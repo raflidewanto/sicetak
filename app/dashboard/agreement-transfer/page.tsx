@@ -1,15 +1,43 @@
-'use client';
+import { Breadcrumbs } from '@/components/breadcrumbs';
+import PageContainer from '@/components/layout/page-container';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import FinancingAgreementTable from '@/features/financing-agreement/components/table';
 
-import { MyDocument } from '@/components/template-surat/templ';
-import { PDFViewer } from '@react-pdf/renderer';
-import React from 'react';
+const breadCrumbsItems = [
+  {
+    link: '/dashboard',
+    title: 'Dashboard'
+  },
+  {
+    link: '/dashboard/agreement-transfer',
+    title: 'Agreement Transfer'
+  }
+];
 
-const Doc = () => {
+const AgreementTransferPage = () => {
   return (
-    <PDFViewer width={'100%'} height={'100%'}>
-      <MyDocument />
-    </PDFViewer>
+    <PageContainer>
+      <Breadcrumbs className="mb-8" items={breadCrumbsItems} />
+      <Tabs defaultValue="template" className="min-h-screen w-full px-2 md:px-4">
+        <TabsList>
+          <TabsTrigger value="template">Template</TabsTrigger>
+          <TabsTrigger value="isi">Isi</TabsTrigger>
+        </TabsList>
+        <TabsContent value="template">
+          <FinancingAgreementTable
+            actionLabel1="Cetak Dokumen"
+            actionLabel2="Cetak Dokumen"
+            productName="Formulir Permohonan Pembiayaan Laporan Survei Analisa Pembiayaan"
+            tableCaption="Fasilitas Dana"
+            tableHeader1="Nama Produk"
+            tableHeader2="Cetak Perseorangan"
+            tableHeader3="Cetak Perusahaan"
+          />
+        </TabsContent>
+        <TabsContent value="isi">Cetak Isi</TabsContent>
+      </Tabs>
+    </PageContainer>
   );
 };
 
-export default Doc;
+export default AgreementTransferPage;

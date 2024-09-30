@@ -2,7 +2,6 @@
 
 import { DashboardNav } from '@/components/dashboard-nav';
 import { navItems } from '@/constants/data';
-import { useMediaQuery } from '@/hooks/use-media-query';
 import { useSidebar } from '@/hooks/useSidebar';
 import { cn } from '@/lib/utils';
 import { ChevronLeft } from 'lucide-react';
@@ -16,7 +15,6 @@ type SidebarProps = {
 
 export default function Sidebar({ className }: SidebarProps) {
   const { isMinimized, toggle } = useSidebar();
-  const mobile = useMediaQuery('(min-width: 1024px)');
 
   const handleToggle = () => {
     toggle();
@@ -30,8 +28,17 @@ export default function Sidebar({ className }: SidebarProps) {
         className
       )}
     >
-      <div suppressHydrationWarning className="hidden p-5 pt-10 lg:block">
-        <Link href="/dashboard">Si Cetak</Link>
+      <div className="hidden p-5 pt-10 lg:block">
+        <Link href="/dashboard">
+          <Show when={!isMinimized} fallback={<PrinterIcon />}>
+            <div className="flex items-center justify-start space-x-2">
+              <span>
+                <PrinterIcon />
+              </span>
+              <p className="hidden text-start text-lg font-bold md:block">Si Cetak</p>
+            </div>
+          </Show>
+        </Link>
       </div>
       <ChevronLeft
         className={cn(
