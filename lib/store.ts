@@ -60,23 +60,15 @@ export const useTaskStore = create<State & Actions>()(
       draggedTask: null,
       addTask: (title: string, description?: string) =>
         set((state) => ({
-          tasks: [
-            ...state.tasks,
-            { id: uuid(), title, description, status: 'TODO' }
-          ]
+          tasks: [...state.tasks, { id: uuid(), title, description, status: 'TODO' }]
         })),
       updateCol: (id: UniqueIdentifier, newName: string) =>
         set((state) => ({
-          columns: state.columns.map((col) =>
-            col.id === id ? { ...col, title: newName } : col
-          )
+          columns: state.columns.map((col) => (col.id === id ? { ...col, title: newName } : col))
         })),
       addCol: (title: string) =>
         set((state) => ({
-          columns: [
-            ...state.columns,
-            { title, id: state.columns.length ? title.toUpperCase() : 'TODO' }
-          ]
+          columns: [...state.columns, { title, id: state.columns.length ? title.toUpperCase() : 'TODO' }]
         })),
       dragTask: (id: string | null) => set({ draggedTask: id }),
       removeTask: (id: string) =>

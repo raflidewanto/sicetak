@@ -6,6 +6,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from '@/components/ui/breadcrumb';
+import { cn } from '@/lib/utils';
 import { Slash } from 'lucide-react';
 import { Fragment } from 'react';
 
@@ -14,9 +15,9 @@ type BreadcrumbItemProps = {
   link: string;
 };
 
-export function Breadcrumbs({ items }: { items: BreadcrumbItemProps[] }) {
+export function Breadcrumbs({ items, className }: { items: BreadcrumbItemProps[]; className?: string }) {
   return (
-    <Breadcrumb>
+    <Breadcrumb className={cn(className)}>
       <BreadcrumbList>
         {items.map((item, index) => (
           <Fragment key={item.title}>
@@ -30,9 +31,7 @@ export function Breadcrumbs({ items }: { items: BreadcrumbItemProps[] }) {
                 <Slash />
               </BreadcrumbSeparator>
             )}
-            {index === items.length - 1 && (
-              <BreadcrumbPage>{item.title}</BreadcrumbPage>
-            )}
+            {index === items.length - 1 && <BreadcrumbPage>{item.title}</BreadcrumbPage>}
           </Fragment>
         ))}
       </BreadcrumbList>

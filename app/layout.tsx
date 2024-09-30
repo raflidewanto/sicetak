@@ -11,17 +11,10 @@ export const metadata: Metadata = {
   description: 'Basic dashboard with Next.js and Shadcn'
 };
 
-export default async function RootLayout({
-  children
-}: {
-  children: React.ReactNode;
-}) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body
-        className={`${inter.className} overflow-hidden `}
-        suppressHydrationWarning
-      >
+      <body className={`${inter.className} overflow-hidden `} suppressHydrationWarning>
         <NextTopLoader showSpinner={false} />
         <Toaster />
         {children}

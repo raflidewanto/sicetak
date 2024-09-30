@@ -118,15 +118,21 @@ export const navItems: NavItem[] = [
     label: 'Dashboard'
   },
   {
-    title: 'Surat',
-    href: '/dashboard/surat',
-    icon: 'surat',
-    label: 'Surat'
+    title: 'Financing Agreement',
+    href: '/dashboard/financing-agreement',
+    icon: 'finance',
+    label: 'Financing Agreement'
   },
   {
-    title: 'Login',
+    title: 'Agreement Transfer',
+    href: '/dashboard/agreement-transfer',
+    icon: 'surat',
+    label: 'Agreement Transfer'
+  },
+  {
+    title: 'Logout',
     href: '/',
     icon: 'login',
-    label: 'login'
+    label: 'logout'
   }
 ];

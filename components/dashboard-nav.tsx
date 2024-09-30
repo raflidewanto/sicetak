@@ -8,12 +8,7 @@ import { cn } from '@/lib/utils';
 import { NavItem } from '@/types';
 import { Dispatch, SetStateAction } from 'react';
 import { useSidebar } from '@/hooks/useSidebar';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from './ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 interface DashboardNavProps {
   items: NavItem[];
@@ -21,11 +16,7 @@ interface DashboardNavProps {
   isMobileNav?: boolean;
 }
 
-export function DashboardNav({
-  items,
-  setOpen,
-  isMobileNav = false
-}: DashboardNavProps) {
+export function DashboardNav({ items, setOpen, isMobileNav = false }: DashboardNavProps) {
   const path = usePathname();
   const { isMinimized } = useSidebar();
 

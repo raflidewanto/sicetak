@@ -1,13 +1,6 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn } from 'next-auth/react';
@@ -45,10 +38,7 @@ export default function UserAuthForm() {
   return (
     <>
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="w-full space-y-2"
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-2">
           <FormField
             control={form.control}
             name="email"
@@ -56,12 +46,7 @@ export default function UserAuthForm() {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input
-                    type="email"
-                    placeholder="Enter your email..."
-                    disabled={loading}
-                    {...field}
-                  />
+                  <Input type="email" placeholder="Enter your email..." disabled={loading} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -78,9 +63,7 @@ export default function UserAuthForm() {
           <span className="w-full border-t" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">
-            Or continue with
-          </span>
+          <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
         </div>
       </div>
       <GithubSignInButton />

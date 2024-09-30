@@ -1,11 +1,14 @@
 'use client';
-import React, { useState } from 'react';
+
 import { DashboardNav } from '@/components/dashboard-nav';
 import { navItems } from '@/constants/data';
+import { useMediaQuery } from '@/hooks/use-media-query';
+import { useSidebar } from '@/hooks/useSidebar';
 import { cn } from '@/lib/utils';
 import { ChevronLeft } from 'lucide-react';
-import { useSidebar } from '@/hooks/useSidebar';
 import Link from 'next/link';
+import Show from '../elements/show';
+import PrinterIcon from '../icons/printer';
 
 type SidebarProps = {
   className?: string;
@@ -13,6 +16,7 @@ type SidebarProps = {
 
 export default function Sidebar({ className }: SidebarProps) {
   const { isMinimized, toggle } = useSidebar();
+  const mobile = useMediaQuery('(min-width: 1024px)');
 
   const handleToggle = () => {
     toggle();
@@ -26,13 +30,8 @@ export default function Sidebar({ className }: SidebarProps) {
         className
       )}
     >
-      <div className="hidden p-5 pt-10 lg:block">
-        <Link
-          href={'https://github.com/Kiranism/next-shadcn-dashboard-starter'}
-          target="_blank"
-        >
-          <p className='font-bold text-lg'>Si Cetak</p>
-        </Link>
+      <div suppressHydrationWarning className="hidden p-5 pt-10 lg:block">
+        <Link href="/dashboard">Si Cetak</Link>
       </div>
       <ChevronLeft
         className={cn(
