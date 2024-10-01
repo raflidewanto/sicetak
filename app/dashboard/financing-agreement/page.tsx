@@ -1,7 +1,11 @@
+'use client';
+'use client';
+'use client';
+
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import PageContainer from '@/components/layout/page-container';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import CetakIsi from '@/features/financing-agreement/components/cetak-isi';
+import AgreementNoInput from '@/features/financing-agreement/components/agreement-no-input';
 import FinancingAgreementTable from '@/features/financing-agreement/components/table';
 
 const breadCrumbsItems = [
@@ -36,7 +40,7 @@ const FinancingAgreementPage = () => {
           />
         </TabsContent>
         <TabsContent value="isi">
-          <CetakIsi />
+          <AgreementNoInput />
         </TabsContent>
       </Tabs>
     </PageContainer>

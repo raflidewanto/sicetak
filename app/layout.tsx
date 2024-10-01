@@ -8,14 +8,14 @@ import NextThemeProvider from '@/components/theme-provider';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Next Shadcn',
-  description: 'Basic dashboard with Next.js and Shadcn'
+  title: 'SICETAK',
+  description: 'si cetak'
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} overflow-hidden `} suppressHydrationWarning>
+      <body className={`${inter.className} overflow-hidden`} suppressHydrationWarning>
         <NextThemeProvider>
           <NextTopLoader showSpinner={false} />
           <Toaster />

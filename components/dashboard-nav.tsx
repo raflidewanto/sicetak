@@ -24,8 +24,6 @@ export function DashboardNav({ items, setOpen, isMobileNav = false }: DashboardN
     return null;
   }
 
-  console.log('isActive', isMobileNav, isMinimized);
-
   return (
     <nav className="grid items-start gap-2">
       <TooltipProvider>
@@ -59,7 +57,10 @@ export function DashboardNav({ items, setOpen, isMobileNav = false }: DashboardN
                   align="center"
                   side="right"
                   sideOffset={8}
-                  className={!isMinimized ? 'hidden' : 'inline-block'}
+                  className={cn(
+                    !isMinimized ? 'hidden' : 'inline-block',
+                    item.label?.toLowerCase() === 'logout' ? 'bg-red-300' : ''
+                  )}
                 >
                   {item.title}
                 </TooltipContent>
