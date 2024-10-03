@@ -20,6 +20,9 @@ const templatesV2: Array<Array<{ [key: string]: { [key: string]: 'perseorangan' 
         perseorangan: 'perseorangan',
         perusahaan: 'perusahaan'
       }
+    },
+    {
+      'Surat Kuasa Fidusia': {}
     }
   ],
   // Fasilitas Modal Usaha

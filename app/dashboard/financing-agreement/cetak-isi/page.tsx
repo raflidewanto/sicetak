@@ -28,7 +28,7 @@ const CetakIsiPage = () => {
         <p>OTR: </p>
         <p>Tenor: </p>
       </div>
-      <FinancingAgreementTable
+      {/* <FinancingAgreementTable
         actionlabel1="Cetak Dokumen"
         actionlabel2="Cetak Dokumen"
         productname="Formulir Permohonan Pembiayaan Laporan Survei Analisa Pembiayaan"
@@ -36,7 +36,7 @@ const CetakIsiPage = () => {
         tableheader1="Nama Produk"
         tableheader2="Cetak Perseorangan"
         tableheader3="Cetak Perusahaan"
-      />
+      /> */}
     </PageContainer>
   );
 };
