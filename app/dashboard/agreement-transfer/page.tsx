@@ -24,7 +24,7 @@ const AgreementTransferPage = () => {
           <TabsTrigger value="isi">Isi</TabsTrigger>
         </TabsList>
         <TabsContent value="template">
-          <FinancingAgreementTable
+          {/* <FinancingAgreementTable
             actionLabel1="Cetak Dokumen"
             actionLabel2="Cetak Dokumen"
             productName="Formulir Permohonan Pembiayaan Laporan Survei Analisa Pembiayaan"
@@ -32,7 +32,7 @@ const AgreementTransferPage = () => {
             tableHeader1="Nama Produk"
             tableHeader2="Cetak Perseorangan"
             tableHeader3="Cetak Perusahaan"
-          />
+          /> */}
         </TabsContent>
         <TabsContent value="isi">Cetak Isi</TabsContent>
       </Tabs>

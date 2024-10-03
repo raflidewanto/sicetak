@@ -16,11 +16,11 @@ const AgreementNoInput = () => {
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-start gap-x-4">
-        <div className="relative w-full max-w-md">
+        <div className="relative w-full">
           <Input
             name="agreement_no"
             placeholder="Agreement Number"
-            className="!pr-0"
+            className="max-w-md !pr-0"
             onChange={(e) => setAgreementNo(e.target.value)}
           />
           <Button

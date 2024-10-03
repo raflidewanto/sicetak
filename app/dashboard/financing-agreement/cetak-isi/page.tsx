@@ -29,13 +29,13 @@ const CetakIsiPage = () => {
         <p>Tenor: </p>
       </div>
       <FinancingAgreementTable
-        actionLabel1="Cetak Dokumen"
-        actionLabel2="Cetak Dokumen"
-        productName="Formulir Permohonan Pembiayaan Laporan Survei Analisa Pembiayaan"
-        tableCaption="Fasilitas Dana"
-        tableHeader1="Nama Produk"
-        tableHeader2="Cetak Perseorangan"
-        tableHeader3="Cetak Perusahaan"
+        actionlabel1="Cetak Dokumen"
+        actionlabel2="Cetak Dokumen"
+        productname="Formulir Permohonan Pembiayaan Laporan Survei Analisa Pembiayaan"
+        tablecaption="Fasilitas Dana"
+        tableheader1="Nama Produk"
+        tableheader2="Cetak Perseorangan"
+        tableheader3="Cetak Perusahaan"
       />
     </PageContainer>
   );
