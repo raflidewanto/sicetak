@@ -2,6 +2,7 @@
 
 import ClientOnly from '@/components/elements/client-only';
 import { config, initialData } from '@/components/puck';
+import { VISUAL_EDITOR_CONFIG, VISUAL_EDITOR_HTML, VISUAL_EDITOR_PREVIEW } from '@/constants/data';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { Config, Puck, Render } from '@measured/puck';
 import { ScanEye } from 'lucide-react';
@@ -10,8 +11,9 @@ import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
 const CreateNewTemplatePage = () => {
-  const [, setStoredConfig] = useLocalStorage('puck-editor-preview', initialData);
-  const [, setHTML] = useLocalStorage('puck-html', '');
+  const [, setStoredConfig] = useLocalStorage(VISUAL_EDITOR_PREVIEW, initialData);
+  const [, setHTML] = useLocalStorage(VISUAL_EDITOR_HTML, '');
+  const [, setPuckConfig] = useLocalStorage(VISUAL_EDITOR_CONFIG, '');
 
   return (
     <ClientOnly>
@@ -19,12 +21,13 @@ const CreateNewTemplatePage = () => {
         config={config as Config}
         data={initialData}
         onPublish={() => {
-          localStorage.setItem('data', JSON.stringify(initialData));
+          window.location.replace('/dashboard/templates/new/confirm');
         }}
         onChange={(data) => {
           setStoredConfig(data);
           const htmlContent = renderToStaticMarkup(<Render config={config as Config} data={data} />);
           setHTML(htmlContent);
+          setPuckConfig(JSON.stringify(data));
         }}
         overrides={{
           // eslint-disable-next-line react/no-unstable-nested-components

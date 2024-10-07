@@ -100,7 +100,7 @@ export const Heading: ComponentConfig<HeadingProps> = {
     textDecoration: 'none'
   },
   render: ({ title, textAlign, size, fontWeight, textDecoration }) => (
-    <div style={{ padding: 64 }}>
+    <div style={{ paddingTop: 64, paddingBottom: 28 }}>
       <h1
         style={{
           textAlign,

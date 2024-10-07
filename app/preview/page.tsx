@@ -2,11 +2,12 @@
 
 import ClientOnly from '@/components/elements/client-only';
 import { config } from '@/components/puck';
+import { VISUAL_EDITOR_PREVIEW } from '@/constants/data';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { Config, Data, Render } from '@measured/puck';
 
 const Preview = () => {
-  const [storedConfig] = useLocalStorage('puck-editor-preview', {});
+  const [storedConfig] = useLocalStorage(VISUAL_EDITOR_PREVIEW, {});
 
   return (
     <ClientOnly>

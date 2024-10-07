@@ -3,7 +3,6 @@ import { ComponentConfig, DropZone } from '@measured/puck';
 
 export type ColumnsProps = {
   columns: '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11' | '12';
-  className?: string;
 };
 
 export const Columns: ComponentConfig<ColumnsProps> = {
@@ -12,10 +11,6 @@ export const Columns: ComponentConfig<ColumnsProps> = {
     columns: '1'
   },
   fields: {
-    className: {
-      type: 'text',
-      label: 'Class Name'
-    },
     columns: {
       type: 'radio',
       options: [
@@ -34,12 +29,11 @@ export const Columns: ComponentConfig<ColumnsProps> = {
       ]
     }
   },
-  render: ({ columns, className }) => {
+  render: ({ columns }) => {
     return (
       <div
         className={cn(`container grid grid-cols-1 content-center justify-items-center gap-6`, {
-          [`sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:grid-cols-${columns}`]: true,
-          className
+          [`sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:grid-cols-${columns}`]: true
         })}
       >
         {Array.from({ length: Number(columns) }).map((_, index) => (
