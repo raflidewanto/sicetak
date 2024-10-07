@@ -9,7 +9,7 @@ const breadCrumbsItems = [
     title: 'Financing Agreement'
   },
   {
-    link: '/dashboard/financing-agreement/cetak-isi',
+    link: '/dashboard/financing-agreement/print-content',
     title: 'Cetak Isi'
   }
 ];

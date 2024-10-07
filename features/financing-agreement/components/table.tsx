@@ -1,47 +1,10 @@
 import PrinterIcon from '@/components/icons/printer';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { productsTemplate } from '@/constants/data';
 import Link from 'next/link';
-
 import React from 'react';
 
 interface Props extends React.ComponentPropsWithRef<'table'> {}
-
-const templatesV2: Array<Array<{ [key: string]: { [key: string]: 'perseorangan' | 'perusahaan' } }>> = [
-  // Fasilitas Dana
-  [
-    {
-      'Formulir Data Calon Debitur Pengganti': {
-        perseorangan: 'perseorangan',
-        perusahaan: 'perusahaan'
-      }
-    },
-    {
-      'Formulir Survei Oper Alih - Agreement Transfer': {
-        perseorangan: 'perseorangan',
-        perusahaan: 'perusahaan'
-      }
-    },
-    {
-      'Surat Kuasa Fidusia': {}
-    }
-  ],
-  // Fasilitas Modal Usaha
-  [
-    {
-      'Formulir Data Calon Debitur Pengganti': {
-        perseorangan: 'perseorangan',
-        perusahaan: 'perusahaan'
-      }
-    },
-    {
-      'Formulir Survei Oper Alih - Agreement Transfer': {
-        perseorangan: 'perseorangan',
-        perusahaan: 'perusahaan'
-      }
-    }
-  ]
-  // and so on
-];
 
 function getTableCaption(key: string) {
   const tableCaptions = {
@@ -59,9 +22,9 @@ function getTableCaption(key: string) {
 const FinancingAgreementTable = (props: Props) => {
   return (
     <>
-      {templatesV2.map((templates, index) => (
+      {Object.entries(productsTemplate).map(([categoryKey, templates], index) => (
         <div key={index} className="mb-6">
-          <Table key={index} {...props}>
+          <Table {...props}>
             <TableCaption>{getTableCaption(`${index}`)}</TableCaption>
             <TableHeader>
               <TableRow>
@@ -71,26 +34,35 @@ const FinancingAgreementTable = (props: Props) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {templates.map((template, templateIndex) => {
-                const templateName = Object.keys(template)[0];
-                return (
-                  <TableRow key={templateIndex}>
-                    <TableCell className="font-medium">{templateName}</TableCell>
-                    <TableCell>
-                      <Link href="/dashboard/financing-agreement/" className="flex items-center justify-start">
-                        <PrinterIcon className="mr-2" />
-                        <p>Cetak Dokumen</p>
-                      </Link>
-                    </TableCell>
-                    <TableCell>
-                      <Link href="/" className="flex items-center justify-start">
-                        <PrinterIcon className="mr-2" />
-                        <p>Cetak Dokumen</p>
-                      </Link>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+              {Object.entries(templates).map(([templateKey, templateName], templateIndex) => (
+                <TableRow key={templateIndex}>
+                  <TableCell className="font-medium">{templateName}</TableCell>
+                  <TableCell>
+                    <Link
+                      href={`/dashboard/financing-agreement/templates/${categoryKey}?type=personal&document-id=${templateKey
+                        .toLocaleLowerCase()
+                        .split(' ')
+                        .join('-')}`}
+                      className="flex items-center justify-start"
+                    >
+                      <PrinterIcon className="mr-2" />
+                      <p>Cetak Dokumen</p>
+                    </Link>
+                  </TableCell>
+                  <TableCell>
+                    <Link
+                      href={`/dashboard/financing-agreement/templates/${categoryKey}?type=company&document-id=${templateKey
+                        .toLocaleLowerCase()
+                        .split(' ')
+                        .join('-')}`}
+                      className="flex items-center justify-start"
+                    >
+                      <PrinterIcon className="mr-2" />
+                      <p>Cetak Dokumen</p>
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </div>

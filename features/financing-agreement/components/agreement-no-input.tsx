@@ -26,7 +26,7 @@ const AgreementNoInput = () => {
           <Button
             tabIndex={0}
             variant={'outline'}
-            onClick={() => router.push(`${pathname}/cetak-isi?agreement-no=${agreementNo}`)}
+            onClick={() => router.push(`${pathname}/print-content?agreement-no=${agreementNo}`)}
             className="absolute right-0 top-1/2 -translate-y-1/2 transform" // Position the button
           >
             <Search color={theme === 'dark' ? '#ffffff' : '#070102'} size={18} />
