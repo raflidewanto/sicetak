@@ -25,7 +25,7 @@ const TemplateCard = (props: Props) => {
           {/* Link to view/edit the template */}
           <Link
             href={`/print/${doc_templ_id}`}
-            className="inline-block rounded-lg bg-indigo-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-600"
+            className="inline-block rounded-lg bg-indigo-500 px-4 py-2 text-sm font-medium transition-colors hover:bg-indigo-600"
           >
             View Template
           </Link>
