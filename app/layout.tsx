@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google';
 import NextTopLoader from 'nextjs-toploader';
 import './globals.css';
 import NextThemeProvider from '@/components/theme-provider';
+import ReactQueryProvider from '@/components/contexts/react-query';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -17,9 +18,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en">
       <body className={`${inter.className} overflow-hidden`} suppressHydrationWarning>
         <NextThemeProvider>
-          <NextTopLoader showSpinner={false} />
-          <Toaster />
-          {children}
+          <ReactQueryProvider>
+            <NextTopLoader showSpinner={false} />
+            <Toaster />
+            {children}
+          </ReactQueryProvider>
         </NextThemeProvider>
       </body>
     </html>
