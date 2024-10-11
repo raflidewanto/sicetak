@@ -5,7 +5,7 @@ import * as PDFJS from 'pdfjs-dist/types/src/pdf';
 
 export const usePDFJS = (
   onLoad: (pdfjs: typeof PDFJS) => Promise<void>,
-  deps: (string | number | boolean | undefined | null)[] = []
+  deps: (string | number | boolean | undefined | null | File)[] = []
 ) => {
   const [pdfjs, setPDFJS] = useState<typeof PDFJS | null>(null);
 
