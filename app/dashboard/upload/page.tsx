@@ -22,13 +22,18 @@ export default function PDFPlaceholderPage() {
       for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber++) {
         const page = await pdfDocument.getPage(pageNumber);
         const textContent = await page.getTextContent();
+        const viewport = page.getViewport({ scale: 1 }); // Get the page height from the viewport
+        const pageHeight = viewport.height;
+        const scaleFactor = viewport.scale; // Use this scale factor for adjustments
+
         let accumulatedText = '';
         let itemCoordinates: { str: string; x: number; y: number }[] = [];
 
         textContent.items.forEach((item: any) => {
           const str = item.str;
-          const x = item.transform[4];
-          const y = item.transform[5];
+
+          const x = item.transform[4] * scaleFactor;
+          const y = pageHeight - item.transform[5] * scaleFactor - 46; // Experiment with the `- 44` offset
 
           accumulatedText += str;
           itemCoordinates.push({ str, x, y });
