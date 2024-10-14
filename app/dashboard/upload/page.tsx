@@ -1,16 +1,22 @@
 'use client';
 
 import PageContainer from '@/components/layout/page-container';
+import { Button } from '@/components/ui/button';
+import { useUpload } from '@/features/templates/mutations/use-upload';
 import { usePDFJS } from '@/hooks/use-pdfjs';
 import React, { useState } from 'react';
-import axios from 'axios';
-import { getErrorMessage } from '@/utils/error';
-import { useUpload } from '@/features/templates/mutations/use-upload';
+
+type bracketPlaceholder = {
+  placeholder: string;
+  x: number;
+  y: number;
+  page: number;
+};
 
 export default function PDFPlaceholderPage() {
   const [file, setFile] = useState<File | null>(null);
   const [agreementNumber, setAgreementNumber] = useState<string>('');
-  const [bracketCoordinates, setBracketCoordinates] = useState<{ placeholder: string; x: number; y: number }[]>([]);
+  const [bracketCoordinates, setBracketCoordinates] = useState<bracketPlaceholder[]>([]);
   const uploadMutation = useUpload();
 
   const onLoadPDFJS = async (pdfjs: any) => {
@@ -22,7 +28,7 @@ export default function PDFPlaceholderPage() {
       const loadingTask = pdfjs.getDocument({ data: typedArray });
       const pdfDocument = await loadingTask.promise;
 
-      let allBracketCoordinates: { placeholder: string; x: number; y: number }[] = [];
+      let allBracketCoordinates: { placeholder: string; x: number; y: number; page: number }[] = []; // Add page field
 
       for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber++) {
         const page = await pdfDocument.getPage(pageNumber);
@@ -38,7 +44,7 @@ export default function PDFPlaceholderPage() {
           const str = item.str;
 
           const x = item.transform[4] * scaleFactor + 10;
-          const y = pageHeight - item.transform[5] * scaleFactor - 46; // Experiment with the `- 46` offset
+          const y = pageHeight - item.transform[5] * scaleFactor - 46;
 
           accumulatedText += str;
           itemCoordinates.push({ str, x, y });
@@ -66,14 +72,14 @@ export default function PDFPlaceholderPage() {
             allBracketCoordinates.push({
               placeholder: placeholderText,
               x: firstBracketCoordinates.x,
-              y: firstBracketCoordinates.y
+              y: firstBracketCoordinates.y,
+              page: pageNumber
             });
           }
         }
       }
 
       setBracketCoordinates(allBracketCoordinates);
-      console.log('Collected Placeholder Coordinates:', allBracketCoordinates);
     };
 
     if (file) {
@@ -94,35 +100,65 @@ export default function PDFPlaceholderPage() {
     if (!file || !agreementNumber) return;
 
     const formData = new FormData();
-    formData.append('File', file);
-    formData.append('agreementNumber', agreementNumber);
-    formData.append('coordinates', JSON.stringify(bracketCoordinates));
+    formData.append('file', file);
+    formData.append('agreement_no', agreementNumber);
+    formData.append('placeholders', JSON.stringify(bracketCoordinates));
 
     uploadMutation.mutate(formData, {
-      onSuccess: () => {
-        console.log('success upload');
+      onSuccess: (data) => {
+        try {
+          const blob = new Blob([data], { type: 'application/pdf' });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'output.pdf'; // Name for the file
+          document.body.appendChild(a);
+          a.click(); // Trigger the download
+          a.remove(); // Clean up
+        } catch (err) {
+          console.error('Error processing the PDF download:', err);
+        }
       },
       onError: (error) => {
-        console.error('error', error.message);
+        console.error('Error during upload:', error.message);
       }
     });
   };
 
   return (
-    <PageContainer>
-      <h1 className="mb-4 text-2xl font-semibold text-gray-800">Upload PDF and Find Placeholder Coordinates</h1>
+    <PageContainer scrollable>
+      <h1 className="mb-4 text-2xl font-semibold text-gray-800">Cetak Isi</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <label htmlFor="pdf-file" className="block text-sm font-medium text-gray-700">
+        <div className="space-y-4">
+          <label htmlFor="pdf-file" className="block text-sm font-medium text-gray-800">
             Upload PDF File
           </label>
-          <input
-            id="pdf-file"
-            type="file"
-            accept=".pdf"
-            onChange={handleFileChange}
-            className="block w-full cursor-pointer rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-900 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <div className="relative flex items-center justify-center">
+            <input
+              id="pdf-file"
+              type="file"
+              accept=".pdf"
+              onChange={handleFileChange}
+              className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+            />
+            <div
+              className={`flex w-full items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm shadow-sm transition-all ${
+                file ? 'border-green-400 bg-green-100 text-green-600' : 'text-gray-500 hover:bg-gray-100'
+              }`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className={`mr-2 h-5 w-5 ${file ? 'text-green-600' : 'text-gray-500'}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              <span>{file ? file.name : 'Select PDF'}</span>
+            </div>
+          </div>
+          <p className="text-xs text-gray-500">PDF files only (max size: 10MB)</p>
         </div>
 
         <div className="space-y-2">
@@ -140,12 +176,7 @@ export default function PDFPlaceholderPage() {
           />
         </div>
 
-        <button
-          type="submit"
-          className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-        >
-          Submit
-        </button>
+        <Button type="submit">Submit</Button>
       </form>
 
       <div className="mt-6">
@@ -155,7 +186,7 @@ export default function PDFPlaceholderPage() {
             {bracketCoordinates.map((bracket, index) => (
               <li key={index} className="text-sm text-gray-600">
                 <strong>Placeholder:</strong> {bracket.placeholder}, <strong>X:</strong> {bracket.x},{' '}
-                <strong>Y:</strong> {bracket.y}
+                <strong>Y:</strong> {bracket.y}, <strong>Page:</strong> {bracket.page} {/* Show page number */}
               </li>
             ))}
           </ul>

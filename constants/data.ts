@@ -6,22 +6,16 @@ export const VISUAL_EDITOR_HTML = '__puckHtml';
 
 export const navItems: NavItem[] = [
   {
-    title: 'Templates',
-    href: '/dashboard/templates',
+    title: 'Cetak PDF',
+    href: '/dashboard/upload',
+    icon: 'pdf',
+    label: 'Print PDF'
+  },
+  {
+    title: 'Approval',
+    href: '/dashboard/approval',
     icon: 'check',
-    label: 'Document Templates'
-  },
-  {
-    title: 'Financing Agreement',
-    href: '/dashboard/financing-agreement',
-    icon: 'finance',
-    label: 'Financing Agreement'
-  },
-  {
-    title: 'Agreement Transfer',
-    href: '/dashboard/agreement-transfer',
-    icon: 'surat',
-    label: 'Agreement Transfer'
+    label: 'Approval'
   },
   {
     title: 'Logout',
