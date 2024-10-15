@@ -33,6 +33,7 @@ export default function PDFPlaceholderPage() {
       for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber++) {
         const page = await pdfDocument.getPage(pageNumber);
         const textContent = await page.getTextContent();
+
         const viewport = page.getViewport({ scale: 1 });
         const pageHeight = viewport.height;
         const scaleFactor = viewport.scale;
@@ -42,7 +43,6 @@ export default function PDFPlaceholderPage() {
 
         textContent.items.forEach((item: any) => {
           const str = item.str;
-
           const x = item.transform[4] * scaleFactor + 10;
           const y = pageHeight - item.transform[5] * scaleFactor - 46;
 
@@ -111,10 +111,10 @@ export default function PDFPlaceholderPage() {
           const url = window.URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
-          a.download = 'output.pdf'; // Name for the file
+          a.download = 'output.pdf';
           document.body.appendChild(a);
-          a.click(); // Trigger the download
-          a.remove(); // Clean up
+          a.click();
+          a.remove();
         } catch (err) {
           console.error('Error processing the PDF download:', err);
         }
@@ -178,22 +178,6 @@ export default function PDFPlaceholderPage() {
 
         <Button type="submit">Submit</Button>
       </form>
-
-      <div className="mt-6">
-        <h2 className="text-xl font-semibold text-gray-800">Placeholders Found:</h2>
-        {bracketCoordinates.length > 0 ? (
-          <ul className="mt-4 space-y-2">
-            {bracketCoordinates.map((bracket, index) => (
-              <li key={index} className="text-sm text-gray-600">
-                <strong>Placeholder:</strong> {bracket.placeholder}, <strong>X:</strong> {bracket.x},{' '}
-                <strong>Y:</strong> {bracket.y}, <strong>Page:</strong> {bracket.page} {/* Show page number */}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="mt-2 text-sm text-gray-500">No placeholders found.</p>
-        )}
-      </div>
     </PageContainer>
   );
 }
