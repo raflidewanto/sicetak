@@ -15,7 +15,6 @@ type bracketPlaceholder = {
 
 export default function PDFPlaceholderPage() {
   const [file, setFile] = useState<File | null>(null);
-  const [agreementNumber, setAgreementNumber] = useState<string>('');
   const [bracketCoordinates, setBracketCoordinates] = useState<bracketPlaceholder[]>([]);
   const uploadMutation = useUpload();
 
@@ -28,7 +27,7 @@ export default function PDFPlaceholderPage() {
       const loadingTask = pdfjs.getDocument({ data: typedArray });
       const pdfDocument = await loadingTask.promise;
 
-      let allBracketCoordinates: { placeholder: string; x: number; y: number; page: number }[] = []; // Add page field
+      let allBracketCoordinates: { placeholder: string; x: number; y: number; page: number }[] = [];
 
       for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber++) {
         const page = await pdfDocument.getPage(pageNumber);
@@ -43,8 +42,8 @@ export default function PDFPlaceholderPage() {
 
         textContent.items.forEach((item: any) => {
           const str = item.str;
-          const x = item.transform[4] * scaleFactor + 10;
-          const y = pageHeight - item.transform[5] * scaleFactor - 46;
+          const x = item.transform[4] * scaleFactor + 3;
+          const y = pageHeight - item.transform[5] * scaleFactor + 40;
 
           accumulatedText += str;
           itemCoordinates.push({ str, x, y });
@@ -97,17 +96,18 @@ export default function PDFPlaceholderPage() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!file || !agreementNumber) return;
+    if (!file) return;
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('agreement_no', agreementNumber);
     formData.append('placeholders', JSON.stringify(bracketCoordinates));
 
     uploadMutation.mutate(formData, {
       onSuccess: (data) => {
+        console.log({ data });
         try {
           const blob = new Blob([data], { type: 'application/pdf' });
+          console.log(blob.size);
           const url = window.URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
@@ -160,22 +160,6 @@ export default function PDFPlaceholderPage() {
           </div>
           <p className="text-xs text-gray-500">PDF files only (max size: 10MB)</p>
         </div>
-
-        <div className="space-y-2">
-          <label htmlFor="agreement-number" className="block text-sm font-medium text-gray-700">
-            Agreement Number
-          </label>
-          <input
-            id="agreement-number"
-            type="text"
-            value={agreementNumber}
-            onChange={(e) => setAgreementNumber(e.target.value)}
-            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter Agreement Number"
-            required
-          />
-        </div>
-
         <Button type="submit">Submit</Button>
       </form>
     </PageContainer>
