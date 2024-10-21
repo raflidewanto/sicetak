@@ -33,3 +33,7 @@ export async function printUsersPDFFromDocx(formData: FormData): Promise<DocxRes
     })
   );
 }
+
+export async function testWhitePDF() {
+  return apiResolver(() => axios.get('/documents/template'));
+}
