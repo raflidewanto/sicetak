@@ -42,8 +42,8 @@ export default function PDFPlaceholderPage() {
 
         textContent.items.forEach((item: any) => {
           const str = item.str;
-          const x = item.transform[4] * scaleFactor + 3;
-          const y = pageHeight - item.transform[5] * scaleFactor + 40;
+          const x = item.transform[4] * scaleFactor + 2; // print
+          const y = pageHeight - item.transform[5] * scaleFactor + 40; // print
 
           accumulatedText += str;
           itemCoordinates.push({ str, x, y });
