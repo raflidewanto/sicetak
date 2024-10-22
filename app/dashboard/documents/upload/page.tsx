@@ -2,6 +2,7 @@
 
 import PageContainer from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
+import { useUploadDoc } from '@/features/documents/mutations/use-upload-doc';
 import { useUpload } from '@/features/templates/mutations/use-upload';
 import { usePDFJS } from '@/hooks/use-pdfjs';
 import React, { useState } from 'react';
@@ -16,7 +17,7 @@ type bracketPlaceholder = {
 export default function PDFPlaceholderPage() {
   const [file, setFile] = useState<File | null>(null);
   const [bracketCoordinates, setBracketCoordinates] = useState<bracketPlaceholder[]>([]);
-  const uploadMutation = useUpload();
+  const uploadMutation = useUploadDoc();
 
   const onLoadPDFJS = async (pdfjs: any) => {
     if (!file) return;
@@ -42,8 +43,8 @@ export default function PDFPlaceholderPage() {
 
         textContent.items.forEach((item: any) => {
           const str = item.str;
-          const x = item.transform[4] * scaleFactor + 2; // print
-          const y = pageHeight - item.transform[5] * scaleFactor; // print
+          const x = item.transform[4] * scaleFactor + 2;
+          const y = pageHeight - item.transform[5] * scaleFactor; // for value, but for template add 40
 
           accumulatedText += str;
           itemCoordinates.push({ str, x, y });
@@ -104,20 +105,11 @@ export default function PDFPlaceholderPage() {
 
     uploadMutation.mutate(formData, {
       onSuccess: (data) => {
-        console.log({ data });
-        try {
-          const blob = new Blob([data], { type: 'application/pdf' });
-          console.log(blob.size);
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'output.pdf';
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-        } catch (err) {
-          console.error('Error processing the PDF download:', err);
+        if (data.success) {
+          window.location.href = '/dashboard/documents';
+          return;
         }
+        alert(data.message);
       },
       onError: (error) => {
         console.error('Error during upload:', error.message);
@@ -127,7 +119,6 @@ export default function PDFPlaceholderPage() {
 
   return (
     <PageContainer scrollable>
-      <h1 className="mb-4 text-2xl font-semibold text-gray-800">Cetak Isi</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-4">
           <label htmlFor="pdf-file" className="block text-sm font-medium text-gray-800">
