@@ -1,7 +1,11 @@
 'use client';
 
+import { useDeleteDoc } from '@/features/documents/mutations/use-delete-doc';
 import { Download, Printer, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Modal } from './ui/modal';
+import useDisclosure from '@/hooks/use-disclosure';
+import { Button } from './ui/button';
 
 type DocumentCardProps = {
   id: string;
@@ -13,6 +17,8 @@ type DocumentCardProps = {
 export default function DocumentCard(props: DocumentCardProps) {
   const { id, file_id, name, file } = props;
   const router = useRouter();
+  const deleteDocMutation = useDeleteDoc();
+  const { isOpen, onClose, onOpen } = useDisclosure();
 
   function handleDownload(file: string) {
     try {
@@ -26,7 +32,7 @@ export default function DocumentCard(props: DocumentCardProps) {
       const blob = new Blob([byteArray], { type: 'application/pdf' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = `${name}.pdf`;
+      link.download = `${name}`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -35,7 +41,16 @@ export default function DocumentCard(props: DocumentCardProps) {
     }
   }
 
-  function handleDelete(id: string) {}
+  function handleDelete(id: string) {
+    deleteDocMutation.mutate(id, {
+      onSuccess: () => {
+        window.location.reload();
+      },
+      onError: ({ name, message, cause }) => {
+        alert(`${name} - ${message} - ${cause}`);
+      }
+    });
+  }
 
   return (
     <div className="w-full overflow-hidden rounded-xl border border-gray-100 bg-white shadow-lg transition-all duration-300 hover:border-zinc-300 hover:shadow-xl">
@@ -57,7 +72,7 @@ export default function DocumentCard(props: DocumentCardProps) {
             Print
           </button>
           <button
-            onClick={() => handleDelete(id)}
+            onClick={() => onOpen()}
             className="group flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition-all duration-300 hover:border-red-300 hover:bg-red-50 hover:text-red-600"
           >
             <Trash2 size={16} className="mr-2 text-gray-400 group-hover:text-red-500" />
@@ -65,6 +80,19 @@ export default function DocumentCard(props: DocumentCardProps) {
           </button>
         </div>
       </div>
+      <Modal title="Delete Document" description="" isOpen={isOpen} onClose={() => onClose()}>
+        <div className="space-y-4">
+          <p>Are you sure you want to delete this document?</p>
+          <div className="space-x-4">
+            <Button variant={'destructive'} onClick={() => handleDelete(id)}>
+              Delete
+            </Button>
+            <Button variant={'ghost'} onClick={() => onClose()}>
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

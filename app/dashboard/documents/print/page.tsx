@@ -4,12 +4,13 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import PageContainer from '@/components/layout/page-container';
 import React, { useState, useEffect } from 'react';
 import { usePrintDocument } from '@/features/documents/mutations/use-print-doc';
+import { AGREEMENT_NO_QUERY, DOCUMENT_ID_QUERY } from '@/constants/data';
 
 const PrintDocumentPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const agreementNo = searchParams.get('agreement-no');
-  const documentId = searchParams.get('id');
+  const agreementNo = searchParams.get(AGREEMENT_NO_QUERY);
+  const documentId = searchParams.get(DOCUMENT_ID_QUERY);
 
   const [inputAgreementNo, setInputAgreementNo] = useState<string | null>(agreementNo);
 

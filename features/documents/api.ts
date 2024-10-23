@@ -60,3 +60,12 @@ type PrintResponse = {
 export async function printDocument(id: string, agreementNo: string): Promise<PrintResponse> {
   return apiResolver<PrintResponse>(() => axios.post(`/print?id=${id}&agreement-no=${agreementNo}`));
 }
+
+type DeleteResponse = {
+  message: string;
+  success: boolean;
+};
+
+export async function deleteDocument(id: string): Promise<DeleteResponse> {
+  return apiResolver<DeleteResponse>(() => axios.delete(`/delete/${id}`));
+}

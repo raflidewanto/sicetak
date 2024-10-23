@@ -1,8 +1,15 @@
 import { NavItem } from '@/types';
 
+// =====================================================
+// local storage
 export const VISUAL_EDITOR_CONFIG = '__puckConfig';
 export const VISUAL_EDITOR_PREVIEW = '__puckVisualEditorPreview';
 export const VISUAL_EDITOR_HTML = '__puckHtml';
+// =====================================================
+// search params
+export const AGREEMENT_NO_QUERY = 'agreement-no';
+export const DOCUMENT_ID_QUERY = 'id';
+// =====================================================
 
 export const navItems: NavItem[] = [
   {
