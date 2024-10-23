@@ -23,7 +23,8 @@ export default function Sidebar({ className }: SidebarProps) {
   return (
     <aside
       className={cn(
-        `relative  hidden h-screen flex-none border-r bg-orange-600 text-white transition-[width] duration-500 md:block dark:bg-slate-900 dark:text-orange-500`,
+        `relative hidden h-screen flex-none border-r bg-white text-zinc-950 transition-[width] duration-500 md:block 
+         dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200`, // Dark mode styles
         !isMinimized ? 'w-72' : 'w-[72px]',
         className
       )}
@@ -33,23 +34,23 @@ export default function Sidebar({ className }: SidebarProps) {
           <Show when={!isMinimized} fallback={<PrinterIcon />}>
             <div className="flex items-center justify-start space-x-2">
               <span>
-                <PrinterIcon />
+                <PrinterIcon className="text-orange-500 dark:text-slate-200" /> {/* Adjust icon color for dark mode */}
               </span>
-              <p className="hidden text-start text-lg font-bold md:block">Si Cetak</p>
+              <p className="hidden text-start text-lg font-bold text-black md:block dark:text-slate-200">Si Cetak</p>
             </div>
           </Show>
         </Link>
       </div>
       <ChevronLeft
         className={cn(
-          'absolute -right-3 top-10 z-50  cursor-pointer rounded-full border bg-background text-3xl text-foreground',
+          'absolute -right-3 top-10 z-50 cursor-pointer rounded-full border bg-white text-3xl text-zinc-950 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200', // Dark mode for Chevron
           isMinimized && 'rotate-180'
         )}
         onClick={handleToggle}
       />
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
-          <div className="mt-3 space-y-1">
+          <div className="mt-3 space-y-3">
             <DashboardNav items={navItems} />
           </div>
         </div>

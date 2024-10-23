@@ -6,10 +6,10 @@ export const VISUAL_EDITOR_HTML = '__puckHtml';
 
 export const navItems: NavItem[] = [
   {
-    title: 'Cetak PDF',
-    href: '/dashboard/upload',
-    icon: 'pdf',
-    label: 'Print PDF'
+    title: 'Cetak Dokumen',
+    href: '/dashboard/documents',
+    icon: 'page',
+    label: 'Documents'
   },
   {
     title: 'Approval',

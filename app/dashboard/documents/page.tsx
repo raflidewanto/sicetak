@@ -22,7 +22,7 @@ const DocumentsPage = () => {
     <PageContainer scrollable>
       <div className="flex w-full flex-col items-start justify-center gap-y-8">
         <Link href="/dashboard/documents/upload">
-          <Button>Upload Document</Button>
+          <Button variant={'linkHover1'}>Upload Document</Button>
         </Link>
         {data?.data.map((data) => (
           <DocumentCard key={data.file_id} file={data.file} file_id={data.file_id} name={data.name} id={data.file_id} />

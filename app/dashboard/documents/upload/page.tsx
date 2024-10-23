@@ -28,7 +28,7 @@ export default function PDFPlaceholderPage() {
       const loadingTask = pdfjs.getDocument({ data: typedArray });
       const pdfDocument = await loadingTask.promise;
 
-      let allBracketCoordinates: { placeholder: string; x: number; y: number; page: number }[] = [];
+      let allBracketCoordinates: bracketPlaceholder[] = [];
 
       for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber++) {
         const page = await pdfDocument.getPage(pageNumber);
@@ -39,40 +39,61 @@ export default function PDFPlaceholderPage() {
         const scaleFactor = viewport.scale;
 
         let accumulatedText = '';
-        let itemCoordinates: { str: string; x: number; y: number }[] = [];
+        let itemCoordinates: { str: string; x: number; y: number; endX: number }[] = [];
 
         textContent.items.forEach((item: any) => {
           const str = item.str;
-          const x = item.transform[4] * scaleFactor + 2;
-          const y = pageHeight - item.transform[5] * scaleFactor; // for value, but for template add 40
+          const x = item.transform[4] * scaleFactor;
+          const y = pageHeight - item.transform[5] * scaleFactor;
 
+          // Calculate the end X position by adding the width of the text
+          const endX = x + (item.width || 0) * scaleFactor;
+
+          itemCoordinates.push({
+            str,
+            x,
+            y,
+            endX
+          });
           accumulatedText += str;
-          itemCoordinates.push({ str, x, y });
         });
 
-        const placeholderRegex = /{{\s*\$\.[\w]+\s*}}/g;
+        const placeholderRegex = /{{\s*\$[\w]+\s*}}/g;
         let match;
 
         while ((match = placeholderRegex.exec(accumulatedText)) !== null) {
           const placeholderText = match[0];
           const placeholderStartIndex = match.index;
-          let firstBracketCoordinates = null;
 
-          let accumulatedLength = 0;
-          for (const { str, x, y } of itemCoordinates) {
-            accumulatedLength += str.length;
+          // Find the correct text item that contains the opening brackets
+          let currentLength = 0;
+          let bracketX = 0;
+          let bracketY = 0;
 
-            if (accumulatedLength >= placeholderStartIndex) {
-              firstBracketCoordinates = { x, y };
+          for (let i = 0; i < itemCoordinates.length; i++) {
+            const item = itemCoordinates[i];
+            const nextLength = currentLength + item.str.length;
+
+            // Check if this item contains the start of the placeholder
+            if (currentLength <= placeholderStartIndex && placeholderStartIndex < nextLength) {
+              // Calculate the position of the first bracket within this text item
+              const offsetInItem = placeholderStartIndex - currentLength;
+              const beforeBracketText = item.str.substring(0, offsetInItem);
+
+              const approximateCharWidth = (item.endX - item.x) / item.str.length;
+              bracketX = item.x + approximateCharWidth * offsetInItem - 2;
+              bracketY = item.y;
               break;
             }
+
+            currentLength = nextLength;
           }
 
-          if (firstBracketCoordinates) {
+          if (bracketX !== 0) {
             allBracketCoordinates.push({
               placeholder: placeholderText,
-              x: firstBracketCoordinates.x,
-              y: firstBracketCoordinates.y,
+              x: bracketX,
+              y: bracketY,
               page: pageNumber
             });
           }
