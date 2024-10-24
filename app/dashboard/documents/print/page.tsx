@@ -5,10 +5,12 @@ import PageContainer from '@/components/layout/page-container';
 import React, { useState, useEffect } from 'react';
 import { usePrintDocument } from '@/features/documents/mutations/use-print-doc';
 import { AGREEMENT_NO_QUERY, DOCUMENT_ID_QUERY } from '@/constants/data';
+import { useToast } from '@/components/ui/use-toast';
 
 const PrintDocumentPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const toast = useToast();
   const agreementNo = searchParams.get(AGREEMENT_NO_QUERY);
   const documentId = searchParams.get(DOCUMENT_ID_QUERY);
 
@@ -37,7 +39,9 @@ const PrintDocumentPage = () => {
 
   function handleDownload() {
     if (!documentId || !inputAgreementNo) {
-      alert('Please enter an agreement number.');
+      toast.toast({
+        title: `Please enter both agreement number.`
+      });
       return;
     }
 
@@ -67,7 +71,9 @@ const PrintDocumentPage = () => {
         window.URL.revokeObjectURL(url);
       },
       onError: (error) => {
-        alert('Failed to download document.');
+        toast.toast({
+          title: `Error downloading the file: ${error.message}`
+        });
       }
     });
   }

@@ -6,6 +6,7 @@ import { getErrorMessage } from '@/utils/error';
 import { Download, Printer, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { AlertModal } from './modal/alert-modal';
+import { useToast } from './ui/use-toast';
 
 type DocumentCardProps = {
   id: string;
@@ -19,6 +20,7 @@ export default function DocumentCard(props: DocumentCardProps) {
   const router = useRouter();
   const deleteDocMutation = useDeleteDoc();
   const { isOpen, onClose, onOpen } = useDisclosure();
+  const toast = useToast();
 
   function handleDownload(file: string) {
     try {
@@ -37,7 +39,10 @@ export default function DocumentCard(props: DocumentCardProps) {
       link.click();
       document.body.removeChild(link);
     } catch (error) {
-      alert(`Error downloading the file: ${getErrorMessage(error)}`);
+      toast.toast({
+        title: `Error downloading the file: ${getErrorMessage(error)}`
+      });
+      return;
     }
   }
 
@@ -47,7 +52,9 @@ export default function DocumentCard(props: DocumentCardProps) {
         window.location.reload();
       },
       onError: ({ name, message, cause }) => {
-        alert(`${name} - ${message} - ${cause}`);
+        toast.toast({
+          title: `Error deleting the file: ${name} - ${message} - ${cause}`
+        });
       }
     });
   }

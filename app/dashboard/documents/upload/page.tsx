@@ -2,6 +2,7 @@
 
 import PageContainer from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 import { useUploadDoc } from '@/features/documents/mutations/use-upload-doc';
 import { usePDFJS } from '@/hooks/use-pdfjs';
 import React, { useState } from 'react';
@@ -17,6 +18,7 @@ export default function PDFPlaceholderPage() {
   const [file, setFile] = useState<File | null>(null);
   const [bracketCoordinates, setBracketCoordinates] = useState<bracketPlaceholder[]>([]);
   const uploadMutation = useUploadDoc();
+  const toast = useToast();
 
   const onLoadPDFJS = async (pdfjs: any) => {
     if (!file) return;
@@ -129,10 +131,14 @@ export default function PDFPlaceholderPage() {
           window.location.href = '/dashboard/documents';
           return;
         }
-        alert(data.message);
+        toast.toast({
+          title: `Error uploading the file: ${data.message}`
+        });
       },
       onError: (error) => {
-        alert(error.message);
+        toast.toast({
+          title: `Error uploading the file: ${error.message}`
+        });
       }
     });
   };
