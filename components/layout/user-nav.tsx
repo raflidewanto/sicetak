@@ -11,7 +11,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { signOut } from 'next-auth/react';
+
 export function UserNav() {
   return (
     <DropdownMenu>
@@ -23,14 +23,18 @@ export function UserNav() {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
+      <DropdownMenuContent
+        className="w-56 dark:border-orange-800 dark:bg-zinc-900 dark:text-white"
+        align="end"
+        forceMount
+      >
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">name</p>
             <p className="text-xs leading-none text-muted-foreground">email</p>
           </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator color="#9a3412" />
         <DropdownMenuGroup>
           <DropdownMenuItem>
             Profile
@@ -46,8 +50,8 @@ export function UserNav() {
           </DropdownMenuItem>
           <DropdownMenuItem>New Team</DropdownMenuItem>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => signOut()}>
+        <DropdownMenuSeparator color="#9a3412" />
+        <DropdownMenuItem onClick={() => {}}>
           Log out
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>

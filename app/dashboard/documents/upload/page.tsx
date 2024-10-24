@@ -3,7 +3,6 @@
 import PageContainer from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
 import { useUploadDoc } from '@/features/documents/mutations/use-upload-doc';
-import { useUpload } from '@/features/templates/mutations/use-upload';
 import { usePDFJS } from '@/hooks/use-pdfjs';
 import React, { useState } from 'react';
 
@@ -78,7 +77,7 @@ export default function PDFPlaceholderPage() {
             if (currentLength <= placeholderStartIndex && placeholderStartIndex < nextLength) {
               // Calculate the position of the first bracket within this text item
               const offsetInItem = placeholderStartIndex - currentLength;
-              const beforeBracketText = item.str.substring(0, offsetInItem);
+              // const beforeBracketText = item.str.substring(0, offsetInItem);
 
               const approximateCharWidth = (item.endX - item.x) / item.str.length;
               bracketX = item.x + approximateCharWidth * offsetInItem - 2;
@@ -133,16 +132,16 @@ export default function PDFPlaceholderPage() {
         alert(data.message);
       },
       onError: (error) => {
-        console.error('Error during upload:', error.message);
+        alert(error.message);
       }
     });
   };
 
   return (
     <PageContainer scrollable>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4 dark:text-white">
         <div className="space-y-4">
-          <label htmlFor="pdf-file" className="block text-sm font-medium text-gray-800">
+          <label htmlFor="pdf-file" className="block text-sm font-medium dark:text-gray-200">
             Upload PDF File
           </label>
           <div className="relative flex items-center justify-center">
@@ -154,13 +153,17 @@ export default function PDFPlaceholderPage() {
               className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
             />
             <div
-              className={`flex w-full items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm shadow-sm transition-all ${
-                file ? 'border-green-400 bg-green-100 text-green-600' : 'text-gray-500 hover:bg-gray-100'
+              className={`flex w-full items-center justify-center rounded-lg border px-4 py-3 text-sm shadow-sm transition-all ${
+                file
+                  ? 'border-green-400 bg-green-100 text-green-600 dark:border-green-500 dark:bg-green-900 dark:text-green-300'
+                  : 'border-gray-300 bg-white text-gray-500 hover:bg-gray-100 dark:border-orange-800 dark:bg-orange-950 dark:text-gray-300 dark:hover:bg-gray-700'
               }`}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className={`mr-2 h-5 w-5 ${file ? 'text-green-600' : 'text-gray-500'}`}
+                className={`mr-2 h-5 w-5 ${
+                  file ? 'text-green-600 dark:text-green-300' : 'text-gray-500 dark:text-gray-400'
+                }`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -170,7 +173,7 @@ export default function PDFPlaceholderPage() {
               <span>{file ? file.name : 'Select PDF'}</span>
             </div>
           </div>
-          <p className="text-xs text-gray-500">PDF files only (max size: 10MB)</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">PDF files only (max size: 10MB)</p>
         </div>
         <Button type="submit">Submit</Button>
       </form>

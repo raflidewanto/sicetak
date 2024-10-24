@@ -67,5 +67,5 @@ type DeleteResponse = {
 };
 
 export async function deleteDocument(id: string): Promise<DeleteResponse> {
-  return apiResolver<DeleteResponse>(() => axios.delete(`/delete/${id}`));
+  return apiResolver<DeleteResponse>(() => axios.post(`/delete/${id}`));
 }

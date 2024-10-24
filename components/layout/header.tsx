@@ -5,7 +5,7 @@ import { UserNav } from './user-nav';
 
 export default function Header() {
   return (
-    <header className="sticky inset-x-0 top-0 w-full dark:bg-slate-800">
+    <header className="sticky inset-x-0 top-0 w-full dark:bg-zinc-900">
       <nav className="flex items-center justify-between px-4 py-2 md:justify-end">
         <div className={cn('block lg:!hidden')}>
           <MobileSidebar />

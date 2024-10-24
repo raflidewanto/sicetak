@@ -19,12 +19,6 @@ export const navItems: NavItem[] = [
     label: 'Documents'
   },
   {
-    title: 'Approval',
-    href: '/dashboard/approval',
-    icon: 'check',
-    label: 'Approval'
-  },
-  {
     title: 'Logout',
     href: '/',
     icon: 'login',

@@ -67,7 +67,6 @@ const PrintDocumentPage = () => {
         window.URL.revokeObjectURL(url);
       },
       onError: (error) => {
-        console.error('Error downloading document:', error);
         alert('Failed to download document.');
       }
     });

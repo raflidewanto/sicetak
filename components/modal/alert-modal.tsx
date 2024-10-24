@@ -8,9 +8,16 @@ interface AlertModalProps {
   onClose: () => void;
   onConfirm: () => void;
   loading: boolean;
+  actionName?: string;
 }
 
-export const AlertModal: React.FC<AlertModalProps> = ({ isOpen, onClose, onConfirm, loading }) => {
+export const AlertModal: React.FC<AlertModalProps> = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  loading,
+  actionName = 'Continue'
+}) => {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -28,7 +35,7 @@ export const AlertModal: React.FC<AlertModalProps> = ({ isOpen, onClose, onConfi
           Cancel
         </Button>
         <Button disabled={loading} variant="destructive" onClick={onConfirm}>
-          Continue
+          {actionName}
         </Button>
       </div>
     </Modal>

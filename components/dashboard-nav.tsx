@@ -59,7 +59,7 @@ export function DashboardNav({ items, setOpen, isMobileNav = false }: DashboardN
                   sideOffset={8}
                   className={cn(
                     !isMinimized ? 'hidden' : 'inline-block',
-                    item.label?.toLowerCase() === 'logout' ? 'bg-red-300' : ''
+                    item.label?.toLowerCase() === 'logout' ? 'bg-red-500' : ''
                   )}
                 >
                   {item.title}
