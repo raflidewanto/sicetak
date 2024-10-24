@@ -31,6 +31,25 @@ const apiResolver = async <ClientResponse = any>(fetcher: () => Promise<AxiosRes
       throw new Error(JSON.stringify(err));
     }
     if (err instanceof Error) {
+      const abortSignalError = ['TimeoutError', 'AbortError', 'TypeError'];
+      if (abortSignalError.includes(err.name)) {
+        let errorMessage = '';
+        switch (err.message) {
+          case 'TimeoutError':
+            errorMessage = 'Oops! Something went wrong, please try again later.';
+            break;
+          case 'AbortError':
+            errorMessage = 'Request aborted by user.';
+            break;
+          case 'TypeError':
+            errorMessage = 'AbortSignal is not supported!';
+            break;
+          default:
+            errorMessage = `Error: type: ${err.name}, message: ${err.message}`;
+            break;
+        }
+        throw new Error(errorMessage);
+      }
       const errorDetails = {
         message: err.message,
         status: err.name,
@@ -38,9 +57,17 @@ const apiResolver = async <ClientResponse = any>(fetcher: () => Promise<AxiosRes
         stack: err.stack
       };
       throw new Error(JSON.stringify(errorDetails));
+    } else {
+      throw new Error(getErrorMessage(err));
     }
-    throw new Error(getErrorMessage(err));
   }
 };
+
+export function newAbortSignal(timeoutMs: number) {
+  const abortController = new AbortController();
+  setTimeout(() => abortController.abort(), timeoutMs || 0);
+
+  return abortController.signal;
+}
 
 export default apiResolver;

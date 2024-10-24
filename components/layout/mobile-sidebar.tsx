@@ -1,15 +1,12 @@
 'use client';
+
 import { DashboardNav } from '@/components/dashboard-nav';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { navItems } from '@/constants/data';
 import { MenuIcon } from 'lucide-react';
 import React, { useState } from 'react';
 
-// import { Playlist } from "../data/playlists";
-
-interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
-  // playlists: Playlist[];
-}
+interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function MobileSidebar({ className }: SidebarProps) {
   const [open, setOpen] = useState(false);
@@ -17,7 +14,7 @@ export function MobileSidebar({ className }: SidebarProps) {
     <>
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
-          <MenuIcon />
+          <MenuIcon className="dark:text-white" />
         </SheetTrigger>
         <SheetContent side="left" className="bg-orange-500 !px-0 text-white dark:bg-slate-950">
           <div className="space-y-4 py-4">

@@ -43,7 +43,7 @@ export default function Sidebar({ className }: SidebarProps) {
       </div>
       <ChevronLeft
         className={cn(
-          'absolute -right-3 top-10 z-50 cursor-pointer rounded-full border bg-white text-3xl text-zinc-950 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200', // Dark mode for Chevron
+          'absolute -right-3 top-10 z-50 cursor-pointer rounded-full border bg-white text-3xl text-zinc-950 dark:border-zinc-700 dark:bg-zinc-900 dark:text-slate-200', // Dark mode for Chevron
           isMinimized && 'rotate-180'
         )}
         onClick={handleToggle}

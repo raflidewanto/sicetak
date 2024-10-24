@@ -6,6 +6,8 @@ import React, { useState, useEffect } from 'react';
 import { usePrintDocument } from '@/features/documents/mutations/use-print-doc';
 import { AGREEMENT_NO_QUERY, DOCUMENT_ID_QUERY } from '@/constants/data';
 import { useToast } from '@/components/ui/use-toast';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 const PrintDocumentPage = () => {
   const searchParams = useSearchParams();
@@ -81,31 +83,41 @@ const PrintDocumentPage = () => {
   return (
     <PageContainer>
       <div className="mx-auto mt-8 max-w-lg">
-        <h1 className="mb-4 text-2xl font-semibold">Print Document</h1>
+        <h1 className="mb-4 text-2xl font-semibold dark:text-white">Print Document</h1>
         <div className="mb-6">
-          <label htmlFor="agreementNo" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="agreementNo" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
             Agreement Number
           </label>
-          <input
+          <Input
             type="text"
             id="agreementNo"
             value={inputAgreementNo || ''}
             onChange={handleInputChange}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-teal-500 focus:outline-none focus:ring-teal-500 sm:text-sm"
+            className="
+            mt-1 block w-full 
+            rounded-md 
+            border border-gray-300 
+            px-3 py-2 
+            shadow-sm 
+            focus:outline-none 
+            sm:text-sm
+            dark:text-white
+            dark:caret-orange-500"
             placeholder="Enter agreement number"
           />
         </div>
 
         <div className="flex justify-end">
-          <button
+          <Button
+            variant={'outline'}
             onClick={handleDownload}
-            disabled={printMutation.isPending} // Disable button while loading
-            className={`inline-flex items-center rounded-md border border-transparent bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700 ${
+            disabled={printMutation.isPending}
+            className={`inline-flex items-center rounded-md px-4 py-2 text-sm font-medium ${
               printMutation.isPending && 'cursor-not-allowed opacity-50'
             }`}
           >
             {printMutation.isPending ? 'Downloading...' : 'Download PDF'}
-          </button>
+          </Button>
         </div>
       </div>
     </PageContainer>

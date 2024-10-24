@@ -35,16 +35,19 @@ export function DashboardNav({ items, setOpen, isMobileNav = false }: DashboardN
                   <Link
                     href={item.disabled ? '/' : item.href}
                     className={cn(
-                      'flex items-center gap-2 overflow-hidden rounded-md py-2 text-sm font-medium transition-all hover:border hover:border-orange-300 hover:bg-white hover:text-orange-500',
-                      path === item.href ? 'bg-orange-500 text-white' : 'transparent',
+                      `flex items-center gap-2 overflow-hidden rounded-md py-2 text-sm font-medium transition-all hover:border hover:border-orange-300 hover:bg-white hover:text-orange-500`,
+                      path === item.href
+                        ? `bg-orange-500 text-white dark:border dark:border-orange-800 dark:bg-orange-950 dark:text-white dark:hover:border-amber-950 dark:hover:bg-orange-900 dark:hover:text-white`
+                        : 'transparent',
                       item.disabled && 'cursor-not-allowed opacity-80',
-                      item.label?.toLowerCase() === 'logout' && 'hover:border hover:border-red-300 hover:text-red-500'
+                      item.label?.toLowerCase() === 'logout' &&
+                        `hover:border hover:border-red-300 hover:text-red-500 dark:text-white dark:hover:border dark:hover:border-red-500 dark:hover:bg-red-950`
                     )}
                     onClick={() => {
                       if (setOpen) setOpen(false);
                     }}
                   >
-                    <Icon className={`ml-3 size-5 flex-none`} />
+                    <Icon className={`ml-3 size-5 flex-none dark:text-orange-600`} />
 
                     {isMobileNav || (!isMinimized && !isMobileNav) ? (
                       <span className="mr-2 truncate">{item.title}</span>

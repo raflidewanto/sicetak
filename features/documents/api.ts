@@ -1,10 +1,12 @@
-import apiResolver from '@/utils/api';
+import apiResolver, { newAbortSignal } from '@/utils/api';
 import Axios from 'axios';
 
 const baseURL = 'http://localhost:9500/api/documents';
 const axios = Axios.create({
   baseURL
 });
+
+const TEN_SECONDS = 10_000;
 
 type Document = {
   id: string;
@@ -26,7 +28,8 @@ export async function uploadDocument(formData: FormData): Promise<UploadResponse
       method: 'POST',
       headers: {
         'Content-Type': 'multipart/form-data'
-      }
+      },
+      signal: newAbortSignal(TEN_SECONDS)
     })
   );
 }
@@ -34,11 +37,15 @@ export async function uploadDocument(formData: FormData): Promise<UploadResponse
 type DocumentResponse = {
   success: boolean;
   message: string;
-  data: Array<Document>;
+  data: Array<Document> | null;
 };
 
-export async function getDocuments(): Promise<DocumentResponse> {
-  return apiResolver<DocumentResponse>(() => axios.get(''));
+export function getDocuments(): Promise<DocumentResponse> {
+  return apiResolver<DocumentResponse>(() =>
+    axios.get('', {
+      signal: AbortSignal.timeout(TEN_SECONDS)
+    })
+  );
 }
 
 type DownloadDocResponse = {
@@ -47,7 +54,7 @@ type DownloadDocResponse = {
   data: Document;
 };
 
-export async function downloadDocument(id: string): Promise<DownloadDocResponse> {
+export function downloadDocument(id: string): Promise<DownloadDocResponse> {
   return apiResolver<DownloadDocResponse>(() => axios.get(`/template/${id}`));
 }
 
@@ -57,7 +64,7 @@ type PrintResponse = {
   data: string;
 };
 
-export async function printDocument(id: string, agreementNo: string): Promise<PrintResponse> {
+export function printDocument(id: string, agreementNo: string): Promise<PrintResponse> {
   return apiResolver<PrintResponse>(() => axios.post(`/print?id=${id}&agreement-no=${agreementNo}`));
 }
 
@@ -66,6 +73,6 @@ type DeleteResponse = {
   success: boolean;
 };
 
-export async function deleteDocument(id: string): Promise<DeleteResponse> {
+export function deleteDocument(id: string): Promise<DeleteResponse> {
   return apiResolver<DeleteResponse>(() => axios.post(`/delete/${id}`));
 }
