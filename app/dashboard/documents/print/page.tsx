@@ -18,7 +18,7 @@ const PrintDocumentPage = () => {
 
   const [inputAgreementNo, setInputAgreementNo] = useState<string | null>(agreementNo);
 
-  const printMutation = usePrintDocument(String(documentId), String(inputAgreementNo));
+  const printMutation = usePrintDocument(String(decodeURI(documentId as string)), String(inputAgreementNo));
 
   useEffect(() => {
     if (agreementNo) {

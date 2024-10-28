@@ -3,7 +3,7 @@
 import { useDeleteDoc } from '@/features/documents/mutations/use-delete-doc';
 import useDisclosure from '@/hooks/use-disclosure';
 import { getErrorMessage } from '@/utils/error';
-import { Download, Printer, Trash2 } from 'lucide-react';
+import { Download, Printer, Trash2, FileUp } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { AlertModal } from './modal/alert-modal';
 import { useToast } from './ui/use-toast';
@@ -16,7 +16,7 @@ type DocumentCardProps = {
 };
 
 export default function DocumentCard(props: DocumentCardProps) {
-  const { id, name, file } = props;
+  const { id, name, file, file_id } = props;
   const router = useRouter();
   const deleteDocMutation = useDeleteDoc();
   const { isOpen, onClose, onOpen } = useDisclosure();
@@ -83,6 +83,16 @@ export default function DocumentCard(props: DocumentCardProps) {
               className="mr-2 text-gray-400 group-hover:text-green-500 dark:text-gray-400 dark:group-hover:text-green-300"
             />
             Print
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard/documents/reupload/${file_id}`)}
+            className="group flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition-all duration-300 hover:border-orange-600 hover:bg-orange-50 hover:text-orange-600 dark:border-gray-600 dark:bg-gray-950 dark:text-gray-200 dark:hover:border-orange-500 dark:hover:bg-orange-900 dark:hover:text-orange-300"
+          >
+            <FileUp
+              size={16}
+              className="mr-2 text-gray-400 group-hover:text-orange-500 dark:text-gray-400 dark:group-hover:text-orange-300"
+            />
+            Reupload
           </button>
           <button
             onClick={() => onOpen()}

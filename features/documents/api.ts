@@ -76,3 +76,12 @@ type DeleteResponse = {
 export function deleteDocument(id: string): Promise<DeleteResponse> {
   return apiResolver<DeleteResponse>(() => axios.post(`/delete/${id}`));
 }
+
+type ReuploadResponse = {
+  message: string;
+  success: boolean;
+};
+
+export function reuploadDocument(formData: FormData, id: string): Promise<ReuploadResponse> {
+  return apiResolver<ReuploadResponse>(() => axios.post(`/reupload/${id}`, formData));
+}
