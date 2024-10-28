@@ -101,7 +101,7 @@ export default function DocumentCard(props: DocumentCardProps) {
         isOpen={isOpen}
         onClose={() => onClose()}
         onConfirm={() => handleDelete(id)}
-        loading={false}
+        loading={deleteDocMutation.isPending}
       />
     </div>
   );

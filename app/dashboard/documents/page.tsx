@@ -1,9 +1,9 @@
 'use client';
 
+import { DocumentCardSkeleton } from '@/components/card-skeleton';
 import DocumentCard from '@/components/document-card';
 import Show from '@/components/elements/show';
 import PageContainer from '@/components/layout/page-container';
-import Loader from '@/components/loader';
 import { Button } from '@/components/ui/button';
 import { useDocuments } from '@/features/documents/queries/use-documents';
 import { Plus } from 'lucide-react';
@@ -11,15 +11,6 @@ import Link from 'next/link';
 
 const DocumentsPage = () => {
   const { data, isLoading, isError } = useDocuments();
-
-  if (isLoading)
-    return (
-      <PageContainer>
-        <div className="flex min-h-screen items-center justify-center">
-          <Loader size="large" />
-        </div>
-      </PageContainer>
-    );
 
   if (isError)
     return (
@@ -39,14 +30,10 @@ const DocumentsPage = () => {
             </p>
           </Button>
         </Link>
-        <Show
-          when={(data?.data?.length ?? 0) > 0}
-          fallback={
-            <div>
-              <p className="text-gray-950 dark:text-gray-200">No documents found</p>
-            </div>
-          }
-        >
+        <Show when={isLoading}>
+          <DocumentCardSkeleton />
+        </Show>
+        <Show when={(data?.data?.length ?? 0) > 0 && !isLoading}>
           {data?.data?.map((data) => (
             <DocumentCard
               key={data.file_id}

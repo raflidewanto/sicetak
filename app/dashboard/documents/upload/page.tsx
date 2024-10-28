@@ -12,6 +12,8 @@ type bracketPlaceholder = {
   x: number;
   y: number;
   page: number;
+  pageWidth: number;
+  pageHeight: number;
 };
 
 export default function PDFPlaceholderPage() {
@@ -38,7 +40,7 @@ export default function PDFPlaceholderPage() {
         const viewport = page.getViewport({ scale: 1 });
         const pageHeight = viewport.height;
         const scaleFactor = viewport.scale;
-
+        const pageWidth = viewport.width;
         let accumulatedText = '';
         let itemCoordinates: { str: string; x: number; y: number; endX: number }[] = [];
 
@@ -47,7 +49,6 @@ export default function PDFPlaceholderPage() {
           const x = item.transform[4] * scaleFactor;
           const y = pageHeight - item.transform[5] * scaleFactor;
 
-          // Calculate the end X position by adding the width of the text
           const endX = x + (item.width || 0) * scaleFactor;
 
           itemCoordinates.push({
@@ -95,7 +96,9 @@ export default function PDFPlaceholderPage() {
               placeholder: placeholderText,
               x: bracketX,
               y: bracketY,
-              page: pageNumber
+              page: pageNumber,
+              pageWidth: pageWidth,
+              pageHeight: pageHeight
             });
           }
         }

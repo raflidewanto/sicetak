@@ -6,7 +6,7 @@ const axios = Axios.create({
   baseURL
 });
 
-const TEN_SECONDS = 10_000;
+const FIFTEEN_SECONDS = 15_000;
 
 type Document = {
   id: string;
@@ -29,7 +29,7 @@ export async function uploadDocument(formData: FormData): Promise<UploadResponse
       headers: {
         'Content-Type': 'multipart/form-data'
       },
-      signal: newAbortSignal(TEN_SECONDS)
+      signal: newAbortSignal(FIFTEEN_SECONDS)
     })
   );
 }
@@ -43,7 +43,7 @@ type DocumentResponse = {
 export function getDocuments(): Promise<DocumentResponse> {
   return apiResolver<DocumentResponse>(() =>
     axios.get('', {
-      signal: AbortSignal.timeout(TEN_SECONDS)
+      signal: AbortSignal.timeout(FIFTEEN_SECONDS)
     })
   );
 }
