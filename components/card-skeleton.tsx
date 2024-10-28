@@ -16,9 +16,10 @@ function SkeletonCard() {
       <div className="p-6">
         <Skeleton className="mb-4 h-6 w-3/4" />
         <div className="flex flex-wrap gap-2">
-          <Skeleton className="h-9 w-full sm:w-36" />
-          <Skeleton className="h-9 w-full sm:w-24" />
-          <Skeleton className="h-9 w-full sm:w-24" />
+          <Skeleton className="h-9 w-32 sm:w-36" />
+          <Skeleton className="h-9 w-32 sm:w-24" />
+          <Skeleton className="h-9 w-32 sm:w-24" />
+          <Skeleton className="h-9 w-32 sm:w-24" />
         </div>
       </div>
     </div>
