@@ -31,7 +31,8 @@ import {
   X,
   Files,
   BadgeDollarSign,
-  Receipt
+  Receipt,
+  FileUp
 } from 'lucide-react';
 
 export type Icon = LucideIcon;
@@ -43,6 +44,7 @@ export const Icons = {
   close: X,
   profile: User2Icon,
   spinner: Loader2,
+  fileUp: FileUp,
   kanban: CircuitBoardIcon,
   chevronLeft: ChevronLeft,
   chevronRight: ChevronRight,

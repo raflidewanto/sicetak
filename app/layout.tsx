@@ -5,6 +5,7 @@ import NextTopLoader from 'nextjs-toploader';
 import './globals.css';
 import NextThemeProvider from '@/components/theme-provider';
 import ReactQueryProvider from '@/components/contexts/react-query';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,11 +19,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en">
       <body className={`${inter.className} overflow-hidden`} suppressHydrationWarning>
         <NextThemeProvider>
-          <ReactQueryProvider>
-            <NextTopLoader showSpinner={false} />
-            <Toaster />
-            {children}
-          </ReactQueryProvider>
+          <NuqsAdapter>
+            <ReactQueryProvider>
+              <NextTopLoader showSpinner={false} />
+              <Toaster />
+              {children}
+            </ReactQueryProvider>
+          </NuqsAdapter>
         </NextThemeProvider>
       </body>
     </html>

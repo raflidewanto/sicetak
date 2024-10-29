@@ -3,6 +3,15 @@
 import PageContainer from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 import { useUploadDoc } from '@/features/documents/mutations/use-upload-doc';
 import { usePDFJS } from '@/hooks/use-pdfjs';
 import React, { useState } from 'react';
@@ -16,9 +25,12 @@ type bracketPlaceholder = {
   pageHeight: number;
 };
 
-export default function PDFPlaceholderPage() {
+type DocumentType = 'company' | 'personal';
+
+export default function UploadDocumentPage() {
   const [file, setFile] = useState<File | null>(null);
   const [bracketCoordinates, setBracketCoordinates] = useState<bracketPlaceholder[]>([]);
+  const [docType, setDocType] = useState<DocumentType | null>(null);
   const uploadMutation = useUploadDoc();
   const toast = useToast();
 
@@ -122,11 +134,23 @@ export default function PDFPlaceholderPage() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!file) return;
+    if (!file) {
+      toast.toast({
+        title: 'Pilih file'
+      });
+      return;
+    }
+    if (!docType) {
+      toast.toast({
+        title: 'Pilih jenis dokumen'
+      });
+      return;
+    }
 
     const formData = new FormData();
     formData.append('file', file);
     formData.append('placeholders', JSON.stringify(bracketCoordinates));
+    formData.append('docType', docType);
 
     uploadMutation.mutate(formData, {
       onSuccess: (data) => {
@@ -183,6 +207,18 @@ export default function PDFPlaceholderPage() {
             </div>
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400">PDF files only (max size: 10MB)</p>
+          <Select onValueChange={(value) => setDocType(value as DocumentType)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Pilih jenis dokumen" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Jenis Dokumen</SelectLabel>
+                <SelectItem value="personal">Perseorangan</SelectItem>
+                <SelectItem value="company">Perusahaan</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
         <Button type="submit">Submit</Button>
       </form>

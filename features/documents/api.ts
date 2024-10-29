@@ -13,6 +13,7 @@ type Document = {
   file_id: string;
   name: string;
   file: string; // base64 encoded
+  type: string;
   created_at: number;
   updated_at: number;
 };
@@ -40,10 +41,20 @@ type DocumentResponse = {
   data: Array<Document> | null;
 };
 
-export function getDocuments(): Promise<DocumentResponse> {
+export function getDocuments({
+  docType,
+  searchQuery
+}: {
+  docType: string;
+  searchQuery: string;
+}): Promise<DocumentResponse> {
   return apiResolver<DocumentResponse>(() =>
-    axios.get('', {
-      signal: AbortSignal.timeout(FIFTEEN_SECONDS)
+    axios.get(``, {
+      signal: AbortSignal.timeout(FIFTEEN_SECONDS),
+      params: {
+        docType: docType,
+        docName: searchQuery
+      }
     })
   );
 }
