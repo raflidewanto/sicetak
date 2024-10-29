@@ -1,3 +1,4 @@
+import { FileUp } from 'lucide-react';
 import { NavItem } from '@/types';
 
 // =====================================================
@@ -12,6 +13,12 @@ export const DOCUMENT_ID_QUERY = 'id';
 // =====================================================
 
 export const navItems: NavItem[] = [
+  {
+    title: 'Upload Dokumen',
+    href: '/dashboard/documents/upload',
+    icon: 'fileUp',
+    label: 'Upload'
+  },
   {
     title: 'Cetak Dokumen',
     href: '/dashboard/documents',

@@ -5,12 +5,30 @@ import DocumentCard from '@/components/document-card';
 import Show from '@/components/elements/show';
 import PageContainer from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 import { useDocuments } from '@/features/documents/queries/use-documents';
+import { useDebounceValue } from '@/hooks/use-debounce-value';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
+import { useQueryState } from 'nuqs';
 
 const DocumentsPage = () => {
-  const { data, isLoading, isError } = useDocuments();
+  const [searchQuery, setSearchQuery] = useQueryState('docName');
+  const [selectedType, setSelectedType] = useQueryState('docType');
+  // Debounce the values with a delay of 500ms then set the debounced values to the query state
+  const [debouncedSearchQuery] = useDebounceValue(searchQuery, 1000);
+  const [debouncedSelectedType] = useDebounceValue(selectedType, 1000);
+
+  const { data, isLoading, isError } = useDocuments(debouncedSelectedType ?? '', debouncedSearchQuery ?? '');
 
   if (isError)
     return (
@@ -22,27 +40,42 @@ const DocumentsPage = () => {
   return (
     <PageContainer scrollable>
       <div className="flex w-full flex-col items-start justify-center gap-y-8">
-        <Link href="/dashboard/documents/upload">
-          <Button variant={'linkHover1'}>
-            <p className="flex items-center justify-start gap-x-1 space-x-2 text-gray-950 dark:text-gray-200">
-              Upload Document
-              <Plus size={16} />
-            </p>
-          </Button>
-        </Link>
+        {/* Search and Filter Controls */}
+        <div className="flex w-full flex-col items-start justify-start gap-x-4 gap-y-4">
+          <Input
+            className="w-3/4"
+            type="text"
+            placeholder="Search by document name..."
+            value={searchQuery ?? ''}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <Select onValueChange={(value) => setSelectedType(value)}>
+            <SelectTrigger className="w-[180px] py-4">
+              <SelectValue placeholder="Pilih jenis dokumen" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Jenis Dokumen</SelectLabel>
+                <SelectItem value="">Semua</SelectItem>
+                <SelectItem value="personal">Perseorangan</SelectItem>
+                <SelectItem value="company">Perusahaan</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+
         <Show when={isLoading}>
           <DocumentCardSkeleton />
         </Show>
+
         <Show when={(data?.data?.length ?? 0) > 0 && !isLoading}>
-          {data?.data?.map((data) => (
-            <DocumentCard
-              key={data.file_id}
-              file={data.file}
-              file_id={data.file_id}
-              name={data.name}
-              id={data.file_id}
-            />
+          {data?.data?.map((doc) => (
+            <DocumentCard key={doc.file_id} file={doc.file} file_id={doc.file_id} name={doc.name} id={doc.file_id} />
           ))}
+        </Show>
+
+        <Show when={data?.data?.length === 0 && !isLoading}>
+          <p className="text-gray-600 dark:text-gray-300">No documents found matching the filters.</p>
         </Show>
       </div>
     </PageContainer>
