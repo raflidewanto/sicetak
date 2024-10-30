@@ -1,46 +1,24 @@
 'use client';
 
-import { useSearchParams, useRouter } from 'next/navigation';
 import PageContainer from '@/components/layout/page-container';
-import React, { useState, useEffect } from 'react';
-import { usePrintDocument } from '@/features/documents/mutations/use-print-doc';
-import { AGREEMENT_NO_QUERY, DOCUMENT_ID_QUERY } from '@/constants/data';
-import { useToast } from '@/components/ui/use-toast';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/components/ui/use-toast';
+import { AGREEMENT_NO_QUERY, DOCUMENT_ID_QUERY } from '@/constants/data';
+import { usePrintDocument } from '@/features/documents/mutations/use-print-doc';
+import { base64ToBlob } from '@/utils/pdf';
+import { useSearchParams } from 'next/navigation';
+import { useQueryState } from 'nuqs';
 
 const PrintDocumentPage = () => {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const toast = useToast();
-  const agreementNo = searchParams.get(AGREEMENT_NO_QUERY);
+  const [agreementNo, setAgreementNo] = useQueryState(AGREEMENT_NO_QUERY);
   const documentId = searchParams.get(DOCUMENT_ID_QUERY);
-
-  const [inputAgreementNo, setInputAgreementNo] = useState<string | null>(agreementNo);
-
-  const printMutation = usePrintDocument(String(decodeURI(documentId as string)), String(inputAgreementNo));
-
-  useEffect(() => {
-    if (agreementNo) {
-      setInputAgreementNo(agreementNo);
-    }
-  }, [agreementNo]);
-
-  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const newAgreementNo = event.target.value;
-    setInputAgreementNo(newAgreementNo);
-
-    const params = new URLSearchParams(searchParams.toString());
-    if (newAgreementNo) {
-      params.set('agreement-no', newAgreementNo);
-    } else {
-      params.delete('agreement-no');
-    }
-    router.replace(`?${params.toString()}`);
-  }
+  const printMutation = usePrintDocument(String(decodeURI(documentId as string)), String(agreementNo));
 
   function handleDownload() {
-    if (!documentId || !inputAgreementNo) {
+    if (!documentId || !agreementNo) {
       toast.toast({
         title: `Please enter both agreement number.`
       });
@@ -51,19 +29,8 @@ const PrintDocumentPage = () => {
       onSuccess: (data) => {
         const base64 = data.data;
         const filename = 'document.pdf';
-
-        // Convert Base64 to binary data
-        const byteCharacters = atob(base64);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-
-        // Create a Blob from the binary data
-        const blob = new Blob([byteArray], { type: 'application/pdf' });
+        const blob = base64ToBlob(base64, 'application/pdf');
         const url = window.URL.createObjectURL(blob);
-
         const a = document.createElement('a');
         a.href = url;
         a.download = filename;
@@ -91,8 +58,8 @@ const PrintDocumentPage = () => {
           <Input
             type="text"
             id="agreementNo"
-            value={inputAgreementNo || ''}
-            onChange={handleInputChange}
+            value={agreementNo || ''}
+            onChange={(e) => setAgreementNo(e.target.value)}
             className="
             mt-1 block w-full 
             rounded-md 

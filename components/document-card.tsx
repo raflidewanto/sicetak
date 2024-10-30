@@ -95,6 +95,12 @@ export default function DocumentCard(props: DocumentCardProps) {
             Reupload
           </button>
           <button
+            onClick={() => router.push(`/dashboard/documents/custom-param/${file_id}`)}
+            className="group flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition-all duration-300 hover:border-indigo-600 hover:bg-indigo-50 hover:text-indigo-600 dark:border-gray-600 dark:bg-gray-950 dark:text-gray-200 dark:hover:border-indigo-500 dark:hover:bg-indigo-900 dark:hover:text-indigo-300"
+          >
+            Add Custom Parameter
+          </button>
+          <button
             onClick={() => onOpen()}
             className="group flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition-all duration-300 hover:border-red-300 hover:bg-red-50 hover:text-red-600 dark:border-gray-600 dark:bg-gray-950 dark:text-gray-200 dark:hover:border-red-500 dark:hover:bg-red-900 dark:hover:text-red-300"
           >

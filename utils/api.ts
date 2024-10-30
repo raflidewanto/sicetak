@@ -27,8 +27,7 @@ const apiResolver = async <ClientResponse = any>(fetcher: () => Promise<AxiosRes
     return res.data;
   } catch (err: unknown) {
     if (err instanceof AxiosError) {
-      const { message } = err;
-      throw new Error(`${message}`);
+      throw err;
     }
     if (err instanceof Error) {
       const abortSignalError = ['TimeoutError', 'AbortError', 'TypeError'];
