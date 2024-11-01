@@ -4,7 +4,6 @@ import { DocumentCardSkeleton } from '@/components/card-skeleton';
 import DocumentCard from '@/components/document-card';
 import Show from '@/components/elements/show';
 import PageContainer from '@/components/layout/page-container';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -17,14 +16,12 @@ import {
 } from '@/components/ui/select';
 import { useDocuments } from '@/features/documents/queries/use-documents';
 import { useDebounceValue } from '@/hooks/use-debounce-value';
-import { Plus } from 'lucide-react';
-import Link from 'next/link';
 import { useQueryState } from 'nuqs';
 
 const DocumentsPage = () => {
   const [searchQuery, setSearchQuery] = useQueryState('docName');
   const [selectedType, setSelectedType] = useQueryState('docType');
-  // Debounce the values with a delay of 500ms then set the debounced values to the query state
+  // Debounce the values with a delay of 1000ms then set the debounced values to the query state
   const [debouncedSearchQuery] = useDebounceValue(searchQuery, 1000);
   const [debouncedSelectedType] = useDebounceValue(selectedType, 1000);
 
@@ -69,8 +66,14 @@ const DocumentsPage = () => {
         </Show>
 
         <Show when={(data?.data?.length ?? 0) > 0 && !isLoading}>
-          {data?.data?.map((doc) => (
-            <DocumentCard key={doc.file_id} file={doc.file} file_id={doc.file_id} name={doc.name} id={doc.file_id} />
+          {data?.data?.map((doc, i) => (
+            <DocumentCard
+              key={`${doc.file_id}-${i}`}
+              file={doc.file}
+              file_id={doc.file_id}
+              name={doc.name}
+              id={doc.file_id}
+            />
           ))}
         </Show>
 

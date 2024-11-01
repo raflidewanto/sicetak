@@ -6,6 +6,12 @@ const axios = Axios.create({
   baseURL
 });
 
+type Response<T = undefined> = {
+  success: boolean;
+  message: string;
+  data?: T;
+};
+
 const FIFTEEN_SECONDS = 15_000;
 
 type Document = {
@@ -13,6 +19,7 @@ type Document = {
   file_id: string;
   name: string;
   file: string; // base64 encoded
+  raw_file: string; // base64 encoded
   type: string;
   created_at: number;
   updated_at: number;
@@ -23,7 +30,7 @@ type UploadResponse = {
   message: string;
 };
 
-export async function uploadDocument(formData: FormData): Promise<UploadResponse> {
+export async function uploadDocument(formData: FormData): Promise<Response> {
   return apiResolver<UploadResponse>(() =>
     axios.post('/upload', formData, {
       method: 'POST',
@@ -35,20 +42,14 @@ export async function uploadDocument(formData: FormData): Promise<UploadResponse
   );
 }
 
-type DocumentResponse = {
-  success: boolean;
-  message: string;
-  data: Array<Document> | null;
-};
-
 export function getDocuments({
   docType,
   searchQuery
 }: {
   docType: string;
   searchQuery: string;
-}): Promise<DocumentResponse> {
-  return apiResolver<DocumentResponse>(() =>
+}): Promise<Response<Document[]>> {
+  return apiResolver<Response<Document[]>>(() =>
     axios.get(``, {
       signal: AbortSignal.timeout(FIFTEEN_SECONDS),
       params: {
@@ -95,4 +96,37 @@ type ReuploadResponse = {
 
 export function reuploadDocument(formData: FormData, id: string): Promise<ReuploadResponse> {
   return apiResolver<ReuploadResponse>(() => axios.post(`/reupload/${id}`, formData));
+}
+
+export type PlaceholderResponseDTO = {
+  id: number;
+  placeholder_id: string;
+  name: string;
+  x: number;
+  y: number;
+  page: number;
+  page_width: number;
+  page_height: number;
+  document_id: string;
+  created_at: number;
+  updated_at: number;
+};
+
+export function getPlaceholders(id: string): Promise<Response<PlaceholderResponseDTO[]>> {
+  return apiResolver<Response<PlaceholderResponseDTO[]>>(() => axios.get(`/placeholders/${id}`));
+}
+
+export function getDocumentById(id: string): Promise<Response<Document>> {
+  return apiResolver<Response<Document>>(() => axios.get(`/template/${id}`));
+}
+
+type UpdatePlaceholderValuePayload = {
+  doc_id: string;
+  placeholder_name: string;
+  value: string;
+  placeholder_id: string;
+};
+
+export function updatePlaceholderValue(payload: UpdatePlaceholderValuePayload): Promise<Response> {
+  return apiResolver<Response>(() => axios.post(`/placeholders/update`, payload));
 }
