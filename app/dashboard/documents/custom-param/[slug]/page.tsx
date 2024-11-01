@@ -118,7 +118,7 @@ export default function CustomParamPage() {
               <Label htmlFor="placeholder-select">Select Placeholder</Label>
               <Select value={selectedPlaceholder} onValueChange={setSelectedPlaceholder}>
                 <Show
-                  when={!!placeholders?.data?.length && !isLoadingPlaceholders}
+                  when={!!placeholders?.data?.length && !isLoadingPlaceholders && placeholders.data.length > 0}
                   fallback={<Skeleton className="h-10 w-full" />}
                 >
                   <SelectTrigger id="placeholder-select">

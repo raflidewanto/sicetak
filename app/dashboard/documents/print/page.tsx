@@ -48,8 +48,8 @@ const PrintDocumentPage = () => {
   }
 
   return (
-    <PageContainer>
-      <div className="mx-auto mt-8 max-w-lg">
+    <PageContainer scrollable>
+      <div className="mx-auto mt-8 min-h-screen max-w-lg">
         <h1 className="mb-4 text-2xl font-semibold dark:text-white">Print Document</h1>
         <div className="mb-6">
           <label htmlFor="agreementNo" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
