@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/components/ui/use-toast';
+import { validPlaceholders } from '@/constants/data';
 import { useUploadDoc } from '@/features/documents/mutations/use-upload-doc';
 import { usePDFJS } from '@/hooks/use-pdfjs';
 import React, { useState } from 'react';
@@ -28,23 +29,6 @@ type bracketPlaceholder = {
 };
 
 type DocumentType = 'company' | 'personal';
-const placeholder = [
-  '{{ $name }}',
-  '{{ $nik }}',
-  '{{ $address }}',
-  '{{ $phone }}',
-  '{{ $agreement_no }}',
-  '{{ $date }}',
-  '{{ $type }}',
-  '{{ $machine_no }}',
-  '{{ $chassis_no }}',
-  '{{ $police_no }}',
-  '{{ $bpkb_no }}',
-  '{{ $color }}',
-  '{{ $production_year }}',
-  '{{ $bpkb_owner }}',
-  '{{ $condition }}'
-];
 
 export default function UploadDocumentPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -244,7 +228,7 @@ export default function UploadDocumentPage() {
       <ScrollArea className="h-72 w-64 rounded-md border dark:border-zinc-700 dark:text-white">
         <div className="p-4">
           <h4 className="mb-4 text-sm font-medium leading-none">Valid Placeholders</h4>
-          {placeholder.map((p, i) => (
+          {validPlaceholders.map((p, i) => (
             <>
               <div key={`${p}-${i}`} className="flex items-center justify-between">
                 {p}

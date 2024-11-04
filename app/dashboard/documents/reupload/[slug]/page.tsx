@@ -2,8 +2,10 @@
 
 import PageContainer from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/components/ui/use-toast';
+import { validPlaceholders } from '@/constants/data';
 import { useReuploadDoc } from '@/features/documents/mutations/use-reupload';
 import { usePDFJS } from '@/hooks/use-pdfjs';
 import { useParams } from 'next/navigation';
@@ -162,7 +164,7 @@ export default function ReuploadDocumentPage() {
 
   return (
     <PageContainer scrollable>
-      <form onSubmit={handleSubmit} className="space-y-4 dark:text-white">
+      <form onSubmit={handleSubmit} className="space-y-4 dark:text-white ">
         <div className="space-y-4">
           <label htmlFor="pdf-file" className="block text-sm font-medium dark:text-gray-200">
             Re-Upload PDF File
@@ -200,6 +202,19 @@ export default function ReuploadDocumentPage() {
         </div>
         <Button type="submit">Submit</Button>
       </form>
+      <ScrollArea className="h-72 w-64 rounded-md border dark:border-zinc-700 dark:text-white">
+        <div className="p-4">
+          <h4 className="mb-4 text-sm font-medium leading-none">Valid Placeholders</h4>
+          {validPlaceholders.map((p, i) => (
+            <>
+              <div key={`${p}-${i}`} className="flex items-center justify-between">
+                {p}
+              </div>
+              <Separator className="my-2" />
+            </>
+          ))}
+        </div>
+      </ScrollArea>
     </PageContainer>
   );
 }
