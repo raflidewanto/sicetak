@@ -7,6 +7,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { AGREEMENT_NO_QUERY, DOCUMENT_ID_QUERY } from '@/constants/data';
 import { usePrintDocument } from '@/features/documents/mutations/use-print-doc';
 import { base64ToBlob } from '@/utils/pdf';
+import { AxiosError } from 'axios';
 import { useSearchParams } from 'next/navigation';
 import { useQueryState } from 'nuqs';
 
@@ -27,19 +28,31 @@ const PrintDocumentPage = () => {
 
     printMutation.mutate(undefined, {
       onSuccess: (data) => {
-        const base64 = data.data;
-        const filename = 'document.pdf';
-        const blob = base64ToBlob(base64, 'application/pdf');
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
+        if (data.success) {
+          const base64 = data.data;
+          const filename = 'document.pdf';
+          const blob = base64ToBlob(base64, 'application/pdf');
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+          return;
+        }
+        toast.toast({
+          title: `Error downloading the file: ${data.message}`
+        });
       },
       onError: (error) => {
+        if (error instanceof AxiosError) {
+          toast.toast({
+            title: `Error downloading the file: ${error.response?.data.message}`
+          });
+          return;
+        }
         toast.toast({
           title: `Error downloading the file: ${error.message}`
         });

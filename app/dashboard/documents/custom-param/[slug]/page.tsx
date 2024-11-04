@@ -66,7 +66,7 @@ export default function CustomParamPage() {
             }
             toast({
               title: 'Error',
-              description: 'Failed to update placeholder. Please try again.',
+              description: `Failed to update placeholder: ${data.message}`,
               variant: 'destructive'
             });
           },
@@ -76,7 +76,7 @@ export default function CustomParamPage() {
               if (status?.toString().startsWith('4')) {
                 toast({
                   title: 'Error',
-                  description: 'Failed to update placeholder. Please try again.',
+                  description: `Failed to update placeholder: ${error.response?.data.message}`,
                   variant: 'destructive'
                 });
                 return;
