@@ -16,7 +16,9 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/components/ui/use-toast';
 import { validPlaceholders } from '@/constants/data';
 import { useUploadDoc } from '@/features/documents/mutations/use-upload-doc';
+import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
 import { usePDFJS } from '@/hooks/use-pdfjs';
+import { Check, Copy } from 'lucide-react';
 import React, { useState } from 'react';
 
 type bracketPlaceholder = {
@@ -36,6 +38,19 @@ export default function UploadDocumentPage() {
   const [docType, setDocType] = useState<DocumentType | null>(null);
   const uploadMutation = useUploadDoc();
   const toast = useToast();
+  const [, copy] = useCopyToClipboard();
+  const [copiedPlaceholder, setCopiedPlaceholder] = useState<string | null>(null);
+
+  const handleCopy = (text: string) => () => {
+    copy(text)
+      .then(() => {
+        setCopiedPlaceholder(text);
+        setTimeout(() => setCopiedPlaceholder(null), 1500);
+      })
+      .catch((error) => {
+        console.error('Failed to copy!', error);
+      });
+  };
 
   const onLoadPDFJS = async (pdfjs: any) => {
     if (!file) return;
@@ -230,10 +245,20 @@ export default function UploadDocumentPage() {
           <h4 className="mb-4 text-sm font-medium leading-none">Valid Placeholders</h4>
           {validPlaceholders.map((p, i) => (
             <>
-              <div key={`${p}-${i}`} className="flex items-center justify-between">
-                {p}
+              <div key={`${p}-${i}`} className="flex items-center justify-between gap-y-2 space-x-4">
+                <span>{p}</span>
+                <div
+                  className={`cursor-pointer transition-all ${
+                    copiedPlaceholder === p
+                      ? 'text-green-500'
+                      : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                  }`}
+                  onClick={handleCopy(p)}
+                >
+                  {copiedPlaceholder === p ? <Check size={20} /> : <Copy size={20} />}
+                </div>
               </div>
-              <Separator className="my-2" />
+              <Separator className="my-2 dark:border-zinc-700" />
             </>
           ))}
         </div>

@@ -49,3 +49,5 @@ export const validPlaceholders = [
   '{{ $bpkb_owner }}',
   '{{ $condition }}'
 ];
+
+export const customParamPlaceholders = ['{{ $content1 }}', '{{ $content2 }}', '{{ $content3 }}', '{{ $content4 }}'];

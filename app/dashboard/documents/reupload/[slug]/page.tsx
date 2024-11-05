@@ -164,7 +164,7 @@ export default function ReuploadDocumentPage() {
 
   return (
     <PageContainer scrollable>
-      <form onSubmit={handleSubmit} className="space-y-4 dark:text-white ">
+      <form onSubmit={handleSubmit} className="mb-4 space-y-4 dark:text-white">
         <div className="space-y-4">
           <label htmlFor="pdf-file" className="block text-sm font-medium dark:text-gray-200">
             Re-Upload PDF File
