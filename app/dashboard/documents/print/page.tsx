@@ -31,7 +31,7 @@ const PrintDocumentPage = () => {
         if (data.success) {
           const base64 = data.data;
           const filename = 'document.pdf';
-          const blob = base64ToBlob(base64, 'application/pdf');
+          const blob = base64ToBlob(base64 || '', 'application/pdf');
           const url = window.URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;

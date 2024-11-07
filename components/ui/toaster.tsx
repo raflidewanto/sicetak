@@ -16,7 +16,7 @@ export function Toaster() {
               {description && <ToastDescription>{description}</ToastDescription>}
             </div>
             {action}
-            <ToastClose />
+            <ToastClose className="dark:text-white dark:hover:text-white" />
           </Toast>
         );
       })}

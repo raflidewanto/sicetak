@@ -21,6 +21,8 @@ type Document = {
   file: string; // base64 encoded
   raw_file: string; // base64 encoded
   type: string;
+  active: boolean;
+  release: boolean;
   created_at: number;
   updated_at: number;
 };
@@ -70,14 +72,8 @@ export function downloadDocument(id: string): Promise<DownloadDocResponse> {
   return apiResolver<DownloadDocResponse>(() => axios.get(`/template/${id}`));
 }
 
-type PrintResponse = {
-  message: string;
-  success: boolean;
-  data: string;
-};
-
-export function printDocument(id: string, agreementNo: string): Promise<PrintResponse> {
-  return apiResolver<PrintResponse>(() => axios.post(`/print?id=${id}&agreement-no=${agreementNo}`));
+export function printDocument(id: string, agreementNo: string): Promise<Response<string>> {
+  return apiResolver<Response<string>>(() => axios.post(`/print?id=${id}&agreement-no=${agreementNo}`));
 }
 
 type DeleteResponse = {
@@ -107,6 +103,7 @@ export type PlaceholderResponseDTO = {
   page: number;
   page_width: number;
   page_height: number;
+  custom_value: string;
   document_id: string;
   created_at: number;
   updated_at: number;
@@ -129,4 +126,12 @@ type UpdatePlaceholderValuePayload = {
 
 export function updatePlaceholderValue(payload: UpdatePlaceholderValuePayload): Promise<Response> {
   return apiResolver<Response>(() => axios.post(`/placeholders/update`, payload));
+}
+
+export function toggleActive(id: string): Promise<Response> {
+  return apiResolver<Response>(() => axios.post(`/active/${id}`));
+}
+
+export function toggleRelease(id: string): Promise<Response> {
+  return apiResolver<Response>(() => axios.post(`/release/${id}`));
 }
