@@ -10,12 +10,14 @@ import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/use-toast';
 import { customParamPlaceholders, validPlaceholders } from '@/constants/data';
+import { PlaceholderResponseDTO } from '@/features/documents/api';
 import { usePlaceholderUpdate } from '@/features/documents/mutations/use-placeholder-update';
 import { useDocumentById } from '@/features/documents/queries/use-documents';
 import { usePlaceholders } from '@/features/documents/queries/use-placeholders';
+import useDisclosure from '@/hooks/use-disclosure';
 import { AxiosError } from 'axios';
 import { useParams } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 export default function CustomParamPage() {
   const { slug: docID } = useParams<{ slug: string }>();
@@ -23,9 +25,10 @@ export default function CustomParamPage() {
   const { data: document, isLoading: isLoadingDocument } = useDocumentById(docID);
   const updatePlaceholderMutation = usePlaceholderUpdate();
 
-  const [selectedPlaceholder, setSelectedPlaceholder] = useState(placeholders?.data?.[0]?.name ?? '');
-  const [newValue, setNewValue] = useState(placeholders?.data?.[0]?.custom_value ?? '');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // Modal-related state
+  const [selectedPlaceholderObj, setSelectedPlaceholderObj] = useState<PlaceholderResponseDTO | null>(null);
+  const [newValue, setNewValue] = useState('');
+  const { isOpen: isModalOpen, onOpen, onClose } = useDisclosure(false);
 
   const customParam = useMemo(() => {
     if (!placeholders?.data?.length) {
@@ -34,15 +37,16 @@ export default function CustomParamPage() {
     return placeholders?.data?.filter((placeholder) => customParamPlaceholders.includes(placeholder.name));
   }, [placeholders]);
 
-  const openModal = (placeholderName: string) => {
-    setSelectedPlaceholder(placeholderName);
-    setIsModalOpen(true);
+  const openModal = (placeholder: PlaceholderResponseDTO) => {
+    setSelectedPlaceholderObj(placeholder);
+    setNewValue(placeholder?.custom_value || '');
+    onOpen();
   };
 
   const closeModal = () => {
-    setSelectedPlaceholder('');
+    setSelectedPlaceholderObj(null);
     setNewValue('');
-    setIsModalOpen(false);
+    onClose();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -69,7 +73,7 @@ export default function CustomParamPage() {
       updatePlaceholderMutation.mutate(
         {
           doc_id: docID,
-          placeholder_name: selectedPlaceholder,
+          placeholder_name: selectedPlaceholderObj?.name || '',
           value: newValue,
           placeholder_id: placeholders?.data?.[0].placeholder_id
         },
@@ -130,56 +134,55 @@ export default function CustomParamPage() {
       <div className="mt-8 flex min-h-screen w-full max-w-screen-lg flex-col space-y-6 md:flex-row md:space-x-6 md:space-y-0 dark:text-white">
         <div className="w-full md:w-[60%]">
           <h2 className="mb-4 text-2xl font-semibold">Custom Parameters</h2>
-
           <div className="space-y-4">
             <Show when={!!errorPlaceholders}>
               <p>{errorPlaceholders?.message}</p>
             </Show>
             <Show when={customParam.length > 0 && !isLoadingPlaceholders}>
-              {customParam.map((placeholder, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <p>{placeholder.name}</p>
-                  <Button onClick={() => openModal(placeholder.name)} className="ml-4">
-                    Edit
-                  </Button>
-                  {/* Edit Modal */}
-                  <Modal
-                    isOpen={isModalOpen}
-                    onClose={closeModal}
-                    title="Edit Placeholder"
-                    description="Edit the placeholder value."
-                  >
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                      <Label htmlFor="custom-value">Custom Value for {selectedPlaceholder}</Label>
-                      <ScrollArea className="h-24 w-full rounded-md border">
-                        <div className="p-4">
-                          <h4 className="mb-4 text-sm font-medium leading-none">Basic Placeholders</h4>
-                          {validPlaceholders.map((tag) => (
-                            <>
-                              <div key={tag} className="text-sm">
-                                {tag}
-                              </div>
-                              <Separator className="my-2" />
-                            </>
-                          ))}
-                        </div>
-                      </ScrollArea>
-                      <Textarea
-                        id="custom-value"
-                        defaultValue={placeholder.custom_value}
-                        onChange={(e) => setNewValue(e.target.value)}
-                        placeholder="Enter new value for the placeholder"
-                        className="h-32"
-                      />
-                      <Button type="submit" className="w-full">
-                        Save Changes
-                      </Button>
-                    </form>
-                  </Modal>
-                </div>
-              ))}
+              {customParam.length > 0 &&
+                !isLoadingPlaceholders &&
+                customParam.map((placeholder) => (
+                  <div key={placeholder.placeholder_id} className="flex items-center justify-between">
+                    <p>{placeholder.name}</p>
+                    <Button onClick={() => openModal(placeholder)} className="ml-4">
+                      Edit
+                    </Button>
+                  </div>
+                ))}
             </Show>
           </div>
+          <Show when={isModalOpen && !!selectedPlaceholderObj} fallback={null}>
+            <Modal
+              isOpen={isModalOpen}
+              onClose={closeModal}
+              title="Edit Placeholder"
+              description={`Edit the placeholder value for "${selectedPlaceholderObj?.name}"`}
+            >
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <Label htmlFor="custom-value">Custom Value for {selectedPlaceholderObj?.name}</Label>
+                <ScrollArea className="h-24 w-full rounded-md border">
+                  <div className="p-4">
+                    <h4 className="mb-4 text-sm font-medium leading-none">Basic Placeholders</h4>
+                    {validPlaceholders.map((tag) => (
+                      <React.Fragment key={tag}>
+                        <div className="text-sm">{tag}</div>
+                        <Separator className="my-2" />
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </ScrollArea>
+                <Textarea
+                  value={newValue}
+                  onChange={(e) => setNewValue(e.target.value)}
+                  placeholder="Enter new value for the placeholder"
+                  className="h-32"
+                />
+                <Button type="submit" className="w-full">
+                  Save Changes
+                </Button>
+              </form>
+            </Modal>
+          </Show>
         </div>
 
         <div className="flex w-full items-start justify-center">

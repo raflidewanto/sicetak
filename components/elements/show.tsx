@@ -12,7 +12,7 @@ const Show = (props: ShowProps) => {
   if (!when && !fallback) {
     return null;
   } else if (!when && fallback) {
-    return fallback;
+    return fallback ?? null;
   } else {
     return children;
   }

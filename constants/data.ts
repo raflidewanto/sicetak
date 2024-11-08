@@ -51,3 +51,45 @@ export const validPlaceholders = [
 ];
 
 export const customParamPlaceholders = ['{{ $content1 }}', '{{ $content2 }}', '{{ $content3 }}', '{{ $content4 }}'];
+
+export const productTypes = [
+  {
+    label: 'All',
+    value: ''
+  },
+  {
+    label: 'Fasilitas Dana',
+    value: 'fund_facilities'
+  },
+  {
+    label: 'Fasilitas Modal Usaha',
+    value: 'business_capital_facilities'
+  },
+  {
+    label: 'Installment Financing',
+    value: 'installment_financing'
+  },
+  {
+    label: 'SLB',
+    value: 'slb'
+  },
+  {
+    label: 'Mitra Loyal Carfin',
+    value: 'carfin_loyal_partnership'
+  },
+  {
+    label: 'Flash Cash R2',
+    value: 'flash_cash_r2'
+  }
+] as const;
+
+export type ProductTypeValue =
+  | ''
+  | 'fund_facilities'
+  | 'business_capital_facilities'
+  | 'installment_financing'
+  | 'slb'
+  | 'carfin_loyal_partnership'
+  | 'flash_cash_r2';
+
+export type DocumentType = 'company' | 'personal';

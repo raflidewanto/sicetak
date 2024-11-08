@@ -46,17 +46,20 @@ export async function uploadDocument(formData: FormData): Promise<Response> {
 
 export function getDocuments({
   docType,
-  searchQuery
+  searchQuery,
+  productType
 }: {
   docType: string;
   searchQuery: string;
+  productType: string;
 }): Promise<Response<Document[]>> {
   return apiResolver<Response<Document[]>>(() =>
     axios.get(``, {
       signal: AbortSignal.timeout(FIFTEEN_SECONDS),
       params: {
         docType: docType,
-        docName: searchQuery
+        docName: searchQuery,
+        docProduct: productType
       }
     })
   );

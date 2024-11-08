@@ -3,11 +3,22 @@
 import PageContainer from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/components/ui/use-toast';
-import { validPlaceholders } from '@/constants/data';
+import { DocumentType, productTypes, ProductTypeValue, validPlaceholders } from '@/constants/data';
 import { useReuploadDoc } from '@/features/documents/mutations/use-reupload';
+import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
 import { usePDFJS } from '@/hooks/use-pdfjs';
+import { Check, Copy } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import React, { useState } from 'react';
 
@@ -23,9 +34,26 @@ type bracketPlaceholder = {
 export default function ReuploadDocumentPage() {
   const { slug } = useParams<{ slug: string }>();
   const [file, setFile] = useState<File | null>(null);
+  const [docType, setDocType] = useState<DocumentType | null>(null);
+  const [docProduct, setDocProduct] = useState<ProductTypeValue | null>(null);
   const [bracketCoordinates, setBracketCoordinates] = useState<bracketPlaceholder[]>([]);
   const toast = useToast();
   const reuploadMitation = useReuploadDoc();
+
+  // clipboard
+  const [, copy] = useCopyToClipboard();
+  const [copiedPlaceholder, setCopiedPlaceholder] = useState<string | null>(null);
+
+  const handleCopy = (text: string) => () => {
+    copy(text)
+      .then(() => {
+        setCopiedPlaceholder(text);
+        setTimeout(() => setCopiedPlaceholder(null), 1500);
+      })
+      .catch((error) => {
+        console.error('Failed to copy!', error);
+      });
+  };
 
   const onLoadPDFJS = async (pdfjs: any) => {
     if (!file) return;
@@ -134,9 +162,24 @@ export default function ReuploadDocumentPage() {
       return;
     }
 
+    if (!docType) {
+      toast.toast({
+        title: 'Pilih jenis dokumen'
+      });
+      return;
+    }
+    if (!docProduct) {
+      toast.toast({
+        title: 'Pilih jenis produk'
+      });
+      return;
+    }
+
     const formData = new FormData();
     formData.append('file', file);
     formData.append('placeholders', JSON.stringify(bracketCoordinates));
+    formData.append('docType', docType);
+    formData.append('docProduct', docProduct);
 
     reuploadMitation.mutate(
       {
@@ -199,6 +242,37 @@ export default function ReuploadDocumentPage() {
             </div>
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400">PDF files only (max size: 10MB)</p>
+          <div className="flex flex-wrap items-center justify-start gap-x-2 gap-y-2">
+            <Select onValueChange={(value) => setDocType(value as DocumentType)}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Pilih jenis dokumen" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Jenis Dokumen</SelectLabel>
+                  <SelectItem value="personal">Perseorangan</SelectItem>
+                  <SelectItem value="company">Perusahaan</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            <Select onValueChange={(value) => setDocProduct(value as ProductTypeValue)}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Pilih jenis produk" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Jenis Produk</SelectLabel>
+                  {productTypes
+                    .filter((p) => p.value !== '')
+                    .map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <Button type="submit">Submit</Button>
       </form>
@@ -207,10 +281,20 @@ export default function ReuploadDocumentPage() {
           <h4 className="mb-4 text-sm font-medium leading-none">Valid Placeholders</h4>
           {validPlaceholders.map((p, i) => (
             <>
-              <div key={`${p}-${i}`} className="flex items-center justify-between">
-                {p}
+              <div key={`${p}-${i}`} className="flex items-center justify-between gap-y-2 space-x-4">
+                <span>{p}</span>
+                <div
+                  className={`cursor-pointer transition-all ${
+                    copiedPlaceholder === p
+                      ? 'text-green-500'
+                      : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                  }`}
+                  onClick={handleCopy(p)}
+                >
+                  {copiedPlaceholder === p ? <Check size={20} /> : <Copy size={20} />}
+                </div>
               </div>
-              <Separator className="my-2" />
+              <Separator className="my-2 dark:border-zinc-700" />
             </>
           ))}
         </div>

@@ -23,9 +23,11 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from '@/components/ui/use-toast';
+import { productTypes } from '@/constants/data';
 import { useDeleteDoc } from '@/features/documents/mutations/use-delete-doc';
 import { useToggleActive } from '@/features/documents/mutations/use-toggle-active';
 import { useToggleRelease } from '@/features/documents/mutations/use-toggle-release';
@@ -39,11 +41,17 @@ import { useQueryState } from 'nuqs';
 const DocumentsPage = () => {
   const [searchQuery, setSearchQuery] = useQueryState('docName');
   const [selectedType, setSelectedType] = useQueryState('docType');
+  const [selectedProductType, setSelectedProductType] = useQueryState('docProduct');
   // Debounce the values with a delay of 1000ms then set the debounced values to the query state
   const [debouncedSearchQuery] = useDebounceValue(searchQuery, 1000);
   const [debouncedSelectedType] = useDebounceValue(selectedType, 1000);
+  const [debouncedSelectedProductType] = useDebounceValue(selectedProductType, 1000);
 
-  const { data, isLoading, isError } = useDocuments(debouncedSelectedType ?? '', debouncedSearchQuery ?? '');
+  const { data, isLoading, isError } = useDocuments(
+    debouncedSelectedType ?? '',
+    debouncedSearchQuery ?? '',
+    debouncedSelectedProductType ?? ''
+  );
 
   const { isOpen, onClose, onOpen } = useDisclosure();
   const deleteDocMutation = useDeleteDoc();
@@ -106,22 +114,81 @@ const DocumentsPage = () => {
             value={searchQuery ?? ''}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <Select onValueChange={(value) => setSelectedType(value)}>
-            <SelectTrigger className="w-[180px] py-4">
-              <SelectValue placeholder="Pilih jenis dokumen" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Jenis Dokumen</SelectLabel>
-                <SelectItem value="">Semua</SelectItem>
-                <SelectItem value="personal">Perseorangan</SelectItem>
-                <SelectItem value="company">Perusahaan</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          <div className="flex flex-wrap items-center justify-start gap-x-4 gap-y-4">
+            <Select onValueChange={(value) => setSelectedType(value)}>
+              <SelectTrigger className="w-[180px] py-4">
+                <SelectValue placeholder="Pilih jenis dokumen" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Jenis Dokumen</SelectLabel>
+                  <SelectItem value="">Semua</SelectItem>
+                  <SelectItem value="personal">Perseorangan</SelectItem>
+                  <SelectItem value="company">Perusahaan</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            <Select onValueChange={(value) => setSelectedProductType(value)}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Pilih jenis produk" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Jenis Produk</SelectLabel>
+                  {productTypes.map((item) => (
+                    <SelectItem key={item.value} value={item.value}>
+                      {item.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        <Show when={isLoading}>loading...</Show>
+        <Show when={isLoading}>
+          {/* Skeleton Table */}
+          <Table className="min-w-full rounded-xl bg-white shadow-md transition-all dark:bg-zinc-900">
+            <TableCaption className="dark:text-gray-400">Loading documents...</TableCaption>
+            <TableHeader>
+              <TableRow className="rounded-lg bg-gray-50 dark:bg-zinc-800">
+                <TableHead className="p-4 text-gray-700 dark:text-gray-300">
+                  <Skeleton className="h-4 w-20 bg-gray-200 dark:bg-zinc-700" />
+                </TableHead>
+                <TableHead className="p-4 text-gray-700 dark:text-gray-300">
+                  <Skeleton className="h-4 w-20 bg-gray-200 dark:bg-zinc-700" />
+                </TableHead>
+                <TableHead className="p-4 text-gray-700 dark:text-gray-300">
+                  <Skeleton className="h-4 w-20 bg-gray-200 dark:bg-zinc-700" />
+                </TableHead>
+                <TableHead className="p-4 text-gray-700 dark:text-gray-300">
+                  <Skeleton className="h-4 w-20 bg-gray-200 dark:bg-zinc-700" />
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {/* Skeleton Rows */}
+              {Array(5)
+                .fill(null)
+                .map((_, i) => (
+                  <TableRow key={i} className="border-b border-gray-200 dark:border-gray-700">
+                    <TableCell className="p-4">
+                      <Skeleton className="h-4 w-3/4 bg-gray-200 dark:bg-zinc-700" />
+                    </TableCell>
+                    <TableCell className="p-4">
+                      <Skeleton className="h-4 w-1/2 bg-gray-200 dark:bg-zinc-700" />
+                    </TableCell>
+                    <TableCell className="p-4">
+                      <Skeleton className="h-4 w-1/4 bg-gray-200 dark:bg-zinc-700" />
+                    </TableCell>
+                    <TableCell className="p-4">
+                      <Skeleton className="h-4 w-1/4 bg-gray-200 dark:bg-zinc-700" />
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </Show>
 
         <Show when={(data?.data?.length ?? 0) > 0 && !isLoading}>
           <Table className="min-w-full rounded-xl bg-white shadow-md transition-all dark:bg-zinc-900">

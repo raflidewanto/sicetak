@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/components/ui/use-toast';
-import { validPlaceholders } from '@/constants/data';
+import { DocumentType, productTypes, ProductTypeValue, validPlaceholders } from '@/constants/data';
 import { useUploadDoc } from '@/features/documents/mutations/use-upload-doc';
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
 import { usePDFJS } from '@/hooks/use-pdfjs';
@@ -30,12 +30,11 @@ type bracketPlaceholder = {
   pageHeight: number;
 };
 
-type DocumentType = 'company' | 'personal';
-
 export default function UploadDocumentPage() {
   const [file, setFile] = useState<File | null>(null);
   const [bracketCoordinates, setBracketCoordinates] = useState<bracketPlaceholder[]>([]);
   const [docType, setDocType] = useState<DocumentType | null>(null);
+  const [docProduct, setDocProduct] = useState<ProductTypeValue | null>(null);
   const uploadMutation = useUploadDoc();
   const toast = useToast();
   const [, copy] = useCopyToClipboard();
@@ -164,11 +163,18 @@ export default function UploadDocumentPage() {
       });
       return;
     }
+    if (!docProduct) {
+      toast.toast({
+        title: 'Pilih jenis produk'
+      });
+      return;
+    }
 
     const formData = new FormData();
     formData.append('file', file);
     formData.append('placeholders', JSON.stringify(bracketCoordinates));
     formData.append('docType', docType);
+    formData.append('docProduct', docProduct);
 
     uploadMutation.mutate(formData, {
       onSuccess: (data) => {
@@ -225,18 +231,37 @@ export default function UploadDocumentPage() {
             </div>
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400">PDF files only (max size: 10MB)</p>
-          <Select onValueChange={(value) => setDocType(value as DocumentType)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Pilih jenis dokumen" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Jenis Dokumen</SelectLabel>
-                <SelectItem value="personal">Perseorangan</SelectItem>
-                <SelectItem value="company">Perusahaan</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          <div className="flex flex-wrap items-center justify-start gap-x-2 gap-y-2">
+            <Select onValueChange={(value) => setDocType(value as DocumentType)}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Pilih jenis dokumen" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Jenis Dokumen</SelectLabel>
+                  <SelectItem value="personal">Perseorangan</SelectItem>
+                  <SelectItem value="company">Perusahaan</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            <Select onValueChange={(value) => setDocProduct(value as ProductTypeValue)}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Pilih jenis produk" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Jenis Produk</SelectLabel>
+                  {productTypes
+                    .filter((p) => p.value !== '')
+                    .map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <Button type="submit">Submit</Button>
       </form>
