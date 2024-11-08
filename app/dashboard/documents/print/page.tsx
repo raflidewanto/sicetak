@@ -30,16 +30,11 @@ const PrintDocumentPage = () => {
       onSuccess: (data) => {
         if (data.success) {
           const base64 = data.data;
-          const filename = 'document.pdf';
+          // const filename = 'document.pdf';
           const blob = base64ToBlob(base64 || '', 'application/pdf');
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = filename;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          window.URL.revokeObjectURL(url);
+          const url = URL.createObjectURL(blob);
+          const pdfWindow = window.open('') as WindowProxy;
+          pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
           return;
         }
         toast.toast({
