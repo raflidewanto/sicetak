@@ -75,12 +75,9 @@ const DocumentsPage = () => {
       }
 
       const blob = new Blob([byteArray], { type: 'application/pdf' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `${docName}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const url = URL.createObjectURL(blob);
+      const pdfWindow = window.open('') as WindowProxy;
+      pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
     } catch (error) {
       toast({
         title: `Error downloading the file: ${getErrorMessage(error)}`
