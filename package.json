@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier . --write",
+    "typecheck": "tsc --project tsconfig.json --pretty --noEmit",
     "prepare": "husky"
   },
   "lint-staged": {
