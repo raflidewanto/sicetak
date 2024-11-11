@@ -213,7 +213,9 @@ const DocumentsPage = () => {
                       <DropdownMenuContent>
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => handleDownload(doc.file, doc.name)}>Download</DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer" onClick={() => handleDownload(doc.file, doc.name)}>
+                          Download
+                        </DropdownMenuItem>
                         <DropdownMenuItem>
                           <Link href={`/dashboard/documents/print?id=${doc.file_id}`}>Print</Link>
                         </DropdownMenuItem>

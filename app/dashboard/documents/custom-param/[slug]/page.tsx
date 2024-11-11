@@ -34,7 +34,9 @@ export default function CustomParamPage() {
     if (!placeholders?.data?.length) {
       return [];
     }
-    return placeholders?.data?.filter((placeholder) => customParamPlaceholders.includes(placeholder.name));
+    return placeholders?.data
+      ?.filter((placeholder) => customParamPlaceholders.includes(placeholder.name))
+      .sort((a, b) => a.name.localeCompare(b.name));
   }, [placeholders]);
 
   const openModal = (placeholder: PlaceholderResponseDTO) => {
@@ -185,7 +187,7 @@ export default function CustomParamPage() {
           </Show>
         </div>
 
-        <div className="flex w-full items-start justify-center">
+        <div className="flex w-full flex-grow items-start justify-center">
           <Show
             when={Boolean(document?.data?.raw_file) && !isLoadingDocument && Boolean(document?.success)}
             fallback={<p className="text-gray-600 dark:text-gray-300">{document?.message}</p>}
