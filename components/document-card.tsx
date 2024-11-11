@@ -7,6 +7,7 @@ import { Download, Printer, Trash2, FileUp } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { AlertModal } from './modal/alert-modal';
 import { useToast } from './ui/use-toast';
+import { AxiosError } from 'axios';
 
 type DocumentCardProps = {
   id: string;
@@ -51,9 +52,20 @@ export default function DocumentCard(props: DocumentCardProps) {
       onSuccess: () => {
         window.location.reload();
       },
-      onError: ({ name, message, cause }) => {
+      onError: (error) => {
+        if (error instanceof AxiosError) {
+          toast.toast({
+            title: `Error deleting the file: ${error.response?.data.message}`
+          });
+          return;
+        } else if (error instanceof Error) {
+          toast.toast({
+            title: `Error deleting the file: ${error.message}`
+          });
+          return;
+        }
         toast.toast({
-          title: `Error deleting the file: ${name} - ${message} - ${cause}`
+          title: `Error deleting the file: ${getErrorMessage(error)}`
         });
       }
     });

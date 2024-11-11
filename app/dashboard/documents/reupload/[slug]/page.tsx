@@ -18,6 +18,8 @@ import { DocumentType, productTypes, ProductTypeValue, validPlaceholders } from 
 import { useReuploadDoc } from '@/features/documents/mutations/use-reupload';
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
 import { usePDFJS } from '@/hooks/use-pdfjs';
+import { getErrorMessage } from '@/utils/error';
+import { AxiosError } from 'axios';
 import { Check, Copy } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import React, { useState } from 'react';
@@ -197,9 +199,19 @@ export default function ReuploadDocumentPage() {
           });
         },
         onError: (error) => {
-          toast.toast({
-            title: `Error reuploading the file ${error.message}`
-          });
+          if (error instanceof AxiosError) {
+            toast.toast({
+              title: `Error reuploading the file: ${error.response?.data.message}`
+            });
+          } else if (error instanceof Error) {
+            toast.toast({
+              title: `Error reuploading the file: ${error.message}`
+            });
+          } else {
+            toast.toast({
+              title: `Error reuploading the file ${getErrorMessage(error)}`
+            });
+          }
         }
       }
     );

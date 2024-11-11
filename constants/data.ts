@@ -54,7 +54,7 @@ export const customParamPlaceholders = ['{{ $content1 }}', '{{ $content2 }}', '{
 
 export const productTypes = [
   {
-    label: 'All',
+    label: 'Semua',
     value: ''
   },
   {

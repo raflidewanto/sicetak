@@ -13,11 +13,13 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from '@/components/ui/use-toast';
 import { DocumentType, productTypes, ProductTypeValue, validPlaceholders } from '@/constants/data';
 import { useUploadDoc } from '@/features/documents/mutations/use-upload-doc';
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
 import { usePDFJS } from '@/hooks/use-pdfjs';
+import { getErrorMessage } from '@/utils/error';
+import { AxiosError } from 'axios';
 import { Check, Copy } from 'lucide-react';
 import React, { useState } from 'react';
 
@@ -36,7 +38,6 @@ export default function UploadDocumentPage() {
   const [docType, setDocType] = useState<DocumentType | null>(null);
   const [docProduct, setDocProduct] = useState<ProductTypeValue | null>(null);
   const uploadMutation = useUploadDoc();
-  const toast = useToast();
   const [, copy] = useCopyToClipboard();
   const [copiedPlaceholder, setCopiedPlaceholder] = useState<string | null>(null);
 
@@ -47,7 +48,10 @@ export default function UploadDocumentPage() {
         setTimeout(() => setCopiedPlaceholder(null), 1500);
       })
       .catch((error) => {
-        console.error('Failed to copy!', error);
+        toast({
+          title: `Error copying the placeholder: ${error.message}`,
+          variant: 'destructive'
+        });
       });
   };
 
@@ -152,19 +156,19 @@ export default function UploadDocumentPage() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!file) {
-      toast.toast({
+      toast({
         title: 'Pilih file'
       });
       return;
     }
     if (!docType) {
-      toast.toast({
+      toast({
         title: 'Pilih jenis dokumen'
       });
       return;
     }
     if (!docProduct) {
-      toast.toast({
+      toast({
         title: 'Pilih jenis produk'
       });
       return;
@@ -182,14 +186,30 @@ export default function UploadDocumentPage() {
           window.location.href = '/dashboard/documents';
           return;
         }
-        toast.toast({
-          title: `Error uploading the file: ${data.message}`
+        toast({
+          title: `Error uploading the file: ${data.message}`,
+          variant: 'destructive'
         });
       },
       onError: (error) => {
-        toast.toast({
-          title: `Error uploading the file: ${error.message}`
+        if (error instanceof AxiosError) {
+          toast({
+            title: `Error uploading the file: ${error.response?.data.message}`,
+            variant: 'destructive'
+          });
+          return;
+        } else if (error instanceof Error) {
+          toast({
+            title: `Error uploading the file: ${error.message}`,
+            variant: 'destructive'
+          });
+          return;
+        }
+        toast({
+          title: `Error uploading the file: ${getErrorMessage(error)}`,
+          variant: 'destructive'
         });
+        return;
       }
     });
   };
