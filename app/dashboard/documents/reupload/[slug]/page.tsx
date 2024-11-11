@@ -53,7 +53,10 @@ export default function ReuploadDocumentPage() {
         setTimeout(() => setCopiedPlaceholder(null), 1500);
       })
       .catch((error) => {
-        console.error('Failed to copy!', error);
+        toast.toast({
+          title: `failed to copy ${error.message}`,
+          variant: 'destructive'
+        });
       });
   };
 

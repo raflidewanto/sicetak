@@ -10,6 +10,7 @@ import { base64ToBlob } from '@/utils/pdf';
 import { AxiosError } from 'axios';
 import { useSearchParams } from 'next/navigation';
 import { useQueryState } from 'nuqs';
+import { Suspense } from 'react';
 
 const PrintDocumentPage = () => {
   const searchParams = useSearchParams();
@@ -99,4 +100,10 @@ const PrintDocumentPage = () => {
   );
 };
 
-export default PrintDocumentPage;
+export default function PrintDocument() {
+  return (
+    <Suspense>
+      <PrintDocumentPage />
+    </Suspense>
+  );
+}

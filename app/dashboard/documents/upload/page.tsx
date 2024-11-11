@@ -193,8 +193,9 @@ export default function UploadDocumentPage() {
       },
       onError: (error) => {
         if (error instanceof AxiosError) {
+          const errMessage = error.response?.data.message;
           toast({
-            title: `Error uploading the file: ${error.response?.data.message}`,
+            title: errMessage ? `Error uploading the file: ${errMessage}` : `Something went wrong`,
             variant: 'destructive'
           });
           return;
@@ -205,8 +206,9 @@ export default function UploadDocumentPage() {
           });
           return;
         }
+        const errMessage = getErrorMessage(error);
         toast({
-          title: `Error uploading the file: ${getErrorMessage(error)}`,
+          title: errMessage ? `Error uploading the file: ${errMessage}` : `Something went wrong`,
           variant: 'destructive'
         });
         return;
@@ -273,8 +275,8 @@ export default function UploadDocumentPage() {
                   <SelectLabel>Jenis Produk</SelectLabel>
                   {productTypes
                     .filter((p) => p.value !== '')
-                    .map((item) => (
-                      <SelectItem key={item.value} value={item.value}>
+                    .map((item, i) => (
+                      <SelectItem key={`${item.value}-${i}`} value={item.value}>
                         {item.label}
                       </SelectItem>
                     ))}
@@ -288,9 +290,9 @@ export default function UploadDocumentPage() {
       <ScrollArea className="h-72 w-64 rounded-md border dark:border-zinc-700 dark:text-white">
         <div className="p-4">
           <h4 className="mb-4 text-sm font-medium leading-none">Valid Placeholders</h4>
-          {validPlaceholders.map((p, i) => (
-            <>
-              <div key={`${p}-${i}`} className="flex items-center justify-between gap-y-2 space-x-4">
+          {validPlaceholders.map((p) => (
+            <React.Fragment key={p}>
+              <div className="flex items-center justify-between gap-y-2 space-x-4">
                 <span>{p}</span>
                 <div
                   className={`cursor-pointer transition-all ${
@@ -304,7 +306,7 @@ export default function UploadDocumentPage() {
                 </div>
               </div>
               <Separator className="my-2 dark:border-zinc-700" />
-            </>
+            </React.Fragment>
           ))}
         </div>
       </ScrollArea>

@@ -4,7 +4,10 @@ import DocumentsTableSkeleton from '@/components/documents-table-skeleton';
 import Show from '@/components/elements/show';
 import EllipsisVertical from '@/components/icons/ellipsis-vertical';
 import PageContainer from '@/components/layout/page-container';
-import { AlertModal } from '@/components/modal/alert-modal';
+import dynamic from 'next/dynamic';
+const AlertModal = dynamic(() => import('../../../components/modal/alert-modal').then((mod) => mod.AlertModal), {
+  ssr: false
+});
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,6 +41,8 @@ import { getErrorMessage } from '@/utils/error';
 import { AxiosError } from 'axios';
 import Link from 'next/link';
 import { useQueryState } from 'nuqs';
+import { Suspense } from 'react';
+import Loader from '@/components/loader';
 
 const DocumentsPage = () => {
   const [searchQuery, setSearchQuery] = useQueryState('docName');
@@ -172,7 +177,9 @@ const DocumentsPage = () => {
                   key={doc.file_id}
                   className="border-b border-gray-200 transition-all hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-zinc-800"
                 >
-                  <TableCell className="p-4 text-sm font-medium text-gray-900 dark:text-gray-100">{doc.name}</TableCell>
+                  <TableCell className="p-2 text-xs font-medium text-gray-900 md:text-sm dark:text-gray-100">
+                    {doc.name}
+                  </TableCell>
                   <TableCell className="p-4">
                     <DropdownMenu>
                       <DropdownMenuTrigger className="flex items-center justify-center">
@@ -247,4 +254,16 @@ const DocumentsPage = () => {
   );
 };
 
-export default DocumentsPage;
+export default function Documents() {
+  return (
+    <Suspense
+      fallback={
+        <PageContainer>
+          <Loader />
+        </PageContainer>
+      }
+    >
+      <DocumentsPage />
+    </Suspense>
+  );
+}
