@@ -193,9 +193,16 @@ export default function UploadDocumentPage() {
       },
       onError: (error) => {
         if (error instanceof AxiosError) {
-          const errMessage = error.response?.data.message;
+          const status = error.response?.status;
+          if (status === 400) {
+            toast({
+              title: `Error uploading the file: ${error.response?.data.message}`,
+              variant: 'destructive'
+            });
+            return;
+          }
           toast({
-            title: errMessage ? `Error uploading the file: ${errMessage}` : `Something went wrong`,
+            title: `Something went wrong`,
             variant: 'destructive'
           });
           return;

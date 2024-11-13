@@ -6,7 +6,7 @@ const axios = Axios.create({
   baseURL
 });
 
-type Response<T = undefined> = {
+export type Response<T = undefined> = {
   success: boolean;
   message: string;
   data?: T;
@@ -14,7 +14,7 @@ type Response<T = undefined> = {
 
 const FIFTEEN_SECONDS = 15_000;
 
-type Document = {
+export type Document = {
   id: string;
   file_id: string;
   name: string;
@@ -84,17 +84,12 @@ type DeleteResponse = {
   success: boolean;
 };
 
-export function deleteDocument(id: string): Promise<DeleteResponse> {
+export function deleteDocument(id: string): Promise<Response> {
   return apiResolver<DeleteResponse>(() => axios.post(`/delete/${id}`));
 }
 
-type ReuploadResponse = {
-  message: string;
-  success: boolean;
-};
-
-export function reuploadDocument(formData: FormData, id: string): Promise<ReuploadResponse> {
-  return apiResolver<ReuploadResponse>(() => axios.post(`/reupload/${id}`, formData));
+export function reuploadDocument(formData: FormData, id: string): Promise<Response> {
+  return apiResolver<Response>(() => axios.post(`/reupload/${id}`, formData));
 }
 
 export type PlaceholderResponseDTO = {
