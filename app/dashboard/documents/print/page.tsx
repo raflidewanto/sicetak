@@ -31,7 +31,6 @@ const PrintDocumentPage = () => {
       onSuccess: (data) => {
         if (data.success) {
           const base64 = data.data;
-          // const filename = 'document.pdf';
           const blob = base64ToBlob(base64 || '', 'application/pdf');
           const url = URL.createObjectURL(blob);
           const pdfWindow = window.open('') as WindowProxy;
@@ -44,8 +43,15 @@ const PrintDocumentPage = () => {
       },
       onError: (error) => {
         if (error instanceof AxiosError) {
+          if (error?.status === 400) {
+            toast.toast({
+              title: `Error downloading the file: ${error.response?.data.message}`,
+              variant: 'destructive'
+            });
+            return;
+          }
           toast.toast({
-            title: `Error downloading the file: ${error.response?.data.message}`
+            title: `Something went wrong`
           });
           return;
         }

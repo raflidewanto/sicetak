@@ -5,6 +5,8 @@
     "@typescript-eslint/no-unused-vars": ["warn", { "args": "none" }],
     "import/no-unresolved": "error",
     "import/named": "off",
-    "no-console": "warn"
+    "no-console": "warn",
+    "semi": "error",
+    "no-unused-vars": "error"
   }
 }

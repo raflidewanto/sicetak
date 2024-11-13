@@ -6,9 +6,7 @@ import { navItems } from '@/constants/data';
 import { MenuIcon } from 'lucide-react';
 import React, { useState } from 'react';
 
-interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-export function MobileSidebar({ className }: SidebarProps) {
+export function MobileSidebar() {
   const [open, setOpen] = useState(false);
   return (
     <>
