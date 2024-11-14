@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 228 33% 97%;
     --foreground: 20 14.3% 4.1%;
     --muted: 60 4.8% 95.9%;
     --muted-foreground: 25 5.3% 44.7%;
@@ -24,6 +24,11 @@
     --destructive-foreground: 60 9.1% 97.8%;
     --ring: 24.6 95% 53.1%;
     --radius: 0.5rem;
+
+    /* sidebar */
+    --sidebar-background: 202 57% 21%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-bg-hover: 203 57% 19%;
   }
 
   [data-theme='dark'] {

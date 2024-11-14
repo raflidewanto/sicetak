@@ -10,7 +10,7 @@ interface EllipsisVerticalProps {
 
 const EllipsisVertical: React.FC<EllipsisVerticalProps> = ({
   className,
-  strokeColor = 'text-zinc-950 dark:text-white', // Default Tailwind classes for colors
+  strokeColor = 'text-zinc-950 ', // Default Tailwind classes for colors
   width = 24, // Default width
   height = 24 // Default height
 }) => {

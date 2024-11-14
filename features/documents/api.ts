@@ -45,21 +45,24 @@ export async function uploadDocument(formData: FormData): Promise<Response> {
 }
 
 export function getDocuments({
-  docType,
-  searchQuery,
-  productType
+  documentName,
+  documentCategory,
+  documentSubCategory,
+  documentType
 }: {
-  docType: string;
-  searchQuery: string;
-  productType: string;
+  documentName: string;
+  documentCategory: string;
+  documentSubCategory: string;
+  documentType: string;
 }): Promise<Response<Document[]>> {
   return apiResolver<Response<Document[]>>(() =>
     axios.get(``, {
       signal: AbortSignal.timeout(FIFTEEN_SECONDS),
       params: {
-        docType: docType,
-        docName: searchQuery,
-        docProduct: productType
+        'doc-name': documentName,
+        'doc-category': documentCategory,
+        'doc-subcategory': documentSubCategory,
+        'doc-type': documentType
       }
     })
   );

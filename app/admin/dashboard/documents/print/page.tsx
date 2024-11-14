@@ -10,7 +10,7 @@ import { base64ToBlob } from '@/utils/pdf';
 import { AxiosError } from 'axios';
 import { useSearchParams } from 'next/navigation';
 import { useQueryState } from 'nuqs';
-import { Suspense } from 'react';
+import React, { Suspense } from 'react';
 
 const PrintDocumentPage = () => {
   const searchParams = useSearchParams();
@@ -65,9 +65,9 @@ const PrintDocumentPage = () => {
   return (
     <PageContainer scrollable>
       <div className="mx-auto mt-8 min-h-screen max-w-lg">
-        <h1 className="mb-4 text-2xl font-semibold dark:text-white">Print Document</h1>
+        <h1 className="mb-4 text-2xl font-semibold">Print Document</h1>
         <div className="mb-6">
-          <label htmlFor="agreementNo" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+          <label htmlFor="agreementNo" className="block text-sm font-medium text-gray-700">
             Agreement Number
           </label>
           <Input
@@ -82,9 +82,7 @@ const PrintDocumentPage = () => {
             px-3 py-2 
             shadow-sm 
             focus:outline-none 
-            sm:text-sm
-            dark:text-white
-            dark:caret-orange-500"
+            sm:text-sm"
             placeholder="Enter agreement number"
           />
         </div>

@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Icons } from '@/components/icons';
@@ -35,19 +36,19 @@ export function DashboardNav({ items, setOpen, isMobileNav = false }: DashboardN
                   <Link
                     href={item.disabled ? '/' : item.href}
                     className={cn(
-                      `flex items-center gap-2 overflow-hidden rounded-md py-2 text-sm font-medium transition-all hover:border hover:border-orange-300 hover:bg-white hover:text-orange-500 dark:hover:border-orange-800 dark:hover:bg-zinc-900 dark:hover:text-orange-500`,
-                      path === item.href
-                        ? `bg-orange-500 text-white dark:border dark:border-orange-800 dark:bg-orange-950 dark:text-white dark:hover:border-amber-950 dark:hover:bg-orange-900 dark:hover:text-white`
+                      `flex h-[3rem] items-center gap-2 overflow-hidden py-2 text-sm font-medium transition-all hover:border-l-4 hover:border-l-orange-600 hover:bg-sidebarBgHover`,
+                      path === item.href || path.split('/')[1] === item.href.split('/')[1]
+                        ? `border-l-4 border-l-orange-600 bg-sidebarBgHover text-white`
                         : 'transparent',
                       item.disabled && 'cursor-not-allowed opacity-80',
                       item.label?.toLowerCase() === 'logout' &&
-                        `hover:border hover:border-red-300 hover:text-red-500 dark:text-white dark:hover:border dark:hover:border-red-500 dark:hover:bg-red-950`
+                        `:border :border-red-500 :bg-red-950  hover:border hover:border-red-300 hover:text-red-500`
                     )}
                     onClick={() => {
                       if (setOpen) setOpen(false);
                     }}
                   >
-                    <Icon className={`ml-3 size-5 flex-none dark:text-orange-600`} />
+                    <Icon className={`ml-3 size-5 flex-none `} />
 
                     {isMobileNav || (!isMinimized && !isMobileNav) ? (
                       <span className="mr-2 truncate">{item.title}</span>

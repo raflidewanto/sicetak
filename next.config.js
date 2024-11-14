@@ -1,7 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['utfs.io']
+    domains: ['utfs.io'],
+    remotePatterns: [
+      {
+        hostname: 'img.freepik.com',
+        protocol: 'https'
+      }
+    ]
   },
   webpack(config) {
     config.resolve.fallback = {

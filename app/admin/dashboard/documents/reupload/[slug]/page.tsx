@@ -13,14 +13,15 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { toast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import { DocumentType, productTypes, ProductTypeValue, validPlaceholders } from '@/constants/data';
-import { useUploadDoc } from '@/features/documents/mutations/use-upload-doc';
+import { useReuploadDoc } from '@/features/documents/mutations/use-reupload';
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
 import { usePDFJS } from '@/hooks/use-pdfjs';
 import { getErrorMessage } from '@/utils/error';
 import { AxiosError } from 'axios';
 import { Check, Copy } from 'lucide-react';
+import { useParams } from 'next/navigation';
 import React, { useState } from 'react';
 
 type bracketPlaceholder = {
@@ -32,12 +33,16 @@ type bracketPlaceholder = {
   pageHeight: number;
 };
 
-export default function UploadDocumentPage() {
+export default function ReuploadDocumentPage() {
+  const { slug } = useParams<{ slug: string }>();
   const [file, setFile] = useState<File | null>(null);
-  const [bracketCoordinates, setBracketCoordinates] = useState<bracketPlaceholder[]>([]);
   const [docType, setDocType] = useState<DocumentType | null>(null);
   const [docProduct, setDocProduct] = useState<ProductTypeValue | null>(null);
-  const uploadMutation = useUploadDoc();
+  const [bracketCoordinates, setBracketCoordinates] = useState<bracketPlaceholder[]>([]);
+  const toast = useToast();
+  const reuploadMitation = useReuploadDoc();
+
+  // clipboard
   const [, copy] = useCopyToClipboard();
   const [copiedPlaceholder, setCopiedPlaceholder] = useState<string | null>(null);
 
@@ -48,8 +53,8 @@ export default function UploadDocumentPage() {
         setTimeout(() => setCopiedPlaceholder(null), 1500);
       })
       .catch((error) => {
-        toast({
-          title: `Error copying the placeholder: ${error.message}`,
+        toast.toast({
+          title: `failed to copy ${error.message}`,
           variant: 'destructive'
         });
       });
@@ -156,19 +161,20 @@ export default function UploadDocumentPage() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!file) {
-      toast({
-        title: 'Pilih file'
+      toast.toast({
+        title: `Please select a file`
       });
       return;
     }
+
     if (!docType) {
-      toast({
+      toast.toast({
         title: 'Pilih jenis dokumen'
       });
       return;
     }
     if (!docProduct) {
-      toast({
+      toast.toast({
         title: 'Pilih jenis produk'
       });
       return;
@@ -180,55 +186,46 @@ export default function UploadDocumentPage() {
     formData.append('docType', docType);
     formData.append('docProduct', docProduct);
 
-    uploadMutation.mutate(formData, {
-      onSuccess: (data) => {
-        if (data.success) {
-          window.location.href = '/dashboard/documents';
-          return;
-        }
-        toast({
-          title: `Error uploading the file: ${data.message}`,
-          variant: 'destructive'
-        });
+    reuploadMitation.mutate(
+      {
+        formData,
+        id: slug
       },
-      onError: (error) => {
-        if (error instanceof AxiosError) {
-          const status = error.response?.status;
-          if (status === 400) {
-            toast({
-              title: `Error uploading the file: ${error.response?.data.message}`,
-              variant: 'destructive'
-            });
+      {
+        onSuccess: (data) => {
+          if (data.success) {
+            window.location.href = '/dashboard/documents';
             return;
           }
-          toast({
-            title: `Something went wrong`,
-            variant: 'destructive'
+          toast.toast({
+            title: `Error uploading the file: ${data.message}`
           });
-          return;
-        } else if (error instanceof Error) {
-          toast({
-            title: `Error uploading the file: ${error.message}`,
-            variant: 'destructive'
-          });
-          return;
+        },
+        onError: (error) => {
+          if (error instanceof AxiosError) {
+            toast.toast({
+              title: `Error reuploading the file: ${error.response?.data.message}`
+            });
+          } else if (error instanceof Error) {
+            toast.toast({
+              title: `Error reuploading the file: ${error.message}`
+            });
+          } else {
+            toast.toast({
+              title: `Error reuploading the file ${getErrorMessage(error)}`
+            });
+          }
         }
-        const errMessage = getErrorMessage(error);
-        toast({
-          title: errMessage ? `Error uploading the file: ${errMessage}` : `Something went wrong`,
-          variant: 'destructive'
-        });
-        return;
       }
-    });
+    );
   };
 
   return (
     <PageContainer scrollable>
-      <form onSubmit={handleSubmit} className="mb-4 space-y-4 dark:text-white">
+      <form onSubmit={handleSubmit} className="mb-4 space-y-4">
         <div className="space-y-4">
-          <label htmlFor="pdf-file" className="block text-sm font-medium dark:text-gray-200">
-            Upload PDF File
+          <label htmlFor="pdf-file" className="block text-sm font-medium">
+            Re-Upload PDF File
           </label>
           <div className="relative flex items-center justify-center">
             <input
@@ -241,15 +238,13 @@ export default function UploadDocumentPage() {
             <div
               className={`flex w-full items-center justify-center rounded-lg border px-4 py-3 text-sm shadow-sm transition-all ${
                 file
-                  ? 'border-green-400 bg-green-100 text-green-600 dark:border-green-500 dark:bg-green-900 dark:text-green-300'
-                  : 'border-gray-300 bg-white text-gray-500 hover:bg-gray-100 dark:border-orange-800 dark:bg-orange-950 dark:text-gray-300 dark:hover:bg-gray-700'
+                  ? 'border-green-400 bg-green-100 text-green-600   '
+                  : ':bg-gray-700 border-gray-300 bg-white text-gray-500    hover:bg-gray-100'
               }`}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className={`mr-2 h-5 w-5 ${
-                  file ? 'text-green-600 dark:text-green-300' : 'text-gray-500 dark:text-gray-400'
-                }`}
+                className={`mr-2 h-5 w-5 ${file ? 'text-green-600 ' : 'text-gray-500 '}`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -259,7 +254,7 @@ export default function UploadDocumentPage() {
               <span>{file ? file.name : 'Select PDF'}</span>
             </div>
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400">PDF files only (max size: 10MB)</p>
+          <p className="text-xs text-gray-500 ">PDF files only (max size: 10MB)</p>
           <div className="flex flex-wrap items-center justify-start gap-x-2 gap-y-2">
             <Select onValueChange={(value) => setDocType(value as DocumentType)}>
               <SelectTrigger className="w-[180px]">
@@ -282,8 +277,8 @@ export default function UploadDocumentPage() {
                   <SelectLabel>Jenis Produk</SelectLabel>
                   {productTypes
                     .filter((p) => p.value !== '')
-                    .map((item, i) => (
-                      <SelectItem key={`${item.value}-${i}`} value={item.value}>
+                    .map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
                         {item.label}
                       </SelectItem>
                     ))}
@@ -294,26 +289,27 @@ export default function UploadDocumentPage() {
         </div>
         <Button type="submit">Submit</Button>
       </form>
-      <ScrollArea className="h-72 w-64 rounded-md border dark:border-zinc-700 dark:text-white">
+      <ScrollArea className="h-72 w-64 rounded-md border  ">
         <div className="p-4">
           <h4 className="mb-4 text-sm font-medium leading-none">Valid Placeholders</h4>
-          {validPlaceholders.map((p) => (
-            <React.Fragment key={p}>
-              <div className="flex items-center justify-between gap-y-2 space-x-4">
+          {validPlaceholders.map((p, i) => (
+            <>
+              <div key={`${p}-${i}`} className="flex items-center justify-between gap-y-2 space-x-4">
                 <span>{p}</span>
                 <div
                   className={`cursor-pointer transition-all ${
-                    copiedPlaceholder === p
-                      ? 'text-green-500'
-                      : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                    copiedPlaceholder === p ? 'text-green-500' : 'text-gray-500 hover:text-gray-700'
                   }`}
                   onClick={handleCopy(p)}
+                  onKeyDown={handleCopy(p)}
+                  role="button"
+                  tabIndex={0}
                 >
                   {copiedPlaceholder === p ? <Check size={20} /> : <Copy size={20} />}
                 </div>
               </div>
-              <Separator className="my-2 dark:border-zinc-700" />
-            </React.Fragment>
+              <Separator className="my-2 " />
+            </>
           ))}
         </div>
       </ScrollArea>

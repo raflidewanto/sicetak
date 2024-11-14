@@ -6,7 +6,8 @@ module.exports = {
     './components/**/*.{ts,tsx}',
     './constants/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}'
+    './src/**/*.{ts,tsx}',
+    './features/**/*.{ts,tsx}'
   ],
   theme: {
     container: {
@@ -23,6 +24,9 @@ module.exports = {
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
+        sidebarBackground: 'hsl(var(--sidebar-background))',
+        sidebarForeground: 'hsl(var(--sidebar-foreground))',
+        sidebarBgHover: 'hsl(var(--sidebar-bg-hover))',
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))'

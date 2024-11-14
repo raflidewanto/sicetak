@@ -1,3 +1,4 @@
+import React from 'react';
 import { DashboardNav } from '@/components/dashboard-nav';
 import { navItems } from '@/constants/data';
 import { cn } from '@/lib/utils';
