@@ -1,8 +1,8 @@
 'use client';
 
-import PageContainer from '@/components/layout/page-container';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import PageContainer from '@/components/layout/PageContainer';
+import { Button } from '@/components/ui/Button';
+import { ScrollArea } from '@/components/ui/ScrollArea';
 import {
   Select,
   SelectContent,
@@ -11,14 +11,14 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue
-} from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
-import { useToast } from '@/components/ui/use-toast';
+} from '@/components/ui/Select';
+import { Separator } from '@/components/ui/Separator';
+import { useToast } from '@/components/ui/useToast';
 import { DocumentType, productTypes, ProductTypeValue, validPlaceholders } from '@/constants/data';
-import { useReuploadDoc } from '@/features/documents/mutations/use-reupload';
-import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
-import { usePDFJS } from '@/hooks/use-pdfjs';
-import { getErrorMessage } from '@/src/utils/error';
+import { useReuploadDoc } from '@/features/documents/mutations/useReupload';
+import { useCopyToClipboard } from '@/hooks/useCopyToClipboard';
+import { usePDFJS } from '@/hooks/usePdfjs';
+import { getErrorMessage } from '@/utils/error';
 import { AxiosError } from 'axios';
 import { Check, Copy } from 'lucide-react';
 import { useParams } from 'next/navigation';
@@ -99,7 +99,7 @@ export default function ReuploadDocumentPage() {
         });
 
         const placeholderRegex = /{{\s*\$[\w]+\s*}}/g;
-        let match;
+        let match: RegExpExecArray | null;
 
         while ((match = placeholderRegex.exec(accumulatedText)) !== null) {
           const placeholderText = match[0];
@@ -237,8 +237,8 @@ export default function ReuploadDocumentPage() {
             />
             <div
               className={`flex w-full items-center justify-center rounded-lg border px-4 py-3 text-sm shadow-sm transition-all ${file
-                  ? 'border-green-400 bg-green-100 text-green-600   '
-                  : ':bg-gray-700 border-gray-300 bg-white text-gray-500    hover:bg-gray-100'
+                ? 'border-green-400 bg-green-100 text-green-600   '
+                : ':bg-gray-700 border-gray-300 bg-white text-gray-500    hover:bg-gray-100'
                 }`}
             >
               <svg

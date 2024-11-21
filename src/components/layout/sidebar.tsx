@@ -1,14 +1,14 @@
 'use client';
 
-import { DashboardNav } from '@/components/dashboard-nav';
+import { DashboardNav } from '@/components/DashboardNav';
 import { navItems } from '@/constants/data';
-import { useSidebar } from '@/hooks/useSidebar';
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import Show from '../elements/show';
-import PrinterIcon from '../icons/printer';
+import Show from '../elements/Show';
+import PrinterIcon from '@/assets/icons/ic-printer.svg';
+import { useSidebar } from '../contexts/SidebarContext';
 
 type SidebarProps = {
   className?: string;

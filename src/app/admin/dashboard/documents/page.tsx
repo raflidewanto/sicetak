@@ -2,18 +2,17 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 'use client';
 
-import AddDocumentIcon from '@/components/icons/add-document-icon';
-import AddParamIcon from '@/components/icons/add-param';
-import EditIcon from '@/components/icons/edit-icon';
-import PageContainer from '@/components/layout/page-container';
-import { Button } from '@/components/ui/button';
+import EditIcon from '@/assets/icons/ic-edit.svg';
+import PageContainer from '@/components/layout/PageContainer';
+import { Button } from '@/components/ui/Button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
+} from '@/components/ui/DropdownMenu';
+import { Input } from '@/components/ui/Input';
+import { Modal } from '@/components/ui/Modal';
 import {
   Select,
   SelectContent,
@@ -22,23 +21,27 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue
-} from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { toast } from '@/components/ui/use-toast';
+} from '@/components/ui/Select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip';
 import { CATEGORY, DOCUMENT_NAME, DOCUMENT_TYPE, SUBCATEGORY } from '@/constants/data';
-import { useSubCategories } from '@/features/categories/queries/use-subcategories';
-import { useDocuments } from '@/features/documents/queries/use-documents';
-import { useDebounceValue } from '@/hooks/use-debounce-value';
+import { useSubCategories } from '@/features/categories/queries/useSubcategories';
+import { useDocuments } from '@/features/documents/queries/useDocuments';
+import { useDebounceValue } from '@/hooks/useDebounceValue';
+import useDisclosure from '@/hooks/useDisclosure';
 import { cn } from '@/lib/utils';
-import { getErrorMessage } from '@/src/utils/error';
+import { getErrorMessage } from '@/utils/error';
 import { DownloadCloud, Edit, Plus, Printer, Search } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useQueryState } from 'nuqs';
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 
 const AdminPage = () => {
+  // UI states
+  const { onOpen, onClose, isOpen } = useDisclosure();
+  const [errorMessage, setErrorMessage] = useState('');
+
   // query state
   const [categoryQuery, setCategoryQuery] = useQueryState(CATEGORY);
   const [subCategoryQuery, setSubCategoryQuery] = useQueryState(SUBCATEGORY);
@@ -74,9 +77,8 @@ const AdminPage = () => {
       const pdfWindow = window.open('') as WindowProxy;
       pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
     } catch (error) {
-      toast({
-        title: `Error downloading the file: ${getErrorMessage(error)}`
-      });
+      setErrorMessage(getErrorMessage(error));
+      onOpen();
       return;
     }
   }
@@ -144,7 +146,6 @@ const AdminPage = () => {
               <DropdownMenuContent className="relative right-3 w-full" align="start">
                 <DropdownMenuItem asChild>
                   <Link href="/admin/dashboard/documents/upload">
-                    <AddDocumentIcon />
                     Tambah Dokumen
                   </Link>
                 </DropdownMenuItem>
@@ -159,7 +160,6 @@ const AdminPage = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/admin/dashboard/documents/custom-param/{id}">
-                    <AddParamIcon />
                     Tambah Parameter
                   </Link>
                 </DropdownMenuItem>
@@ -262,7 +262,11 @@ const AdminPage = () => {
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <Printer className="inline-block cursor-pointer text-[#3B3B3B]" size={18} />
+                                  <Link href={`/admin/dashboard/documents/${doc.file_id}/print`}>
+                                    <Printer
+                                      className="inline-block cursor-pointer text-[#3B3B3B]"
+                                      size={18} />
+                                  </Link>
                                 </TooltipTrigger>
                                 <TooltipContent>Cetak isi</TooltipContent>
                               </Tooltip>
@@ -286,6 +290,11 @@ const AdminPage = () => {
           </section>
         </main>
       </div>
+      <Modal title="Error" description={errorMessage ?? 'Something went wrong'} isOpen={isOpen} onClose={onClose} type='error'>
+        <Button variant="destructive" onClick={onClose}>
+          Close
+        </Button>
+      </Modal>
     </PageContainer>
   );
 };

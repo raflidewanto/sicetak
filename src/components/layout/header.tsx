@@ -1,10 +1,11 @@
-// import ThemeToggle from '@/components/layout/ThemeToggle/theme-toggle';
+"use client";
+
 import { cn } from '@/lib/utils';
-import { MobileSidebar } from './mobile-sidebar';
-import { UserNav } from './user-nav';
-import { Separator } from '../ui/separator';
-import Box from '../icons/box';
-import NotificationIcon from '../icons/notification';
+import { MobileSidebar } from './MobileSidebar';
+import { UserNav } from './UserNav';
+import { Separator } from '../ui/Separator';
+import Box from "@/assets/icons/ic-box.svg";
+import NotificationIcon from '@/assets/icons/ic-notification.svg';
 
 export default function Header() {
   return (
@@ -18,7 +19,6 @@ export default function Header() {
           <Box />
           <Separator orientation="vertical" className="h-[1.813rem] bg-[#98A2B3]" />
           <UserNav />
-          {/* <ThemeToggle /> */}
         </div>
       </nav>
     </header>

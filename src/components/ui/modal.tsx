@@ -1,17 +1,27 @@
 'use client';
 
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
+import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
+import { Ban, CheckCircleIcon } from 'lucide-react';
 import React from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+
+const Icons = {
+  success: <CheckCircleIcon className="h-6 w-6 text-green-500" />,
+  warning: <ExclamationTriangleIcon className="h-6 w-6 text-yellow-500" />,
+  error: <Ban className="h-6 w-6 text-red-500" />
+};
 
 interface ModalProps {
   title: string;
   description: string;
+  type: 'success' | 'warning' | 'error';
   isOpen: boolean;
   onClose: () => void;
+  icon?: React.ReactNode;
   children?: React.ReactNode;
 }
 
-export const Modal: React.FC<ModalProps> = ({ title, description, isOpen, onClose, children }) => {
+export const Modal: React.FC<ModalProps> = ({ title, description, isOpen, onClose, children, icon, type }) => {
   const onChange = (open: boolean) => {
     if (!open) {
       onClose();
@@ -20,12 +30,19 @@ export const Modal: React.FC<ModalProps> = ({ title, description, isOpen, onClos
 
   return (
     <Dialog open={isOpen} onOpenChange={onChange}>
-      <DialogContent className="  ">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+      <DialogContent>
+        <DialogHeader className='flex flex-row items-start justify-start gap-4'>
+          {Icons[type] || icon}
+          <div className='flex flex-col items-start justify-start gap-2 relative -top-1'>
+            <DialogTitle>{title}</DialogTitle>
+            <DialogDescription className='max-w-md'>
+              <p className=''>{description}</p>
+            </DialogDescription>
+          </div>
         </DialogHeader>
-        <div>{children}</div>
+        <div className='flex justify-end items-center gap-3'>
+          {children}
+        </div>
       </DialogContent>
     </Dialog>
   );

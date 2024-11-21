@@ -1,12 +1,12 @@
 'use client';
 
-import Show from '@/components/elements/show';
-import UploadedFileIcon from '@/components/icons/uploaded-file';
-import PageContainer from '@/components/layout/page-container';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import Show from '@/components/elements/Show';
+import UploadedFileIcon from '@/assets/icons/ic-uploaded-file.svg';
+import PageContainer from '@/components/layout/PageContainer';
+import { Button } from '@/components/ui/Button';
+import { Card, CardContent } from '@/components/ui/Card';
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
 import {
   Select,
   SelectContent,
@@ -15,20 +15,21 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue
-} from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { toast } from '@/components/ui/use-toast';
-import { bracketPlaceholder, DocumentType } from '@/constants/data';
-import { useUploadDoc } from '@/features/documents/mutations/use-upload-doc';
-import { usePDFJS } from '@/hooks/use-pdfjs';
+} from '@/components/ui/Select';
+import { Switch } from '@/components/ui/Switch';
+import { Textarea } from '@/components/ui/Textarea';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip';
+import { toast } from '@/components/ui/useToast';
+import { DocumentType } from '@/constants/data';
+import { useUploadDoc } from '@/features/documents/mutations/useUploadDocument';
+import { usePDFJS } from '@/hooks/usePdfjs';
 import { cn } from '@/lib/utils';
-import { getErrorMessage } from '@/src/utils/error';
+import { getErrorMessage } from '@/utils/error';
 import { AxiosError } from 'axios';
 import { X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { memo, useState } from 'react';
+import { bracketPlaceholder } from '@/types';
 
 const AddNewDocumentPage = () => {
   // route
@@ -87,7 +88,7 @@ const AddNewDocumentPage = () => {
         });
 
         const placeholderRegex = /{{\s*\$[\w]+\s*}}/g;
-        let match;
+        let match: RegExpExecArray | null;
 
         while ((match = placeholderRegex.exec(accumulatedText)) !== null) {
           const placeholderText = match[0];

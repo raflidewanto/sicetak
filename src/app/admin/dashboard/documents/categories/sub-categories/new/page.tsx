@@ -1,10 +1,10 @@
 'use client';
 
-import PageContainer from '@/components/layout/page-container';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import PageContainer from '@/components/layout/PageContainer';
+import { Button } from '@/components/ui/Button';
+import { Card, CardContent } from '@/components/ui/Card';
+import { Input } from '@/components/ui/Input';
+import { Textarea } from '@/components/ui/Textarea';
 import { cn } from '@/lib/utils';
 
 const AddSubCategoryPage = () => {

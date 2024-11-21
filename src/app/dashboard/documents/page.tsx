@@ -2,8 +2,9 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 'use client';
 
-import PageContainer from '@/components/layout/page-container';
-import { Input } from '@/components/ui/input';
+import Show from '@/components/elements/Show';
+import PageContainer from '@/components/layout/PageContainer';
+import { Input } from '@/components/ui/Input';
 import {
   Select,
   SelectContent,
@@ -12,12 +13,10 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue
-} from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+} from '@/components/ui/Select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip';
 import { CATEGORY } from '@/constants/data';
-// import { useDocuments } from '@/features/documents/queries/use-documents';
-// import { useDebounceValue } from '@/hooks/use-debounce-value';
 import { cn } from '@/lib/utils';
 import { DownloadCloud, Printer, Search } from 'lucide-react';
 import { useQueryState } from 'nuqs';
@@ -57,20 +56,6 @@ const dummySubCategories = [
 const DocumentsPage = () => {
   // query state
   const [categoryQuery, setCategoryQuery] = useQueryState(CATEGORY);
-  // const [subCategoryQuery, setSubCategoryQuery] = useQueryState(SUBCATEGORY);
-  // const [documentQuery, setDocumentQuery] = useQueryState(DOCUMENT_NAME);
-
-  // debounced query state
-  // const [categoryDebouncedQuery] = useDebounceValue(categoryQuery, 1500);
-  // const [subCategoryDebouncedQuery] = useDebounceValue(subCategoryQuery, 1500);
-  // const [documentDebouncedQuery] = useDebounceValue(documentQuery, 1500);
-
-  // queries
-  // const { data: documents, isLoading } = useDocuments(
-  //   documentDebouncedQuery ?? "",
-  //   categoryDebouncedQuery ?? "",
-  //   subCategoryDebouncedQuery ?? ""
-  // );
 
   return (
     <PageContainer scrollable>
@@ -143,23 +128,25 @@ const DocumentsPage = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody className="bg-white">
-                    {dummyDocuments.map((doc) => (
-                      <TableRow key={doc.id} className="h-[3.313rem] border-b">
-                        <TableCell className="px-4 py-2">{doc.name}</TableCell>
-                        <TableCell className="px-4 py-2 text-center">
-                          <div className="flex items-center justify-evenly gap-x-2">
-                            <DownloadCloud className="text-[#3B3B3B]" />
-                            <Printer className="inline-block text-[#3B3B3B]" size={18} />
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-4 py-2 text-center">
-                          <div className="flex items-center justify-evenly gap-x-2">
-                            <DownloadCloud className="text-[#3B3B3B]" />
-                            <Printer className="inline-block text-[#3B3B3B]" size={18} />
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    <Show when={dummyDocuments.length > 0} fallback={<p>No data</p>}>
+                      {dummyDocuments.map((doc) => (
+                        <TableRow key={doc.id} className="h-[3.313rem] border-b">
+                          <TableCell className="px-4 py-2">{doc.name}</TableCell>
+                          <TableCell className="px-4 py-2 text-center">
+                            <div className="flex items-center justify-evenly gap-x-2">
+                              <DownloadCloud className="text-[#3B3B3B]" />
+                              <Printer className="inline-block text-[#3B3B3B]" size={18} />
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-4 py-2 text-center">
+                            <div className="flex items-center justify-evenly gap-x-2">
+                              <DownloadCloud className="text-[#3B3B3B]" />
+                              <Printer className="inline-block text-[#3B3B3B]" size={18} />
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </Show>
                   </TableBody>
                 </Table>
               </div>
