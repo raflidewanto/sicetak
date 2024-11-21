@@ -318,8 +318,8 @@ const AddNewDocumentPage = () => {
                     <SelectContent>
                       <SelectGroup>
                         <SelectLabel>Sub Kategori</SelectLabel>
-                        <SelectItem value="fund-facility">Fasilitas Dana</SelectItem>
-                        <SelectItem value="business-capital-facilities">Fasilitas Modal Usaha</SelectItem>
+                        <SelectItem value="fasilitas-dana">Fasilitas Dana</SelectItem>
+                        <SelectItem value="fasilitas-modal-usaha">Fasilitas Modal Usaha</SelectItem>
                         <SelectItem value="installment-financing">Installment Financing</SelectItem>
                       </SelectGroup>
                     </SelectContent>
