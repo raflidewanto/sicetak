@@ -29,7 +29,7 @@ import { bracketPlaceholder, DocumentType } from '@/constants/data';
 import { useUploadDoc } from '@/features/documents/mutations/use-upload-doc';
 import { usePDFJS } from '@/hooks/use-pdfjs';
 import { cn } from '@/lib/utils';
-import { getErrorMessage } from '@/utils/error';
+import { getErrorMessage } from '@/src/utils/error';
 import { AxiosError } from 'axios';
 import { Plus, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -38,6 +38,7 @@ import React, { memo, useState } from 'react';
 const EditDocument = () => {
   // route
   const router = useRouter();
+  // const { slug } = useParams<{ slug: string }>();
 
   // PDF states
   const [file, setFile] = useState<File | null>(null);

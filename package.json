@@ -8,14 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint --fix",
-    "format": "prettier . --write",
-    "typecheck": "tsc --project tsconfig.json --pretty --noEmit",
-    "prepare": "husky"
-  },
-  "lint-staged": {
-    "**/*": [
-      "prettier --write --ignore-unknown"
-    ]
+    "typecheck": "tsc --project tsconfig.json --pretty --noEmit"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.1.2",
@@ -75,10 +68,6 @@
     "@types/uuid": "^9.0.7",
     "@typescript-eslint/eslint-plugin": "^6.11.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-react": "^7.37.2",
-    "husky": "^9.0.11",
-    "lint-staged": "^15.2.7",
-    "prettier": "3.0.3",
-    "prettier-plugin-tailwindcss": "^0.5.14"
+    "eslint-plugin-react": "^7.37.2"
   }
 }

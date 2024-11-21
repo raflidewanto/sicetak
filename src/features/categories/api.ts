@@ -1,4 +1,4 @@
-import apiResolver from '@/utils/api';
+import apiResolver from '@/src/utils/api';
 import Axios from 'axios';
 
 const baseURL = 'http://localhost:9500/api/sub-categories';

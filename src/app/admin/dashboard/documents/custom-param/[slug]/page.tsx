@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 'use client';
 
 import Show from '@/components/elements/show';
@@ -7,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Select,
   SelectContent,
@@ -16,6 +19,8 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -24,13 +29,13 @@ import { bracketPlaceholder, DocumentType } from '@/constants/data';
 import { useUploadDoc } from '@/features/documents/mutations/use-upload-doc';
 import { usePDFJS } from '@/hooks/use-pdfjs';
 import { cn } from '@/lib/utils';
-import { getErrorMessage } from '@/utils/error';
+import { getErrorMessage } from '@/src/utils/error';
 import { AxiosError } from 'axios';
-import { X } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { memo, useState } from 'react';
+import React, { memo, useState } from 'react';
 
-const AddNewDocumentPage = () => {
+const EditDocument = () => {
   // route
   const router = useRouter();
 
@@ -318,8 +323,8 @@ const AddNewDocumentPage = () => {
                     <SelectContent>
                       <SelectGroup>
                         <SelectLabel>Sub Kategori</SelectLabel>
-                        <SelectItem value="fasilitas-dana">Fasilitas Dana</SelectItem>
-                        <SelectItem value="fasilitas-modal-usaha">Fasilitas Modal Usaha</SelectItem>
+                        <SelectItem value="fund-facility">Fasilitas Dana</SelectItem>
+                        <SelectItem value="business-capital-facilities">Fasilitas Modal Usaha</SelectItem>
                         <SelectItem value="installment-financing">Installment Financing</SelectItem>
                       </SelectGroup>
                     </SelectContent>
@@ -366,6 +371,92 @@ const AddNewDocumentPage = () => {
                 </button>
               </div>
               <UploadSection />
+            </div>
+
+            {/* placeholders container */}
+            <div className="grid grid-cols-1 gap-x-6 px-6 py-4 sm:grid-cols-2">
+              {/* list placeholders */}
+              <section className="min-h-[15.813rem] bg-white">
+                <div className="rounded-tl-md rounded-tr-md bg-[#F2F5F6] p-4">
+                  <p className="text-[0.75rem] font-medium text-gray-700">Default State</p>
+                </div>
+                <ScrollArea className="h-72 w-full">
+                  {Array.from({ length: 10 }).map((_, i) => (
+                    <React.Fragment key={i}>
+                      <div className="flex min-h-[3.313rem] items-center justify-start px-4 py-2">
+                        <p>test</p>
+                      </div>
+                      <Separator />
+                    </React.Fragment>
+                  ))}
+                </ScrollArea>
+              </section>
+              {/* add new placeholder */}
+              <section className="min-h-[15.813rem] bg-white">
+                <div className="rounded-tl-md rounded-tr-md bg-[#F2F5F6] p-4">
+                  <p className="text-[0.75rem] font-medium text-gray-700">Custom Param</p>
+                </div>
+                <div className="flex min-h-[3.313rem] items-center justify-start px-4 py-2">
+                  <Sheet>
+                    <SheetTrigger asChild>
+                      <p className="flex cursor-pointer items-center justify-start gap-x-2 text-[0.75rem] text-orange-500">
+                        <Plus size={16} color="#F97316" />
+                        Tambah / Edit Placeholder
+                      </p>
+                    </SheetTrigger>
+                    <SheetContent className="w-full">
+                      <SheetHeader>
+                        <SheetTitle>Tambah Parameter</SheetTitle>
+                      </SheetHeader>
+                      <section className="flex h-full w-full flex-col items-start justify-between gap-y-6 py-6">
+                        <div className="w-full">
+                          {/* placeholder select */}
+                          <div className="mb-4 flex-grow">
+                            <p>Placeholder</p>
+                            <Select>
+                              <SelectTrigger className="min-w-full">
+                                <SelectValue placeholder="Pilih Placeholder" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectLabel>Pilih Placeholder</SelectLabel>
+                                  <SelectItem value="{{ $content1 }}">{`{{ $content1 }}`}</SelectItem>
+                                  <SelectItem value="{{ $content2 }}">{`{{ $content2 }}`}</SelectItem>
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          {/* placeholder value */}
+                          <div className="w-full">
+                            <p>Value</p>
+                            <Textarea className="w-full" />
+                          </div>
+                        </div>
+                        {/* actions */}
+                        <div className="flex justify-end space-x-4 px-5">
+                          <Button
+                            variant="ghost"
+                            className="border border-gray-300 bg-white"
+                            onClick={() => router.back()}
+                          >
+                            Kembali
+                          </Button>
+                          <Button type="submit" className="bg-orange-500 text-white">
+                            Simpan
+                          </Button>
+                        </div>
+                      </section>
+                      <div
+                        onClick={(e) => e.stopPropagation()}
+                        className="fixed left-1/2 top-1/2 z-[999999999999] h-screen w-[34rem] -translate-x-[80%] -translate-y-1/2 p-4 py-4 delay-0 duration-0"
+                      >
+                        <iframe src="https://example.com" width="100%" height="100%" allowFullScreen title="s"></iframe>
+                      </div>
+                    </SheetContent>
+                  </Sheet>
+                </div>
+                <Separator />
+              </section>
             </div>
 
             {/* switches for release and active */}
@@ -418,4 +509,4 @@ const AddNewDocumentPage = () => {
   );
 };
 
-export default AddNewDocumentPage;
+export default EditDocument;

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import { AGREEMENT_NO_QUERY, DOCUMENT_ID_QUERY } from '@/constants/data';
 import { usePrintDocument } from '@/features/documents/mutations/use-print-doc';
-import { base64ToBlob } from '@/utils/pdf';
+import { base64ToBlob } from '@/src/utils/pdf';
 import { AxiosError } from 'axios';
 import { useSearchParams } from 'next/navigation';
 import { useQueryState } from 'nuqs';
@@ -92,9 +92,8 @@ const PrintDocumentPage = () => {
             variant={'outline'}
             onClick={handleDownload}
             disabled={printMutation.isPending}
-            className={`inline-flex items-center rounded-md px-4 py-2 text-sm font-medium ${
-              printMutation.isPending && 'cursor-not-allowed opacity-50'
-            }`}
+            className={`inline-flex items-center rounded-md px-4 py-2 text-sm font-medium ${printMutation.isPending && 'cursor-not-allowed opacity-50'
+              }`}
           >
             {printMutation.isPending ? 'Downloading...' : 'Download PDF'}
           </Button>

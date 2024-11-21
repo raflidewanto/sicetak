@@ -31,7 +31,7 @@ import { useSubCategories } from '@/features/categories/queries/use-subcategorie
 import { useDocuments } from '@/features/documents/queries/use-documents';
 import { useDebounceValue } from '@/hooks/use-debounce-value';
 import { cn } from '@/lib/utils';
-import { getErrorMessage } from '@/utils/error';
+import { getErrorMessage } from '@/src/utils/error';
 import { DownloadCloud, Edit, Plus, Printer, Search } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';

@@ -18,7 +18,7 @@ import { DocumentType, productTypes, ProductTypeValue, validPlaceholders } from 
 import { useReuploadDoc } from '@/features/documents/mutations/use-reupload';
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
 import { usePDFJS } from '@/hooks/use-pdfjs';
-import { getErrorMessage } from '@/utils/error';
+import { getErrorMessage } from '@/src/utils/error';
 import { AxiosError } from 'axios';
 import { Check, Copy } from 'lucide-react';
 import { useParams } from 'next/navigation';
@@ -236,11 +236,10 @@ export default function ReuploadDocumentPage() {
               className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
             />
             <div
-              className={`flex w-full items-center justify-center rounded-lg border px-4 py-3 text-sm shadow-sm transition-all ${
-                file
+              className={`flex w-full items-center justify-center rounded-lg border px-4 py-3 text-sm shadow-sm transition-all ${file
                   ? 'border-green-400 bg-green-100 text-green-600   '
                   : ':bg-gray-700 border-gray-300 bg-white text-gray-500    hover:bg-gray-100'
-              }`}
+                }`}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -297,9 +296,8 @@ export default function ReuploadDocumentPage() {
               <div key={`${p}-${i}`} className="flex items-center justify-between gap-y-2 space-x-4">
                 <span>{p}</span>
                 <div
-                  className={`cursor-pointer transition-all ${
-                    copiedPlaceholder === p ? 'text-green-500' : 'text-gray-500 hover:text-gray-700'
-                  }`}
+                  className={`cursor-pointer transition-all ${copiedPlaceholder === p ? 'text-green-500' : 'text-gray-500 hover:text-gray-700'
+                    }`}
                   onClick={handleCopy(p)}
                   onKeyDown={handleCopy(p)}
                   role="button"

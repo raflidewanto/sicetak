@@ -1,4 +1,4 @@
-import apiResolver, { newAbortSignal } from '@/utils/api';
+import apiResolver, { newAbortSignal } from '@/src/utils/api';
 import Axios from 'axios';
 
 const baseURL = 'http://localhost:9500/api/documents';
