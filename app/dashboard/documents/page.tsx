@@ -1,7 +1,8 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 'use client';
 
 import PageContainer from '@/components/layout/page-container';
-import Loader from '@/components/loader';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -12,166 +13,167 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import { toast } from '@/components/ui/use-toast';
-import { productTypes } from '@/constants/data';
-import DocumentsTable from '@/features/documents/components/documents-table';
-import { useDeleteDoc } from '@/features/documents/mutations/use-delete-doc';
-import { useToggleActive } from '@/features/documents/mutations/use-toggle-active';
-import { useToggleRelease } from '@/features/documents/mutations/use-toggle-release';
-import { useDocuments } from '@/features/documents/queries/use-documents';
-import { useDebounceValue } from '@/hooks/use-debounce-value';
-import useDisclosure from '@/hooks/use-disclosure';
-import { getErrorMessage } from '@/utils/error';
-import { AxiosError } from 'axios';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { CATEGORY } from '@/constants/data';
+// import { useDocuments } from '@/features/documents/queries/use-documents';
+// import { useDebounceValue } from '@/hooks/use-debounce-value';
+import { cn } from '@/lib/utils';
+import { DownloadCloud, Printer, Search } from 'lucide-react';
 import { useQueryState } from 'nuqs';
 import { Suspense } from 'react';
 
+interface Document {
+  id: number;
+  name: string;
+  individual: boolean;
+  company: boolean;
+  active: boolean;
+}
+
+const dummyDocuments: Document[] = [
+  { id: 1, name: 'Surat Kuasa Tanah', individual: true, company: false, active: true },
+  {
+    id: 2,
+    name: 'Formulir Permohonan Pembiayaan Laporan Survei Analisa Pembiayaan',
+    individual: false,
+    company: true,
+    active: true
+  },
+  { id: 3, name: 'Offering Letter dan Informasi Penting', individual: true, company: true, active: false },
+  { id: 4, name: 'Perjanjian Pembiayaan, Syarat dan Ketentuan', individual: true, company: false, active: true },
+  { id: 5, name: 'Form Gesekan Nomor Rangka dan Nomor Mesin', individual: false, company: true, active: false }
+];
+
+const dummySubCategories = [
+  'Fasilitas Dana',
+  'Fasilitas Modal Usaha',
+  'Installment Financing',
+  'SLB',
+  'Mitra Loyal Carfin',
+  'Flash Cash R2'
+];
+
 const DocumentsPage = () => {
-  // Query params
-  const [searchQuery, setSearchQuery] = useQueryState('docName');
-  const [selectedType, setSelectedType] = useQueryState('docType');
-  const [selectedProductType, setSelectedProductType] = useQueryState('docProduct');
-  // Debounce the values with a delay of 1000ms then set the debounced values to the query state
-  const [debouncedSearchQuery] = useDebounceValue(searchQuery, 1000);
-  const [debouncedSelectedType] = useDebounceValue(selectedType, 1000);
-  const [debouncedSelectedProductType] = useDebounceValue(selectedProductType, 1000);
+  // query state
+  const [categoryQuery, setCategoryQuery] = useQueryState(CATEGORY);
+  // const [subCategoryQuery, setSubCategoryQuery] = useQueryState(SUBCATEGORY);
+  // const [documentQuery, setDocumentQuery] = useQueryState(DOCUMENT_NAME);
 
-  // Documents
-  const { data, isLoading, isError } = useDocuments(
-    debouncedSelectedType ?? '',
-    debouncedSearchQuery ?? '',
-    debouncedSelectedProductType ?? ''
-  );
-  const deleteDocMutation = useDeleteDoc();
-  const toggleActiveMutation = useToggleActive();
-  const releaseMutation = useToggleRelease();
+  // debounced query state
+  // const [categoryDebouncedQuery] = useDebounceValue(categoryQuery, 1500);
+  // const [subCategoryDebouncedQuery] = useDebounceValue(subCategoryQuery, 1500);
+  // const [documentDebouncedQuery] = useDebounceValue(documentQuery, 1500);
 
-  // UI state
-  const { isOpen, onClose, onOpen } = useDisclosure();
-
-  if (isError)
-    return (
-      <PageContainer>
-        <p className="min-h-screen dark:text-white">Oops! Something went wrong, please try again in a few minutes</p>
-      </PageContainer>
-    );
-
-  function handleDownload(file: string) {
-    try {
-      // Decode the base64 string
-      const byteString = atob(file);
-      const byteArray = new Uint8Array(byteString.length);
-      for (let i = 0; i < byteString.length; i++) {
-        byteArray[i] = byteString.charCodeAt(i);
-      }
-
-      const blob = new Blob([byteArray], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      const pdfWindow = window.open('') as WindowProxy;
-      pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
-    } catch (error) {
-      toast({
-        title: `Error downloading the file: ${getErrorMessage(error)}`
-      });
-      return;
-    }
-  }
-
-  function handleDelete(id: string) {
-    deleteDocMutation.mutate(id, {
-      onSuccess: () => {
-        window.location.reload();
-      },
-      onError: (error) => {
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 400) {
-            toast({
-              title: `Error deleting the file: ${error.response?.data.message}`
-            });
-            return;
-          }
-          toast({
-            title: `Something went wrong`
-          });
-          return;
-        }
-        toast({
-          title: `Error deleting the file: ${error.message}`
-        });
-        return;
-      }
-    });
-  }
+  // queries
+  // const { data: documents, isLoading } = useDocuments(
+  //   documentDebouncedQuery ?? "",
+  //   categoryDebouncedQuery ?? "",
+  //   subCategoryDebouncedQuery ?? ""
+  // );
 
   return (
     <PageContainer scrollable>
-      <div className="flex w-full flex-col items-start justify-center gap-y-8">
-        {/* Search and Filter Controls */}
-        <div className="flex w-full flex-col items-start justify-start gap-x-4 gap-y-4">
-          <Input
-            className="w-3/4"
-            type="text"
-            placeholder="Search by document name..."
-            value={searchQuery ?? ''}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <div className="flex flex-wrap items-center justify-start gap-x-4 gap-y-4">
-            <Select onValueChange={(value) => setSelectedType(value)}>
-              <SelectTrigger className="w-[180px] py-4">
-                <SelectValue placeholder="Pilih jenis dokumen" />
+      <div className="flex min-h-[35rem] w-full flex-grow flex-col items-stretch rounded-md border border-gray-300 text-xs xl:min-h-screen">
+        <section className="flex h-auto flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-tl-md rounded-tr-md border-b border-gray-300 bg-[#173E55] px-4 py-2 md:h-[4rem] md:flex-nowrap">
+          <h1 className="text-base text-white">Sub Category</h1>
+          <div className="flex flex-wrap items-center gap-x-2">
+            <div className="relative w-full md:w-auto">
+              <Search className="absolute left-2 top-[0.45rem]" color="gray" size={18} />
+              <Input className="h-8 w-full bg-white pl-8 md:w-96" placeholder="Search..." />
+            </div>
+            <Select>
+              <SelectTrigger className="w-full bg-white md:w-[12rem]">
+                <SelectValue placeholder="Pilih Kategori" className="py-3" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="w-full md:w-64">
                 <SelectGroup>
-                  <SelectLabel>Jenis Dokumen</SelectLabel>
-                  <SelectItem value="">Semua</SelectItem>
-                  <SelectItem value="personal">Perseorangan</SelectItem>
-                  <SelectItem value="company">Perusahaan</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-            <Select onValueChange={(value) => setSelectedProductType(value)}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Pilih jenis produk" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Jenis Produk</SelectLabel>
-                  {productTypes.map((item) => (
-                    <SelectItem key={item.value} value={item.value}>
-                      {item.label}
-                    </SelectItem>
-                  ))}
+                  <SelectLabel>Pilih Kategori</SelectLabel>
+                  <SelectItem value="financing-agreement">Financing Agreement</SelectItem>
+                  <SelectItem value="agreement-transfer">Agreement Transfer</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
           </div>
-        </div>
-        <DocumentsTable
-          data={data}
-          isLoading={isLoading}
-          handleDownload={handleDownload}
-          handleDelete={handleDelete}
-          onOpen={onOpen}
-          onClose={onClose}
-          toggleActiveMutation={toggleActiveMutation}
-          releaseMutation={releaseMutation}
-          deleteDocMutation={deleteDocMutation}
-          isOpen={isOpen}
-        />
+        </section>
+        <main className="flex flex-grow">
+          {/* Categories container */}
+          <section className="max-h-dvh w-full overflow-y-scroll border-r-2 border-gray-300 bg-white md:w-[20%]">
+            {/* Category Card */}
+            {dummySubCategories.map((category, i) => (
+              <TooltipProvider key={`${category}-${i}`}>
+                <Tooltip>
+                  <TooltipTrigger className="w-full">
+                    <div
+                      onClick={() => setCategoryQuery(category.split(' ').join('-').toLowerCase())}
+                      className={cn(
+                        `flex min-h-[3rem] w-full items-center justify-between border-b border-gray-300 bg-white px-4 py-2 transition-all hover:border-l-4 hover:border-l-[#173E55] hover:bg-background`,
+                        {
+                          'border-l-4 border-l-[#173E55] bg-background':
+                            categoryQuery === category.split(' ').join('-').toLowerCase()
+                        }
+                      )}
+                    >
+                      <p
+                        className={cn(`text-sm font-semibold capitalize`, {
+                          'line-clamp-1': category.length > 17
+                        })}
+                      >
+                        {category.length > 18 ? category.substring(0, 17) + '...' : category}
+                      </p>
+                      <TooltipContent>
+                        <p>{category}</p>
+                      </TooltipContent>
+                    </div>
+                  </TooltipTrigger>
+                </Tooltip>
+              </TooltipProvider>
+            ))}
+          </section>
+          {/* table */}
+          <section className="min-h-max flex-1 overflow-auto px-4">
+            <div className="flex w-full flex-col gap-4 px-2 py-2">
+              <div className="w-full overflow-auto rounded-b-md border-b">
+                <Table className="w-full table-auto">
+                  <TableHeader className="py-2">
+                    <TableRow>
+                      <TableHead className="px-4 py-2 text-left">Nama Dokumen</TableHead>
+                      <TableHead className="px-4 py-2 text-center">Perseorangan</TableHead>
+                      <TableHead className="px-4 py-2 text-center">Perusahaan</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody className="bg-white">
+                    {dummyDocuments.map((doc) => (
+                      <TableRow key={doc.id} className="h-[3.313rem] border-b">
+                        <TableCell className="px-4 py-2">{doc.name}</TableCell>
+                        <TableCell className="px-4 py-2 text-center">
+                          <div className="flex items-center justify-evenly gap-x-2">
+                            <DownloadCloud className="text-[#3B3B3B]" />
+                            <Printer className="inline-block text-[#3B3B3B]" size={18} />
+                          </div>
+                        </TableCell>
+                        <TableCell className="px-4 py-2 text-center">
+                          <div className="flex items-center justify-evenly gap-x-2">
+                            <DownloadCloud className="text-[#3B3B3B]" />
+                            <Printer className="inline-block text-[#3B3B3B]" size={18} />
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          </section>
+        </main>
       </div>
     </PageContainer>
   );
 };
 
-export default function Documents() {
+export default function DocumentPageSuspensed() {
   return (
-    <Suspense
-      fallback={
-        <PageContainer>
-          <Loader />
-        </PageContainer>
-      }
-    >
+    <Suspense>
       <DocumentsPage />
     </Suspense>
   );

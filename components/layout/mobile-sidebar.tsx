@@ -12,9 +12,9 @@ export function MobileSidebar() {
     <>
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
-          <MenuIcon className="dark:text-white" />
+          <MenuIcon className="" />
         </SheetTrigger>
-        <SheetContent side="left" className="bg-orange-500 !px-0 text-white dark:bg-slate-950">
+        <SheetContent side="left" className="bg-sidebarBackground !px-0 text-white ">
           <div className="space-y-4 py-4">
             <div className="px-3 py-2">
               <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">Overview</h2>

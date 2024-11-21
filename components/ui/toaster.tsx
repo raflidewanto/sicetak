@@ -2,6 +2,7 @@
 
 import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from '@/components/ui/toast';
 import { useToast } from '@/components/ui/use-toast';
+import React from 'react';
 
 export function Toaster() {
   const { toasts } = useToast();
@@ -10,13 +11,13 @@ export function Toaster() {
     <ToastProvider>
       {toasts.map(function ({ id, title, description, action, ...props }) {
         return (
-          <Toast key={id} {...props} className="dark:bg-zinc-900 dark:text-white">
+          <Toast key={id} {...props} className="">
             <div className="grid gap-1">
               {title && <ToastTitle>{title}</ToastTitle>}
               {description && <ToastDescription>{description}</ToastDescription>}
             </div>
             {action}
-            <ToastClose className="dark:text-white dark:hover:text-white" />
+            <ToastClose className="text-gray-950" />
           </Toast>
         );
       })}

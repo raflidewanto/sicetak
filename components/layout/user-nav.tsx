@@ -1,4 +1,6 @@
 'use client';
+
+import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,23 +13,35 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import Show from '../elements/show';
+import { useState } from 'react';
 
 export function UserNav() {
+  const [open, setOpen] = useState(false);
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={''} alt={''} />
-            <AvatarFallback>{}</AvatarFallback>
-          </Avatar>
-        </Button>
+        <div className="flex w-36 items-center gap-2">
+          <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+            <Avatar className="h-8 w-8 cursor-default">
+              <AvatarImage
+                src={'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?w=360'}
+                alt={''}
+              />
+              <AvatarFallback>{}</AvatarFallback>
+            </Avatar>
+          </Button>
+          <div className="flex cursor-default flex-col items-start justify-center">
+            <p className="text-[0.875rem]">John Doe</p>
+            <p className="text-[0.75rem] text-slate-800">Admin</p>
+          </div>
+          <Show when={open} fallback={<ChevronDown size={24} className="cursor-pointer" />}>
+            <ChevronUp size={24} className="cursor-pointer" />
+          </Show>
+        </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        className="w-56 dark:border-orange-800 dark:bg-zinc-900 dark:text-white"
-        align="end"
-        forceMount
-      >
+      <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">name</p>

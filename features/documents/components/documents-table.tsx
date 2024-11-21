@@ -42,25 +42,20 @@ const DocumentsTable = (props: DocumentsTableProps) => {
       </Show>
 
       <Show when={(data?.data?.length ?? 0) > 0 && !isLoading}>
-        <Table className="min-w-full rounded-xl bg-white shadow-md transition-all dark:bg-zinc-900">
-          <TableCaption className="dark:text-gray-400">A list of your recent documents</TableCaption>
+        <Table className="min-w-full rounded-xl bg-white shadow-md transition-all ">
+          <TableCaption className="">A list of your recent documents</TableCaption>
           <TableHeader>
-            <TableRow className="rounded-lg bg-gray-50 dark:bg-zinc-800">
-              <TableHead className="p-4 text-gray-700 dark:text-gray-300">Document</TableHead>
-              <TableHead className="p-4 text-gray-700 dark:text-gray-300">Actions</TableHead>
-              <TableHead className="p-4 text-gray-700 dark:text-gray-300">Status</TableHead>
-              <TableHead className="p-4 text-gray-700 dark:text-gray-300">Release</TableHead>
+            <TableRow className="rounded-lg bg-gray-50 ">
+              <TableHead className="p-4 text-gray-700 ">Document</TableHead>
+              <TableHead className="p-4 text-gray-700 ">Actions</TableHead>
+              <TableHead className="p-4 text-gray-700 ">Status</TableHead>
+              <TableHead className="p-4 text-gray-700 ">Release</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data?.data?.map((doc, i) => (
-              <TableRow
-                key={doc.file_id}
-                className="border-b border-gray-200 transition-all hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-zinc-800"
-              >
-                <TableCell className="p-2 text-xs font-medium text-gray-900 md:text-sm dark:text-gray-100">
-                  {doc.name}
-                </TableCell>
+              <TableRow key={doc.file_id} className="border-b border-gray-200 transition-all hover:bg-gray-50">
+                <TableCell className="p-2 text-xs font-medium text-gray-900 md:text-sm ">{doc.name}</TableCell>
                 <TableCell className="p-4">
                   <DropdownMenu>
                     <DropdownMenuTrigger className="flex items-center justify-center">
@@ -91,7 +86,7 @@ const DocumentsTable = (props: DocumentsTableProps) => {
                       defaultChecked={doc.active}
                       onCheckedChange={() => toggleActiveMutation.mutate(doc.file_id)}
                     />
-                    <Label htmlFor={`is-active-${i}`} className="dark:text-gray-300">
+                    <Label htmlFor={`is-active-${i}`} className="">
                       {doc.active ? 'Active' : 'Inactive'}
                     </Label>
                   </div>
@@ -103,7 +98,7 @@ const DocumentsTable = (props: DocumentsTableProps) => {
                       defaultChecked={doc.release}
                       onCheckedChange={() => releaseMutation.mutate(doc.file_id)}
                     />
-                    <Label htmlFor={`is-release-${i}`} className="dark:text-gray-300">
+                    <Label htmlFor={`is-release-${i}`} className="">
                       {doc.release ? 'Release' : 'Unrelease'}
                     </Label>
                   </div>
@@ -115,7 +110,7 @@ const DocumentsTable = (props: DocumentsTableProps) => {
       </Show>
 
       <Show when={data?.data?.length === 0 && !isLoading}>
-        <p className="text-gray-600 dark:text-gray-300">No documents found matching the filters.</p>
+        <p className="text-gray-600 ">No documents found matching the filters.</p>
       </Show>
     </>
   );

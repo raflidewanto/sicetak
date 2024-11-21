@@ -4,21 +4,21 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const DocumentsTableSkeleton = () => {
   return (
-    <Table className="min-w-full rounded-xl bg-white shadow-md transition-all dark:bg-zinc-900">
-      <TableCaption className="dark:text-gray-400">Loading documents...</TableCaption>
+    <Table className="min-w-full rounded-xl bg-white shadow-md transition-all ">
+      <TableCaption className="">Loading documents...</TableCaption>
       <TableHeader>
-        <TableRow className="rounded-lg bg-gray-50 dark:bg-zinc-800">
-          <TableHead className="p-4 text-gray-700 dark:text-gray-300">
-            <Skeleton className="h-4 w-20 bg-gray-200 dark:bg-zinc-700" />
+        <TableRow className="rounded-lg bg-gray-50 ">
+          <TableHead className="p-4 text-gray-700 ">
+            <Skeleton className="h-4 w-20 bg-gray-200 " />
           </TableHead>
-          <TableHead className="p-4 text-gray-700 dark:text-gray-300">
-            <Skeleton className="h-4 w-20 bg-gray-200 dark:bg-zinc-700" />
+          <TableHead className="p-4 text-gray-700 ">
+            <Skeleton className="h-4 w-20 bg-gray-200 " />
           </TableHead>
-          <TableHead className="p-4 text-gray-700 dark:text-gray-300">
-            <Skeleton className="h-4 w-20 bg-gray-200 dark:bg-zinc-700" />
+          <TableHead className="p-4 text-gray-700 ">
+            <Skeleton className="h-4 w-20 bg-gray-200 " />
           </TableHead>
-          <TableHead className="p-4 text-gray-700 dark:text-gray-300">
-            <Skeleton className="h-4 w-20 bg-gray-200 dark:bg-zinc-700" />
+          <TableHead className="p-4 text-gray-700 ">
+            <Skeleton className="h-4 w-20 bg-gray-200 " />
           </TableHead>
         </TableRow>
       </TableHeader>
@@ -27,18 +27,18 @@ const DocumentsTableSkeleton = () => {
         {Array(5)
           .fill(null)
           .map((_, i) => (
-            <TableRow key={i} className="border-b border-gray-200 dark:border-gray-700">
+            <TableRow key={i} className="border-b border-gray-200 ">
               <TableCell className="p-4">
-                <Skeleton className="h-4 w-3/4 bg-gray-200 dark:bg-zinc-700" />
+                <Skeleton className="h-4 w-3/4 bg-gray-200 " />
               </TableCell>
               <TableCell className="p-4">
-                <Skeleton className="h-4 w-1/2 bg-gray-200 dark:bg-zinc-700" />
+                <Skeleton className="h-4 w-1/2 bg-gray-200 " />
               </TableCell>
               <TableCell className="p-4">
-                <Skeleton className="h-4 w-1/4 bg-gray-200 dark:bg-zinc-700" />
+                <Skeleton className="h-4 w-1/4 bg-gray-200 " />
               </TableCell>
               <TableCell className="p-4">
-                <Skeleton className="h-4 w-1/4 bg-gray-200 dark:bg-zinc-700" />
+                <Skeleton className="h-4 w-1/4 bg-gray-200 " />
               </TableCell>
             </TableRow>
           ))}

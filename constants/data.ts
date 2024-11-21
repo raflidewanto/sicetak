@@ -9,27 +9,37 @@ export const VISUAL_EDITOR_HTML = '__puckHtml';
 // search params
 export const AGREEMENT_NO_QUERY = 'agreement-no';
 export const DOCUMENT_ID_QUERY = 'id';
+export const CATEGORY = 'category';
+export const SUBCATEGORY = 'subcategory';
+export const DOCUMENT_NAME = 'document-name';
+export const DOCUMENT_TYPE = 'document-type'; // personal or corporate
 // =====================================================
 
 export const navItems: NavItem[] = [
   {
-    title: 'Upload Dokumen',
-    href: '/dashboard/documents/upload',
-    icon: 'fileUp',
-    label: 'Upload'
-  },
-  {
-    title: 'Cetak Dokumen',
+    title: 'Dokumen',
     href: '/dashboard/documents',
-    icon: 'page',
-    label: 'Documents'
+    icon: 'fileUp',
+    label: 'Dokumen'
   },
   {
-    title: 'Logout',
-    href: '/',
-    icon: 'login',
-    label: 'logout'
+    title: 'Admin',
+    href: '/admin/dashboard/documents',
+    icon: 'user',
+    label: 'Admin'
   }
+  // {
+  //   title: 'Upload Dokumen',
+  //   href: '/dashboard/documents/upload',
+  //   icon: 'fileUp',
+  //   label: 'Upload'
+  // },
+  // {
+  //   title: 'Cetak Dokumen',
+  //   href: '/dashboard/documents',
+  //   icon: 'page',
+  //   label: 'Documents'
+  // }
 ];
 
 export const validPlaceholders = [
@@ -92,4 +102,13 @@ export type ProductTypeValue =
   | 'carfin_loyal_partnership'
   | 'flash_cash_r2';
 
-export type DocumentType = 'company' | 'personal';
+export type DocumentType = 'corporate' | 'personal';
+
+export type bracketPlaceholder = {
+  placeholder: string;
+  x: number;
+  y: number;
+  page: number;
+  pageWidth: number;
+  pageHeight: number;
+};

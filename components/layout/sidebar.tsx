@@ -3,6 +3,7 @@
 import { DashboardNav } from '@/components/dashboard-nav';
 import { navItems } from '@/constants/data';
 import { useSidebar } from '@/hooks/useSidebar';
+import React from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -23,33 +24,35 @@ export default function Sidebar({ className }: SidebarProps) {
   return (
     <aside
       className={cn(
-        `relative hidden h-screen flex-none border-r bg-white text-zinc-950 transition-[width] duration-500 md:block 
-         dark:border-zinc-700 dark:bg-zinc-900 dark:text-slate-200`,
-        !isMinimized ? 'w-72' : 'w-[72px]',
+        `relative hidden h-screen flex-none border-r bg-sidebarBackground text-sidebarForeground transition-[width] duration-500 md:block`,
+        !isMinimized ? 'w-[14.125rem]' : 'w-[72px]',
         className
       )}
     >
-      <div className="hidden p-5 pt-10 lg:block">
+      <div className="hidden px-5 pt-6 lg:block">
         <Link href="/dashboard">
-          <Show when={!isMinimized} fallback={<PrinterIcon className="text-orange-500" />}>
+          <Show when={!isMinimized} fallback={<PrinterIcon />}>
             <div className="flex items-center justify-start space-x-2">
               <span>
-                <PrinterIcon className="text-orange-500 dark:text-orange-500" />
+                <PrinterIcon />
               </span>
-              <p className="hidden text-start text-lg font-bold text-black md:block dark:text-slate-200">Si Cetak</p>
+              <p className="hidden text-start text-[1.5rem] font-bold text-white md:block">SiCetak</p>
             </div>
+            <p className="text-xs">
+              By SMS<span className="text-orange-500">Finance</span>
+            </p>
           </Show>
         </Link>
       </div>
       <ChevronLeft
         className={cn(
-          'absolute -right-3 top-10 z-50 cursor-pointer rounded-full border bg-white text-3xl text-zinc-950 dark:border-zinc-700 dark:bg-zinc-900 dark:text-slate-200', // Dark mode for Chevron
+          'absolute -right-3 top-10 z-50 cursor-pointer rounded-full border bg-white text-3xl text-zinc-950   ', // Dark mode for Chevron
           isMinimized && 'rotate-180'
         )}
         onClick={handleToggle}
       />
       <div className="space-y-4 py-4">
-        <div className="px-3 py-2">
+        <div className="py-2">
           <div className="mt-3 space-y-3">
             <DashboardNav items={navItems} />
           </div>
