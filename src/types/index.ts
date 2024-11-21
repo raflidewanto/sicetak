@@ -1,4 +1,4 @@
-import { Icons } from '@/components/icons';
+import { Icons } from '@/components/Icons';
 
 export interface NavItem {
   title: string;
@@ -30,3 +30,12 @@ export interface FooterItem {
 export type MainNavItem = NavItemWithOptionalChildren;
 
 export type SidebarNavItem = NavItemWithChildren;
+
+export type bracketPlaceholder = {
+  placeholder: string;
+  x: number;
+  y: number;
+  page: number;
+  pageWidth: number;
+  pageHeight: number;
+};

@@ -1,11 +1,6 @@
 import { NavItem } from '@/types';
 
 // =====================================================
-// local storage
-export const VISUAL_EDITOR_CONFIG = '__puckConfig';
-export const VISUAL_EDITOR_PREVIEW = '__puckVisualEditorPreview';
-export const VISUAL_EDITOR_HTML = '__puckHtml';
-// =====================================================
 // search params
 export const AGREEMENT_NO_QUERY = 'agreement-no';
 export const DOCUMENT_ID_QUERY = 'id';
@@ -28,18 +23,6 @@ export const navItems: NavItem[] = [
     icon: 'user',
     label: 'Admin'
   }
-  // {
-  //   title: 'Upload Dokumen',
-  //   href: '/dashboard/documents/upload',
-  //   icon: 'fileUp',
-  //   label: 'Upload'
-  // },
-  // {
-  //   title: 'Cetak Dokumen',
-  //   href: '/dashboard/documents',
-  //   icon: 'page',
-  //   label: 'Documents'
-  // }
 ];
 
 export const validPlaceholders = [
@@ -103,12 +86,3 @@ export type ProductTypeValue =
   | 'flash_cash_r2';
 
 export type DocumentType = 'corporate' | 'personal';
-
-export type bracketPlaceholder = {
-  placeholder: string;
-  x: number;
-  y: number;
-  page: number;
-  pageWidth: number;
-  pageHeight: number;
-};

@@ -1,35 +1,36 @@
 'use client';
 
-import PageContainer from '@/components/layout/page-container';
-import { Button } from '@/components/ui/button';
+import PageContainer from '@/components/layout/PageContainer';
+import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/components/ui/use-toast';
+import { Modal } from '@/components/ui/Modal';
 import { AGREEMENT_NO_QUERY, DOCUMENT_ID_QUERY } from '@/constants/data';
-import { usePrintDocument } from '@/features/documents/mutations/use-print-doc';
-import { base64ToBlob } from '@/src/utils/pdf';
+import { usePrintDocument } from '@/features/documents/mutations/usePrintDocument';
+import { useModal } from '@/hooks/useModal';
+import { base64ToBlob } from '@/utils/pdf';
 import { AxiosError } from 'axios';
 import { useSearchParams } from 'next/navigation';
 import { useQueryState } from 'nuqs';
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 
 const PrintDocumentPage = () => {
   const searchParams = useSearchParams();
-  const toast = useToast();
   const [agreementNo, setAgreementNo] = useQueryState(AGREEMENT_NO_QUERY);
   const documentId = searchParams.get(DOCUMENT_ID_QUERY);
   const printMutation = usePrintDocument(String(decodeURI(documentId as string)), String(agreementNo));
 
+  // UI states
+  const { closeModal, openModal, modalState } = useModal();
+
   function handleDownload() {
     if (!documentId || !agreementNo) {
-      toast.toast({
-        title: `Please enter both agreement number.`
-      });
+      openModal("Warning", "Please enter both agreement number.", 'warning');
       return;
     }
 
     printMutation.mutate(undefined, {
       onSuccess: (data) => {
-        if (data.success) {
+        if (false) {
           const base64 = data.data;
           const blob = base64ToBlob(base64 || '', 'application/pdf');
           const url = URL.createObjectURL(blob);
@@ -37,27 +38,18 @@ const PrintDocumentPage = () => {
           pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
           return;
         }
-        toast.toast({
-          title: `Error downloading the file: ${data.message}`
-        });
+        openModal("Error", `Error downloading the file: ${data.message}`, 'error');
       },
       onError: (error) => {
         if (error instanceof AxiosError) {
           if (error?.status === 400) {
-            toast.toast({
-              title: `Error downloading the file: ${error.response?.data.message}`,
-              variant: 'destructive'
-            });
+            openModal("Error", `Error downloading the file: ${error.response?.data.message}`, 'error');
             return;
           }
-          toast.toast({
-            title: `Something went wrong`
-          });
+          openModal("Error", `Something went wrong`, 'error');
           return;
         }
-        toast.toast({
-          title: `Error downloading the file: ${error.message}`
-        });
+        openModal("Error", `Error downloading the file: ${error.message}`, 'error');
       }
     });
   }
@@ -99,6 +91,13 @@ const PrintDocumentPage = () => {
           </Button>
         </div>
       </div>
+      <Modal
+        title={modalState.title}
+        description={modalState.description}
+        isOpen={modalState.isOpen}
+        onClose={closeModal}
+        type={modalState.type}
+      />
     </PageContainer>
   );
 };

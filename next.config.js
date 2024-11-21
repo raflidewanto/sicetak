@@ -18,6 +18,13 @@ const nextConfig = {
       fs: false // the solution
     };
 
+    config.module.rules.push({
+      test: /\.svg$/,
+      issuer: /\.[jt]sx?$/,
+      use: ['@svgr/webpack'],
+    });
+    return config;
+
     return config;
   }
 };

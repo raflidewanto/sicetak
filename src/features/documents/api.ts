@@ -1,7 +1,7 @@
-import apiResolver, { newAbortSignal } from '@/src/utils/api';
+import apiResolver, { newAbortSignal } from '@/utils/api';
 import Axios from 'axios';
 
-const baseURL = 'http://localhost:9500/api/documents';
+const baseURL = `${process.env.NEXT_PUBLIC_SICETAK_API_BASE_URL}/documents`;
 const axios = Axios.create({
   baseURL
 });

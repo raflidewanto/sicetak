@@ -1,7 +1,7 @@
-import apiResolver from '@/src/utils/api';
+import apiResolver from '@/utils/api';
 import Axios from 'axios';
 
-const baseURL = 'http://localhost:9500/api/sub-categories';
+const baseURL = `${process.env.NEXT_PUBLIC_SICETAK_API_BASE_URL}/sub-categories`;
 const axios = Axios.create({
   baseURL
 });

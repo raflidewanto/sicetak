@@ -1,13 +1,7 @@
 'use client';
 
-import Header from '@/components/layout/header';
-import Sidebar from '@/components/layout/sidebar';
-// import type { Metadata } from 'next';
-
-// export const metadata: Metadata = {
-//   title: 'SI Cetak',
-//   description: ''
-// };
+import Header from '@/components/layout/Header';
+import Sidebar from '@/components/layout/Sidebar';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
