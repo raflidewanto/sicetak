@@ -1,0 +1,15 @@
+{
+  "extends": ["next/core-web-vitals", "plugin:react/recommended", "plugin:jsx-a11y/recommended"],
+  "plugins": ["@typescript-eslint", "react", "jsx-a11y"],
+  "rules": {
+    "@typescript-eslint/no-unused-vars": ["warn", { "args": "none" }],
+    "react/prop-types": "off",
+    "react/react-in-jsx-scope": "off",
+    "react/no-unknown-property": ["error", { "ignore": [] }],
+    "import/no-unresolved": "error",
+    "import/named": "off",
+    "no-console": "warn",
+    "semi": "error",
+    "no-unused-vars": "error"
+  }
+}
