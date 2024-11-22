@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Icons } from '@/components/Icons';
-import { cn } from '@/lib/utils';
+import { cN } from '@/lib/utils';
 import { NavItem } from '@/types';
 import { Dispatch, SetStateAction } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/Tooltip';
@@ -37,7 +37,7 @@ export function DashboardNav({ items, setOpen, isMobileNav = false }: DashboardN
                   <TooltipTrigger asChild>
                     <Link
                       href={item.disabled ? '/' : item.href}
-                      className={cn(
+                      className={cN(
                         `flex h-[3rem] items-center gap-2 overflow-hidden py-2 text-sm font-medium transition-all hover:border-l-4 hover:border-l-orange-600 hover:bg-sidebarBgHover`,
                         path === item.href || path.split('/')[1] === item.href.split('/')[1]
                           ? `border-l-4 border-l-orange-600 bg-sidebarBgHover text-white`
@@ -63,7 +63,7 @@ export function DashboardNav({ items, setOpen, isMobileNav = false }: DashboardN
                     align="center"
                     side="right"
                     sideOffset={8}
-                    className={cn(
+                    className={cN(
                       !isMinimized ? 'hidden' : 'inline-block',
                       item.label?.toLowerCase() === 'logout' ? 'bg-red-500' : ''
                     )}

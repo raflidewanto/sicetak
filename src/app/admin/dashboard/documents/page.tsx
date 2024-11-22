@@ -27,12 +27,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { CATEGORY, DOCUMENT_NAME, DOCUMENT_TYPE, SUBCATEGORY } from '@/constants/data';
 import { useDebounceValue } from '@/hooks/useDebounceValue';
 import useDisclosure from '@/hooks/useDisclosure';
-import { cn } from '@/lib/utils';
+import { cN } from '@/lib/utils';
 import { useDocuments } from '@/services/documents/queries/useDocuments';
 import { useSubCategories } from '@/services/subcategories/queries/useSubcategories';
 import { getErrorMessage } from '@/utils/error';
 import { DownloadCloud, Edit, Plus, Printer, Search } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useQueryState } from 'nuqs';
 import { Suspense, useState } from 'react';
@@ -151,7 +150,6 @@ const AdminPage = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/admin/dashboard/documents/categories/new">
-                    <Image src={'/assets/icons/add-category.png'} width={16} height={16} alt="Tambah Kategori" />
                     Tambah Kategori
                   </Link>
                 </DropdownMenuItem>
@@ -176,11 +174,11 @@ const AdminPage = () => {
                 <TooltipTrigger className="w-full">
                   <div
                     onClick={() => setSubCategoryQuery(null)}
-                    className={cn(
+                    className={cN(
                       `flex min-h-[3rem] w-full items-center justify-between border-b border-gray-300 bg-white px-4 py-2 transition-all hover:border-l-4 hover:border-l-[#173E55] hover:bg-background`
                     )}
                   >
-                    <p className={cn(`text-sm font-semibold capitalize`)}>Semua</p>
+                    <p className={cN(`text-sm font-semibold capitalize`)}>Semua</p>
                   </div>
                 </TooltipTrigger>
               </Tooltip>
@@ -193,7 +191,7 @@ const AdminPage = () => {
                       onClick={() =>
                         setSubCategoryQuery(subcategory?.subcategory_name.split(' ').join('-').toLowerCase())
                       }
-                      className={cn(
+                      className={cN(
                         `flex min-h-[3rem] w-full items-center justify-between border-b border-gray-300 bg-white px-4 py-2 transition-all hover:border-l-4 hover:border-l-[#173E55] hover:bg-background`,
                         {
                           'border-l-4 border-l-[#173E55] bg-background':
@@ -202,7 +200,7 @@ const AdminPage = () => {
                       )}
                     >
                       <p
-                        className={cn(`text-sm font-semibold capitalize`, {
+                        className={cN(`text-sm font-semibold capitalize`, {
                           'line-clamp-1': subcategory?.subcategory_name.length > 17
                         })}
                       >
@@ -222,11 +220,11 @@ const AdminPage = () => {
             {/* add new sub category button */}
             <Link
               href="/admin/dashboard/documents/categories/sub-category/new"
-              className={cn(
+              className={cN(
                 `flex min-h-[3rem] w-full items-center justify-between border-b border-gray-300 bg-white px-4 py-2 transition-all hover:border-l-4 hover:border-l-[#173E55] hover:bg-background`
               )}
             >
-              <p className={cn(`text-sm font-semibold capitalize`)}>Tambah Sub Kategori</p>
+              <p className={cN(`text-sm font-semibold capitalize`)}>Tambah Sub Kategori</p>
               <Plus size={16} color="#F97316" />
             </Link>
           </section>

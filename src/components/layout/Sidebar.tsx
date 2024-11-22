@@ -3,7 +3,7 @@
 import { DashboardNav } from '@/components/DashboardNav';
 import { navItems } from '@/constants/data';
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { cN } from '@/lib/utils';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import Show from '../elements/Show';
@@ -23,7 +23,7 @@ export default function Sidebar({ className }: SidebarProps) {
 
   return (
     <aside
-      className={cn(
+      className={cN(
         `relative hidden h-screen flex-none border-r bg-sidebarBackground text-sidebarForeground transition-[width] duration-500 md:block`,
         !isMinimized ? 'w-[14.125rem]' : 'w-[72px]',
         className
@@ -45,7 +45,7 @@ export default function Sidebar({ className }: SidebarProps) {
         </Link>
       </div>
       <ChevronLeft
-        className={cn(
+        className={cN(
           'absolute -right-3 top-10 z-50 cursor-pointer rounded-full border bg-white text-3xl text-zinc-950   ', // Dark mode for Chevron
           isMinimized && 'rotate-180'
         )}

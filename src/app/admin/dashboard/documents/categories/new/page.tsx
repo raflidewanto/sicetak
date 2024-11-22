@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
-import { cn } from '@/lib/utils';
+import { cN } from '@/lib/utils';
 
 const AddCategoryPage = () => {
   return (
@@ -14,7 +14,7 @@ const AddCategoryPage = () => {
         <CardContent className="p-5">
           <h1 className="text-lg font-bold capitalize">Tambah Kategori</h1>
           <div className="my-2 flex space-x-4">
-            <p className={cn(`border-b-2 border-orange-500 px-4 py-2 text-sm font-bold text-gray-800`)}>Detail</p>
+            <p className={cN(`border-b-2 border-orange-500 px-4 py-2 text-sm font-bold text-gray-800`)}>Detail</p>
           </div>
 
           <div className="p-4">

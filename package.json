@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "dev-staging-sicetak": "cross-env NODE_ENV=development next dev",
+    "build-staging-sicetak": "cross-env APP_ENV=staging next build",
     "dev": "next dev",
-    "cdev": "rm -fr .next && next dev",
+    "start-dev": "rm -fr .next && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint --fix",

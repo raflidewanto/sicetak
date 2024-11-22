@@ -17,7 +17,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip';
 import { CATEGORY } from '@/constants/data';
-import { cn } from '@/lib/utils';
+import { cN } from '@/lib/utils';
 import { DownloadCloud, Printer, Search } from 'lucide-react';
 import { useQueryState } from 'nuqs';
 import { Suspense } from 'react';
@@ -91,7 +91,7 @@ const DocumentsPage = () => {
                   <TooltipTrigger className="w-full">
                     <div
                       onClick={() => setCategoryQuery(category.split(' ').join('-').toLowerCase())}
-                      className={cn(
+                      className={cN(
                         `flex min-h-[3rem] w-full items-center justify-between border-b border-gray-300 bg-white px-4 py-2 transition-all hover:border-l-4 hover:border-l-[#173E55] hover:bg-background`,
                         {
                           'border-l-4 border-l-[#173E55] bg-background':
@@ -100,7 +100,7 @@ const DocumentsPage = () => {
                       )}
                     >
                       <p
-                        className={cn(`text-sm font-semibold capitalize`, {
+                        className={cN(`text-sm font-semibold capitalize`, {
                           'line-clamp-1': category.length > 17
                         })}
                       >

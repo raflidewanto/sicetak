@@ -28,7 +28,7 @@ import { toast } from '@/components/ui/useToast';
 import { DocumentType } from '@/constants/data';
 import { useUploadDoc } from '@/services/documents/mutations/useUploadDocument';
 import { usePDFJS } from '@/hooks/usePdfjs';
-import { cn } from '@/lib/utils';
+import { cN } from '@/lib/utils';
 import { bracketPlaceholder } from '@/types';
 import { getErrorMessage } from '@/utils/error';
 import { AxiosError } from 'axios';
@@ -353,7 +353,7 @@ const EditDocument = () => {
                 <button
                   type="button"
                   onClick={() => setDocType('personal')}
-                  className={cn(
+                  className={cN(
                     'px-4 py-2 text-sm font-medium ring-transparent focus-visible:outline-none',
                     docType === 'personal' ? 'border-b-2 border-orange-500 font-bold text-gray-800' : 'text-gray-600'
                   )}
@@ -363,7 +363,7 @@ const EditDocument = () => {
                 <button
                   type="button"
                   onClick={() => setDocType('corporate')}
-                  className={cn(
+                  className={cN(
                     'px-4 py-2 text-sm font-medium ring-transparent focus-visible:outline-none',
                     docType === 'corporate' ? 'border-b-2 border-orange-500 font-bold text-gray-800' : 'text-gray-600'
                   )}

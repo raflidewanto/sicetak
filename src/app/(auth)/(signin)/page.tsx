@@ -2,7 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { buttonVariants } from '@/components/ui/Button';
-import { cn } from '@/lib/utils';
+import { cN } from '@/lib/utils';
 
 export const metadata: Metadata = {
   title: 'Authentication',
@@ -14,7 +14,7 @@ export default function AuthenticationPage() {
     <div className="relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
       <Link
         href="/examples/authentication"
-        className={cn(buttonVariants({ variant: 'ghost' }), 'absolute right-4 top-4 hidden md:right-8 md:top-8')}
+        className={cN(buttonVariants({ variant: 'ghost' }), 'absolute right-4 top-4 hidden md:right-8 md:top-8')}
       >
         Login
       </Link>
