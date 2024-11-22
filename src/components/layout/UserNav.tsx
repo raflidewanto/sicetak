@@ -14,7 +14,7 @@ import {
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
 import Show from '../elements/Show';
-import { Avatar, AvatarImage } from '../ui/avatar';
+import { Avatar, AvatarImage } from '../ui/Avatar';
 
 export function UserNav() {
   const [open, setOpen] = useState(false);

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { AGREEMENT_NO_QUERY } from '@/constants/data';
-import { usePrintDocument } from '@/features/documents/mutations/usePrintDocument';
+import { usePrintDocument } from '@/services/documents/mutations/usePrintDocument';
 import { useModal } from '@/hooks/useModal';
 import { base64ToBlob } from '@/utils/pdf';
 import { AxiosError } from 'axios';
@@ -75,7 +75,8 @@ const PrintDocumentPage = () => {
             rounded-md 
             border border-gray-300 
             px-3 py-2 
-            shadow-sm 
+            shadow-sm
+            bg-white
             focus:outline-none 
             sm:text-sm"
             placeholder="Enter agreement number"

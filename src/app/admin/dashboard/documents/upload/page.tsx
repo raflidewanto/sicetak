@@ -21,7 +21,7 @@ import { Textarea } from '@/components/ui/Textarea';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip';
 import { toast } from '@/components/ui/useToast';
 import { DocumentType } from '@/constants/data';
-import { useUploadDoc } from '@/features/documents/mutations/useUploadDocument';
+import { useUploadDoc } from '@/services/documents/mutations/useUploadDocument';
 import { usePDFJS } from '@/hooks/usePdfjs';
 import { cn } from '@/lib/utils';
 import { getErrorMessage } from '@/utils/error';

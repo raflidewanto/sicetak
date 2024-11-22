@@ -25,11 +25,11 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip';
 import { CATEGORY, DOCUMENT_NAME, DOCUMENT_TYPE, SUBCATEGORY } from '@/constants/data';
-import { useSubCategories } from '@/features/categories/queries/useSubcategories';
-import { useDocuments } from '@/features/documents/queries/useDocuments';
 import { useDebounceValue } from '@/hooks/useDebounceValue';
 import useDisclosure from '@/hooks/useDisclosure';
 import { cn } from '@/lib/utils';
+import { useDocuments } from '@/services/documents/queries/useDocuments';
+import { useSubCategories } from '@/services/subcategories/queries/useSubcategories';
 import { getErrorMessage } from '@/utils/error';
 import { DownloadCloud, Edit, Plus, Printer, Search } from 'lucide-react';
 import Image from 'next/image';

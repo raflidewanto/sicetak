@@ -15,7 +15,7 @@ import {
 import { Separator } from '@/components/ui/Separator';
 import { useToast } from '@/components/ui/useToast';
 import { DocumentType, productTypes, ProductTypeValue, validPlaceholders } from '@/constants/data';
-import { useReuploadDoc } from '@/features/documents/mutations/useReupload';
+import { useReuploadDoc } from '@/services/documents/mutations/useReupload';
 import { useCopyToClipboard } from '@/hooks/useCopyToClipboard';
 import { usePDFJS } from '@/hooks/usePdfjs';
 import { getErrorMessage } from '@/utils/error';
