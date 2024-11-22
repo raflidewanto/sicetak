@@ -1,14 +1,17 @@
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 'use client';
 
 import UploadedFileIcon from '@/assets/icons/ic-uploaded-file.svg';
+import CopyButton from '@/components/CopyButton';
 import Show from '@/components/elements/Show';
 import PageContainer from '@/components/layout/PageContainer';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
+import { Modal } from '@/components/ui/Modal';
 import { ScrollArea } from '@/components/ui/ScrollArea';
 import {
   Select,
@@ -25,23 +28,33 @@ import { Switch } from '@/components/ui/Switch';
 import { Textarea } from '@/components/ui/Textarea';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip';
 import { toast } from '@/components/ui/useToast';
-import { DocumentType } from '@/constants/data';
-import { useUploadDoc } from '@/services/documents/mutations/useUploadDocument';
+import { customParamPlaceholders, DocumentType, validPlaceholders } from '@/constants/data';
+import { useModal } from '@/hooks/useModal';
 import { usePDFJS } from '@/hooks/usePdfjs';
 import { cN } from '@/lib/utils';
+import { PlaceholderResponseDTO } from '@/services/documents/api';
+import { usePlaceholderUpdate } from '@/services/documents/mutations/usePlaceholderUpdate';
+import { useUploadDoc } from '@/services/documents/mutations/useUploadDocument';
+import { useDocumentById } from '@/services/documents/queries/useDocuments';
+import { usePlaceholders } from '@/services/documents/queries/usePlaceholders';
 import { bracketPlaceholder } from '@/types';
 import { getErrorMessage } from '@/utils/error';
 import { AxiosError } from 'axios';
-import { Plus, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import React, { memo, useState } from 'react';
+import { EditIcon, X } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
+import React, { memo, useMemo, useState } from 'react';
 
 const EditDocument = () => {
   // route
   const router = useRouter();
+  const { slug: documentId } = useParams<{ slug: string }>();
+
+  // queries
+  const { data: placeholders } = usePlaceholders(documentId);
+  const { data: document } = useDocumentById(documentId);
 
   // PDF states
-  const [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null>();
   const [fileName, setFileName] = useState<string>('');
   const [fileDescription, setFileDescription] = useState<string>('');
   const [fileCategory, setFileCategory] = useState<string>('');
@@ -51,8 +64,20 @@ const EditDocument = () => {
   const [release, setRelease] = useState<boolean>(false);
   const [active, setActive] = useState<boolean>(false);
 
+  // placeholder state
+  const [selectedPlaceholder, setSelectedPlaceholder] = useState<PlaceholderResponseDTO | null>(null);
+  const [placeholderValue, setPlaceholderValue] = useState<string>('');
+
   // mutations
   const uploadMutation = useUploadDoc();
+  const updatePlaceholderMutation = usePlaceholderUpdate();
+
+  // UI
+  const { openModal, closeModal, modalState } = useModal();
+
+  const customParams = useMemo(() => {
+    return placeholders?.data?.sort((a, b) => a.name.localeCompare(b.name)).filter(p => customParamPlaceholders.includes(p.name));
+  }, [placeholders]);
 
   const onLoadPDFJS = async (pdfjs: any) => {
     if (!file) return;
@@ -162,7 +187,12 @@ const EditDocument = () => {
           <div className="flex flex-row items-center justify-center gap-x-3">
             <label className="cursor-pointer rounded-md bg-gray-200 px-4 py-2 text-sm text-gray-700">
               Choose File
-              <input type="file" accept=".pdf" className="hidden" onChange={(e) => handleFileChange(e)} />
+              <input
+                type="file"
+                accept=".pdf"
+                className="hidden"
+                onChange={(e) => handleFileChange(e)}
+              />
             </label>
             <p className="text-[0.75rem]">Upload File Here</p>
           </div>
@@ -276,12 +306,31 @@ const EditDocument = () => {
     });
   };
 
+  const handleUpdatePlaceholder = (e: React.FormEvent) => {
+    e.preventDefault();
+    const payload = {
+      doc_id: documentId,
+      placeholder_name: selectedPlaceholder?.name ?? "",
+      value: placeholderValue ?? "",
+      placeholder_id: selectedPlaceholder?.placeholder_id ?? ""
+    };
+    updatePlaceholderMutation.mutate(payload, {
+      onSuccess: (data) => {
+        if (data.success) {
+          openModal("Success", `${data.message}`, 'success');
+          return;
+        }
+        openModal("Error", `Error updating the placeholder: ${data.message}`, 'error');
+      },
+    });
+  };
+
   return (
     <PageContainer scrollable>
       <Card>
         <CardContent className="p-5">
           <form onSubmit={handleSubmit}>
-            <h1 className="text-lg font-bold capitalize">Tambah Dokumen</h1>
+            <h1 className="text-lg font-bold capitalize">Edit Dokumen</h1>
             <section className="space-y-4 py-4">
               <div>
                 <label htmlFor="file-name" className="block text-sm font-medium text-gray-700">
@@ -291,6 +340,7 @@ const EditDocument = () => {
                   id="file-name"
                   placeholder="Value"
                   className="mt-1"
+                  defaultValue={document?.data?.name}
                   onChange={(e) => setFileName(e.target.value)}
                 />
               </div>
@@ -374,92 +424,6 @@ const EditDocument = () => {
               <UploadSection />
             </div>
 
-            {/* placeholders container */}
-            <div className="grid grid-cols-1 gap-x-6 px-6 py-4 sm:grid-cols-2">
-              {/* list placeholders */}
-              <section className="min-h-[15.813rem] bg-white">
-                <div className="rounded-tl-md rounded-tr-md bg-[#F2F5F6] p-4">
-                  <p className="text-[0.75rem] font-medium text-gray-700">Default State</p>
-                </div>
-                <ScrollArea className="h-72 w-full">
-                  {Array.from({ length: 10 }).map((_, i) => (
-                    <React.Fragment key={i}>
-                      <div className="flex min-h-[3.313rem] items-center justify-start px-4 py-2">
-                        <p>test</p>
-                      </div>
-                      <Separator />
-                    </React.Fragment>
-                  ))}
-                </ScrollArea>
-              </section>
-              {/* add new placeholder */}
-              <section className="min-h-[15.813rem] bg-white">
-                <div className="rounded-tl-md rounded-tr-md bg-[#F2F5F6] p-4">
-                  <p className="text-[0.75rem] font-medium text-gray-700">Custom Param</p>
-                </div>
-                <div className="flex min-h-[3.313rem] items-center justify-start px-4 py-2">
-                  <Sheet>
-                    <SheetTrigger asChild>
-                      <p className="flex cursor-pointer items-center justify-start gap-x-2 text-[0.75rem] text-orange-500">
-                        <Plus size={16} color="#F97316" />
-                        Tambah / Edit Placeholder
-                      </p>
-                    </SheetTrigger>
-                    <SheetContent className="w-full">
-                      <SheetHeader>
-                        <SheetTitle>Tambah Parameter</SheetTitle>
-                      </SheetHeader>
-                      <section className="flex h-full w-full flex-col items-start justify-between gap-y-6 py-6">
-                        <div className="w-full">
-                          {/* placeholder select */}
-                          <div className="mb-4 flex-grow">
-                            <p>Placeholder</p>
-                            <Select>
-                              <SelectTrigger className="min-w-full">
-                                <SelectValue placeholder="Pilih Placeholder" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectGroup>
-                                  <SelectLabel>Pilih Placeholder</SelectLabel>
-                                  <SelectItem value="{{ $content1 }}">{`{{ $content1 }}`}</SelectItem>
-                                  <SelectItem value="{{ $content2 }}">{`{{ $content2 }}`}</SelectItem>
-                                </SelectGroup>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          {/* placeholder value */}
-                          <div className="w-full">
-                            <p>Value</p>
-                            <Textarea className="w-full" />
-                          </div>
-                        </div>
-                        {/* actions */}
-                        <div className="flex justify-end space-x-4 px-5">
-                          <Button
-                            variant="ghost"
-                            className="border border-gray-300 bg-white"
-                            onClick={() => router.back()}
-                          >
-                            Kembali
-                          </Button>
-                          <Button type="submit" className="bg-orange-500 text-white">
-                            Simpan
-                          </Button>
-                        </div>
-                      </section>
-                      <div
-                        onClick={(e) => e.stopPropagation()}
-                        className="fixed left-1/2 top-1/2 z-[999999999999] h-screen w-[34rem] -translate-x-[80%] -translate-y-1/2 p-4 py-4 delay-0 duration-0"
-                      >
-                        <iframe src="https://example.com" width="100%" height="100%" allowFullScreen title="s"></iframe>
-                      </div>
-                    </SheetContent>
-                  </Sheet>
-                </div>
-                <Separator />
-              </section>
-            </div>
-
             {/* switches for release and active */}
             <section className="flex flex-col items-start justify-center gap-y-8 px-4 py-6 sm:flex-row sm:items-center sm:justify-start sm:gap-x-8">
               <div className="space-y-2">
@@ -504,6 +468,147 @@ const EditDocument = () => {
               </Button>
             </div>
           </form>
+          {/* placeholders container */}
+          <div className="grid grid-cols-1 gap-x-6 px-6 py-4 sm:grid-cols-2">
+            {/* list placeholders */}
+            <section className="min-h-[15.813rem] bg-white">
+              <div className="rounded-tl-md rounded-tr-md bg-[#F2F5F6] p-4">
+                <p className="text-[0.75rem] font-medium text-gray-700">Default State</p>
+              </div>
+              <ScrollArea className="h-72 w-full">
+                <Show when={(placeholders?.data?.length ?? 0) > 0} fallback={
+                  <p>No data</p>
+                }>
+                  {placeholders?.data?.map((placeholder) => (
+                    <React.Fragment key={placeholder.placeholder_id}>
+                      <div className="flex min-h-[3.313rem] items-center justify-start px-4 py-2">
+                        <p>{placeholder.name}</p>
+                      </div>
+                      <Separator />
+                    </React.Fragment>
+                  ))}
+                </Show>
+              </ScrollArea>
+            </section>
+            <section className="min-h-[15.813rem] bg-white">
+              <div className="rounded-tl-md rounded-tr-md bg-[#F2F5F6] p-4">
+                <p className="text-[0.75rem] font-medium text-gray-700">Custom Param</p>
+              </div>
+              <ScrollArea className="h-72 w-full">
+                <Show when={(customParams?.length ?? 0) > 0} fallback={
+                  <p>No data</p>
+                }>
+                  {customParams?.map((placeholder) => (
+                    <React.Fragment key={placeholder.placeholder_id}>
+                      <div className="flex min-h-[3.313rem] items-center justify-between px-4 py-2">
+                        <p>{placeholder.name}</p>
+                        <Sheet>
+                          <SheetTrigger asChild>
+                            {/* // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
+                            <p
+                              onClick={() => setSelectedPlaceholder(placeholder)}
+                              className="flex cursor-pointer items-center justify-start gap-x-2 text-[0.75rem] text-orange-500">
+                              <EditIcon size={16} color="#F97316" />
+                            </p>
+                          </SheetTrigger>
+                          <SheetContent className="w-full text-xs overflow-scroll focus-visible:outline-none">
+                            <form onSubmit={handleUpdatePlaceholder}>
+                              <SheetHeader>
+                                <SheetTitle>Edit Parameter</SheetTitle>
+                              </SheetHeader>
+                              <section className="flex h-full w-full flex-col items-start justify-between gap-y-6 py-6">
+                                <div className="w-full">
+                                  <div className='mb-4'>
+                                    <Input
+                                      defaultValue={placeholder?.name ?? ""}
+                                      className="focus-visible:outline-none w-full text-gray-950"
+                                      disabled
+                                    />
+                                  </div>
+                                  {/* placeholder value */}
+                                  <div className="w-full space-y-4">
+                                    <Textarea
+                                      onChange={(e) => setPlaceholderValue(e.target.value)}
+                                      defaultValue={placeholder?.custom_value ?? ""}
+                                      className="w-full min-h-[12.313rem]" />
+                                    <section className="min-h-[15.813rem] bg-white">
+                                      <div className="rounded-tl-md rounded-tr-md bg-[#F2F5F6] p-4">
+                                        <p className="text-[0.75rem] font-medium text-gray-700">Default State</p>
+                                      </div>
+                                      <ScrollArea className="h-72 w-full">
+                                        <Show
+                                          when={(validPlaceholders.length ?? 0) > 0}
+                                          fallback={
+                                            <p>No data</p>
+                                          }>
+                                          {validPlaceholders?.map((placeholder, idx) => (
+                                            <React.Fragment key={`${placeholder}-${idx}`}>
+                                              <div className="flex min-h-[3.313rem] items-center justify-between px-4 py-2">
+                                                <p>{placeholder}</p>
+                                                <CopyButton text={placeholder} />
+                                              </div>
+                                              <Separator />
+                                            </React.Fragment>
+                                          ))}
+                                        </Show>
+                                      </ScrollArea>
+                                    </section>
+                                  </div>
+                                </div>
+                                {/* actions */}
+                                <div className="flex justify-between space-x-4 px-5 w-full">
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    className="border border-gray-300 bg-white w-1/2"
+                                    onClick={() => router.back()}
+                                  >
+                                    Kembali
+                                  </Button>
+                                  <Button type="submit" className="bg-orange-500 text-white w-1/2">
+                                    Simpan
+                                  </Button>
+                                </div>
+                              </section>
+                              {/* pdf viewer -> do not move outside sheet component it'll close the dialog due to onClickOutside event */}
+                              <div
+                                onClick={(e) => e.stopPropagation()}
+                                className="fixed left-1/2 top-1/2 z-[999999999999] h-screen w-[38rem] -translate-x-[80%] -translate-y-1/2 p-4 py-4 delay-0 duration-0"
+                              >
+                                <Show
+                                  when={!!document?.data?.raw_file}
+                                  fallback={<p>There&apos;s an error when trying to display the document</p>}>
+                                  <iframe
+                                    src={`data:application/pdf;base64,${document?.data?.raw_file}`}
+                                    width="100%"
+                                    height="100%"
+                                    allowFullScreen
+                                    title="PDF Document"
+                                  />
+                                </Show>
+                              </div>
+                              <Separator />
+                            </form>
+                          </SheetContent>
+                        </Sheet>
+                      </div>
+                      <Separator />
+                    </React.Fragment>
+                  ))}
+                </Show>
+              </ScrollArea>
+              <Separator />
+            </section>
+          </div>
+
+
+          <Modal
+            title={modalState.title}
+            description={modalState.description}
+            isOpen={modalState.isOpen}
+            onClose={closeModal}
+            type={modalState.type}
+          />
         </CardContent>
       </Card>
     </PageContainer>
