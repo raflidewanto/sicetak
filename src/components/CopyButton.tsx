@@ -2,7 +2,7 @@
 
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { useState } from "react";
-import { Copy, Check } from "lucide-react"; // Import icons
+import { Copy, Check } from "lucide-react";
 import Show from "./elements/Show";
 
 export default function CopyIcon({ text }: { text: string }) {

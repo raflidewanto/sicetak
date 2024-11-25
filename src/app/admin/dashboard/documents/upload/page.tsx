@@ -1,12 +1,13 @@
 'use client';
 
-import Show from '@/components/elements/Show';
 import UploadedFileIcon from '@/assets/icons/ic-uploaded-file.svg';
+import Show from '@/components/elements/Show';
 import PageContainer from '@/components/layout/PageContainer';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
+import { Modal } from '@/components/ui/Modal';
 import {
   Select,
   SelectContent,
@@ -21,15 +22,17 @@ import { Textarea } from '@/components/ui/Textarea';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip';
 import { toast } from '@/components/ui/useToast';
 import { DocumentType } from '@/constants/data';
-import { useUploadDoc } from '@/services/documents/mutations/useUploadDocument';
+import { useModal } from '@/hooks/useModal';
 import { usePDFJS } from '@/hooks/usePdfjs';
 import { cN } from '@/lib/utils';
+import { useUploadDoc } from '@/services/documents/mutations/useUploadDocument';
+import { bracketPlaceholder } from '@/types';
 import { getErrorMessage } from '@/utils/error';
+import { extractBracketCoordinates } from '@/utils/pdf';
 import { AxiosError } from 'axios';
 import { X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { memo, useState } from 'react';
-import { bracketPlaceholder } from '@/types';
 
 const AddNewDocumentPage = () => {
   // route
@@ -46,97 +49,20 @@ const AddNewDocumentPage = () => {
   const [release, setRelease] = useState<boolean>(false);
   const [active, setActive] = useState<boolean>(false);
 
+  // hooks
+  const { openModal, closeModal, modalState } = useModal();
+
   // mutations
   const uploadMutation = useUploadDoc();
 
   const onLoadPDFJS = async (pdfjs: any) => {
     if (!file) return;
 
-    const fileReader = new FileReader();
-    fileReader.onload = async () => {
-      const typedArray = new Uint8Array(fileReader.result as ArrayBuffer);
-      const loadingTask = pdfjs.getDocument({ data: typedArray });
-      const pdfDocument = await loadingTask.promise;
-
-      let allBracketCoordinates: bracketPlaceholder[] = [];
-
-      for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber++) {
-        const page = await pdfDocument.getPage(pageNumber);
-        const textContent = await page.getTextContent();
-
-        const viewport = page.getViewport({ scale: 1 });
-        const pageHeight = viewport.height;
-        const scaleFactor = viewport.scale;
-        const pageWidth = viewport.width;
-        let accumulatedText = '';
-        let itemCoordinates: { str: string; x: number; y: number; endX: number }[] = [];
-
-        textContent.items.forEach((item: any) => {
-          const str = item.str;
-          const x = item.transform[4] * scaleFactor;
-          const y = pageHeight - item.transform[5] * scaleFactor;
-
-          const endX = x + (item.width || 0) * scaleFactor;
-
-          itemCoordinates.push({
-            str,
-            x,
-            y,
-            endX
-          });
-          accumulatedText += str;
-        });
-
-        const placeholderRegex = /{{\s*\$[\w]+\s*}}/g;
-        let match: RegExpExecArray | null;
-
-        while ((match = placeholderRegex.exec(accumulatedText)) !== null) {
-          const placeholderText = match[0];
-          const placeholderStartIndex = match.index;
-
-          // Find the correct text item that contains the opening brackets
-          let currentLength = 0;
-          let bracketX = 0;
-          let bracketY = 0;
-
-          for (let i = 0; i < itemCoordinates.length; i++) {
-            const item = itemCoordinates[i];
-            const nextLength = currentLength + item.str.length;
-
-            // Check if this item contains the start of the placeholder
-            if (currentLength <= placeholderStartIndex && placeholderStartIndex < nextLength) {
-              // Calculate the position of the first bracket within this text item
-              const offsetInItem = placeholderStartIndex - currentLength;
-              // const beforeBracketText = item.str.substring(0, offsetInItem);
-
-              const approximateCharWidth = (item.endX - item.x) / item.str.length;
-              bracketX = item.x + approximateCharWidth * offsetInItem - 2;
-              bracketY = item.y;
-              break;
-            }
-
-            currentLength = nextLength;
-          }
-
-          if (bracketX !== 0) {
-            allBracketCoordinates.push({
-              placeholder: placeholderText,
-              x: bracketX,
-              y: bracketY,
-              page: pageNumber,
-              pageWidth: pageWidth,
-              pageHeight: pageHeight
-            });
-          }
-        }
-      }
-
-      setBracketCoordinates(allBracketCoordinates);
+    // callback function to handle the extracted coordinates
+    const handleCoordinates = (coordinates: bracketPlaceholder[]) => {
+      setBracketCoordinates(coordinates);
     };
-
-    if (file) {
-      fileReader.readAsArrayBuffer(file);
-    }
+    await extractBracketCoordinates(pdfjs, file, handleCoordinates);
   };
 
   usePDFJS(onLoadPDFJS, [file]);
@@ -234,38 +160,23 @@ const AddNewDocumentPage = () => {
           window.location.href = '/dashboard/documents';
           return;
         }
-        toast({
-          title: `Error uploading the file: ${data.message}`,
-          variant: 'destructive'
-        });
+        openModal("Error", `Error updating the placeholder: ${data.message}`, 'error');
       },
       onError: (error) => {
         if (error instanceof AxiosError) {
           const status = error.response?.status;
           if (status === 400) {
-            toast({
-              title: `Error uploading the file: ${error.response?.data.message}`,
-              variant: 'destructive'
-            });
+            openModal("Upload error", `Error uploading file: ${error.response?.data.message}`, 'error');
             return;
           }
-          toast({
-            title: `Something went wrong`,
-            variant: 'destructive'
-          });
+          openModal("Upload error", `Something went wrong`, 'error');
           return;
         } else if (error instanceof Error) {
-          toast({
-            title: `Error uploading the file: ${error.message}`,
-            variant: 'destructive'
-          });
+          openModal("Upload error", `Error uploading file: ${error.message}`, 'error');
           return;
         }
         const errMessage = getErrorMessage(error);
-        toast({
-          title: errMessage ? `Error uploading the file: ${errMessage}` : `Something went wrong`,
-          variant: 'destructive'
-        });
+        openModal("Upload error", `Error uploading file: ${errMessage ? errMessage : 'Something went wrong'}`, 'error');
         return;
       }
     });
@@ -415,6 +326,13 @@ const AddNewDocumentPage = () => {
           </form>
         </CardContent>
       </Card>
+      <Modal
+        title={modalState.title}
+        description={modalState.description}
+        isOpen={modalState.isOpen}
+        onClose={closeModal}
+        type={modalState.type}
+      />
     </PageContainer>
   );
 };

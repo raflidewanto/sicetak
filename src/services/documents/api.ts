@@ -12,17 +12,20 @@ export type Response<T = undefined> = {
 const FIFTEEN_SECONDS = 15_000;
 
 export type Document = {
-  id: string;
+	id: string;
   file_id: string;
-  name: string;
-  file: string; // base64 encoded
-  raw_file: string; // base64 encoded
-  type: string;
-  active: boolean;
+	name: string;
+	file: string // base64
+	raw_file: string //base64
+	description: string;
+	type: string;
+  category_name: string;
+	subcategory_name: string;
   release: boolean;
-  created_at: number;
-  updated_at: number;
-};
+  active: boolean;
+	created_at: number;
+	updated_at: number;
+}
 
 type UploadResponse = {
   success: boolean;

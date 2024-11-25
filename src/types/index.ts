@@ -39,3 +39,15 @@ export type bracketPlaceholder = {
   pageWidth: number;
   pageHeight: number;
 };
+
+export type ReuploadDocumentPayload = {
+  name: string,
+  document_type: string,
+  category: string,
+  subcategory: string,
+  description: string,
+  placeholders: string,
+  active: boolean,
+  release: boolean,
+  file: File,
+};

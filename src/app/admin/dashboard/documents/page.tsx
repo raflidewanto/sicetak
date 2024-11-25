@@ -3,6 +3,10 @@
 'use client';
 
 import EditIcon from '@/assets/icons/ic-edit.svg';
+import AddCategoryIcon from '@/assets/icons/ic-add-category.svg';
+import AddSubCategoryIcon from '@/assets/icons/ic-subcategory.svg';
+import AddDocumentIcon from '@/assets/icons/ic-add-document.svg';
+import AddParamIcon from '@/assets/icons/ic-setting-param.svg';
 import PageContainer from '@/components/layout/PageContainer';
 import { Button } from '@/components/ui/Button';
 import {
@@ -35,6 +39,8 @@ import { DownloadCloud, Edit, Plus, Printer, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useQueryState } from 'nuqs';
 import { Suspense, useState } from 'react';
+import { TableBodySkeleton } from '@/components/admin/DocumentTableSkeleton';
+import Show from '@/components/elements/Show';
 
 const AdminPage = () => {
   // UI states
@@ -54,7 +60,7 @@ const AdminPage = () => {
   const [documentTypeDebouncedQuery] = useDebounceValue(documentType, 1500);
 
   // queries
-  const { data: documents } = useDocuments(
+  const { data: documents, isLoading: isDocumentsLoading } = useDocuments(
     documentDebouncedQuery ?? '',
     categoryDebouncedQuery ?? '',
     subCategoryDebouncedQuery ?? '',
@@ -144,21 +150,35 @@ const AdminPage = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="relative right-3 w-full" align="start">
                 <DropdownMenuItem asChild>
-                  <Link href="/admin/dashboard/documents/upload">
-                    Tambah Dokumen
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
                   <Link href="/admin/dashboard/documents/categories/new">
-                    Tambah Kategori
+                    <p className='flex items-center gap-x-2 text-sm font-medium text-gray-700'>
+                      <AddCategoryIcon />
+                      Tambah Kategori
+                    </p>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/admin/dashboard/documents/categories/sub-category/new">Tambah Sub Kategori</Link>
+                  <Link href="/admin/dashboard/documents/categories/sub-category/new">
+                    <p className='flex items-center gap-x-2 text-sm font-medium text-gray-700'>
+                      <AddSubCategoryIcon />
+                      Tambah SubKategori
+                    </p>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/admin/dashboard/documents/upload">
+                    <p className='flex items-center gap-x-2 text-sm font-medium text-gray-700'>
+                      <AddDocumentIcon />
+                      Tambah Dokumen
+                    </p>
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/admin/dashboard/documents/custom-param/{id}">
-                    Tambah Parameter
+                    <p className='flex items-center gap-x-2 text-sm font-medium text-gray-700'>
+                      <AddParamIcon />
+                      Tambah Parameter
+                    </p>
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -240,48 +260,52 @@ const AdminPage = () => {
                       <TableHead className="px-4 py-2 text-center">Action</TableHead>
                     </TableRow>
                   </TableHeader>
-                  <TableBody className="bg-white">
-                    {documents?.data?.map((doc) => (
-                      <TableRow key={doc.id} className="h-[3.313rem] border-b">
-                        <TableCell className="px-4 py-2">{doc.name}</TableCell>
-                        <TableCell className="px-4 py-2 text-center">
-                          <div className="flex items-center justify-evenly gap-x-2">
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <DownloadCloud
-                                    onClick={() => handleDownloadTemplate(doc?.file)}
-                                    className="cursor-pointer text-[#3B3B3B]"
-                                  />
-                                </TooltipTrigger>
-                                <TooltipContent>Download Template</TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Link href={`/admin/dashboard/documents/${doc.file_id}/print`}>
-                                    <Printer
-                                      className="inline-block cursor-pointer text-[#3B3B3B]"
-                                      size={18} />
-                                  </Link>
-                                </TooltipTrigger>
-                                <TooltipContent>Cetak isi</TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-4 py-2 text-center">
-                          <Link
-                            href={`/admin/dashboard/documents/${doc.file_id}/edit`}
-                            className="flex cursor-pointer items-center justify-center gap-2"
-                          >
-                            <EditIcon />
-                          </Link>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
+                  <Show
+                    when={Boolean(documents?.data) && !isDocumentsLoading}
+                    fallback={<TableBodySkeleton />}>
+                    <TableBody className="bg-white">
+                      {documents?.data?.map((doc) => (
+                        <TableRow key={doc.id} className="h-[3.313rem] border-b">
+                          <TableCell className="px-4 py-2">{doc.name}</TableCell>
+                          <TableCell className="px-4 py-2 text-center">
+                            <div className="flex items-center justify-evenly gap-x-2">
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <DownloadCloud
+                                      onClick={() => handleDownloadTemplate(doc?.file)}
+                                      className="cursor-pointer text-[#3B3B3B]"
+                                    />
+                                  </TooltipTrigger>
+                                  <TooltipContent>Download Template</TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Link href={`/admin/dashboard/documents/${doc.file_id}/print`}>
+                                      <Printer
+                                        className="inline-block cursor-pointer text-[#3B3B3B]"
+                                        size={18} />
+                                    </Link>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Cetak isi</TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-4 py-2 text-center">
+                            <Link
+                              href={`/admin/dashboard/documents/${doc.file_id}/edit`}
+                              className="flex cursor-pointer items-center justify-center gap-2"
+                            >
+                              <EditIcon />
+                            </Link>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Show>
                 </Table>
               </div>
             </div>
