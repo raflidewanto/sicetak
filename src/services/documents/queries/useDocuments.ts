@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getDocumentById, getDocuments } from '../api';
+import { FIVE_MINUTES_IN_MS } from '@/constants/data';
 
-const FIVE_MINUTES_IN_MS = 5 * 60 * 1000;
 export function useDocuments(
   documentName: string,
   documentCategory: string,

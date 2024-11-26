@@ -12,6 +12,8 @@ import { AxiosError } from 'axios';
 import { useParams } from 'next/navigation';
 import { useQueryState } from 'nuqs';
 import { Suspense } from 'react';
+import { Card, CardContent, CardHeader } from '@/components/ui/Card';
+import { Label } from '@/components/ui/Label';
 
 const PrintDocumentPage = () => {
   const [agreementNo, setAgreementNo] = useQueryState(AGREEMENT_NO_QUERY);
@@ -59,42 +61,36 @@ const PrintDocumentPage = () => {
 
   return (
     <PageContainer scrollable>
-      <div className="mx-auto mt-8 min-h-screen max-w-lg">
-        <h1 className="mb-4 text-2xl font-semibold">Print Document</h1>
-        <div className="mb-6">
-          <label htmlFor="agreementNo" className="block text-sm font-medium text-gray-700">
-            Agreement Number
-          </label>
-          <Input
-            type="text"
-            id="agreementNo"
-            value={agreementNo || ''}
-            onChange={(e) => setAgreementNo(e.target.value)}
-            className="
-            mt-1 block w-full 
-            rounded-md 
-            border border-gray-300 
-            px-3 py-2 
-            shadow-sm
-            bg-white
-            focus:outline-none 
-            sm:text-sm"
-            placeholder="Enter agreement number"
-          />
-        </div>
-
-        <div className="flex justify-end">
-          <Button
-            variant={'outline'}
-            onClick={handleDownload}
-            disabled={printMutation.isPending}
-            className={`inline-flex items-center rounded-md px-4 py-2 text-sm font-medium ${printMutation.isPending && 'cursor-not-allowed opacity-50'
-              }`}
-          >
-            {printMutation.isPending ? 'Downloading...' : 'Download PDF'}
-          </Button>
-        </div>
-      </div>
+      <Card>
+        <CardContent>
+          <CardHeader className='font-bold px-0 text-[1.125rem]'>
+            Print Dokumen
+          </CardHeader>
+          <section className='space-y-1'>
+            <Label
+              htmlFor='agreement-no'
+              className='block text-sm font-medium text-gray-700'
+            >
+              No. Agreement
+            </Label>
+            <div className='flex gap-x-4 flex-col gap-y-4 sm:flex-row'>
+              <Input
+                id="agreement-no"
+                className="max-w-[21.875rem]"
+                placeholder='Masukkan nomor agreement'
+                onChange={(e) => setAgreementNo(e.target.value)} />
+              <Button
+                onClick={handleDownload}
+                type='button'
+                variant={"outline"}
+                className='text-orange-500'
+              >
+                Lihat
+              </Button>
+            </div>
+          </section>
+        </CardContent>
+      </Card>
       <Modal
         title={modalState.title}
         description={modalState.description}

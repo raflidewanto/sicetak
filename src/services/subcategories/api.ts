@@ -1,15 +1,9 @@
 import apiResolver from '@/utils/api';
-import { createAxiosInstance } from '../axiosInstance';
+import { createAxiosInstance, Response } from '../axiosInstance';
 
 const axios = createAxiosInstance('sub-categories');
 
-export type Response<T = undefined> = {
-  success: boolean;
-  message: string;
-  data?: T;
-};
-
-type SubCategoryResponseDTO = {
+export type SubCategoryResponseDTO = {
   id: string;
   subcategory_id: string;
   subcategory_name: string;

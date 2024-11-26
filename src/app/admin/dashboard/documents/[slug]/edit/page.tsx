@@ -32,9 +32,11 @@ import { customParamPlaceholders, DocumentType, validPlaceholders } from '@/cons
 import { useModal } from '@/hooks/useModal';
 import { usePDFJS } from '@/hooks/usePdfjs';
 import { cN } from '@/lib/utils';
+import { useCategories } from '@/services/categories/queries/useCategories';
+import { useSubCategoriesByCategory } from '@/services/categories/queries/useSubCategoriesByCategory';
 import { PlaceholderResponseDTO } from '@/services/documents/api';
 import { usePlaceholderUpdate } from '@/services/documents/mutations/usePlaceholderUpdate';
-import { useUploadDoc } from '@/services/documents/mutations/useUploadDocument';
+import { useReuploadDoc } from '@/services/documents/mutations/useReupload';
 import { useDocumentById } from '@/services/documents/queries/useDocuments';
 import { usePlaceholders } from '@/services/documents/queries/usePlaceholders';
 import { bracketPlaceholder } from '@/types';
@@ -43,7 +45,7 @@ import { extractBracketCoordinates } from '@/utils/pdf';
 import { AxiosError } from 'axios';
 import { EditIcon, X } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import React, { memo, useMemo, useState } from 'react';
+import React, { memo, useEffect, useMemo, useState } from 'react';
 
 const EditDocument = () => {
   // route
@@ -53,24 +55,27 @@ const EditDocument = () => {
   // queries
   const { data: placeholders } = usePlaceholders(documentId);
   const { data: document } = useDocumentById(documentId);
+  const { data: categories } = useCategories();
 
   // PDF states
   const [file, setFile] = useState<File | null>();
   const [fileName, setFileName] = useState<string>('');
   const [fileDescription, setFileDescription] = useState<string>('');
-  const [fileCategory, setFileCategory] = useState<string>('');
-  const [fileSubCategory, setFileSubCategory] = useState<string>('');
+  const [fileCategory, setFileCategory] = useState<string>(document?.data?.category_name ?? '');
+  const [fileSubCategory, setFileSubCategory] = useState<string>(document?.data?.subcategory_name ?? '');
   const [bracketCoordinates, setBracketCoordinates] = useState<bracketPlaceholder[]>([]);
   const [docType, setDocType] = useState<DocumentType>('personal');
   const [release, setRelease] = useState<boolean>(document?.data?.release ?? false);
   const [active, setActive] = useState<boolean>(document?.data?.active ?? false);
+
+  const { data: subCategories } = useSubCategoriesByCategory(fileCategory);
 
   // placeholder state
   const [selectedPlaceholder, setSelectedPlaceholder] = useState<PlaceholderResponseDTO | null>(null);
   const [placeholderValue, setPlaceholderValue] = useState<string>('');
 
   // mutations
-  const uploadMutation = useUploadDoc();
+  const reuploadMutation = useReuploadDoc();
   const updatePlaceholderMutation = usePlaceholderUpdate();
 
   // UI
@@ -79,6 +84,11 @@ const EditDocument = () => {
   const customParams = useMemo(() => {
     return placeholders?.data?.sort((a, b) => a.name.localeCompare(b.name)).filter(p => customParamPlaceholders.includes(p.name));
   }, [placeholders]);
+
+  useEffect(() => {
+    setFileCategory(document?.data?.category_name ?? "");
+    setFileSubCategory(document?.data?.subcategory_name ?? "");
+  }, [document]);
 
   const onLoadPDFJS = async (pdfjs: any) => {
     if (!file) return;
@@ -184,7 +194,10 @@ const EditDocument = () => {
     formData.append('active', active.valueOf().toString());
     formData.append('release', release.valueOf().toString());
 
-    uploadMutation.mutate(formData, {
+    reuploadMutation.mutate({
+      formData,
+      id: documentId
+    }, {
       onSuccess: (data) => {
         if (data.success) {
           window.location.href = '/dashboard/documents';
@@ -271,15 +284,21 @@ const EditDocument = () => {
                 <section className="w-full space-y-2">
                   {/* TODO: get categories from db */}
                   <Label className="block text-sm font-medium text-gray-700">Kategori</Label>
-                  <Select onValueChange={(v) => setFileCategory(v)} defaultValue={document?.data?.category_name}>
+                  <Select
+                    onValueChange={(v) => setFileCategory(v)}
+                    value={fileCategory}
+                  >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Pilih Kategori" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
                         <SelectLabel>Kategori</SelectLabel>
-                        <SelectItem value="financing-agreement">Financing Agreement</SelectItem>
-                        <SelectItem value="agreement-transfer">Agreement Transfer</SelectItem>
+                        {categories?.data?.map((category) => (
+                          <SelectItem value={category.category_name} key={category.category_id} className="capitalize">
+                            {category.category_name.split('-').join(' ')}
+                          </SelectItem>
+                        ))}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -288,16 +307,21 @@ const EditDocument = () => {
                 <section className="w-full space-y-2">
                   {/* TODO: get subcategories by selected category from db */}
                   <Label className="block text-sm font-medium text-gray-700">Sub Kategori</Label>
-                  <Select onValueChange={(v) => setFileSubCategory(v)} defaultValue={document?.data?.subcategory_name}>
+                  <Select
+                    onValueChange={(v) => setFileSubCategory(v)}
+                    value={document?.data?.subcategory_name}
+                  >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Pilih Sub Kategori" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
                         <SelectLabel>Sub Kategori</SelectLabel>
-                        <SelectItem value="fund-facility">Fasilitas Dana</SelectItem>
-                        <SelectItem value="business-capital-facilities">Fasilitas Modal Usaha</SelectItem>
-                        <SelectItem value="installment-financing">Installment Financing</SelectItem>
+                        {subCategories?.data?.map(subCategory => (
+                          <SelectItem value={subCategory.subcategory_name} key={subCategory.subcategory_id} className="capitalize">
+                            {subCategory.subcategory_name.split('-').join(' ')}
+                          </SelectItem>
+                        ))}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -354,12 +378,11 @@ const EditDocument = () => {
                   <Switch
                     id="active"
                     onCheckedChange={() => setActive(!active)}
-                    defaultChecked={document?.data?.active}
-                    checked={document?.data?.active}
+                    checked={active}
                   />
                   <Label htmlFor="active">
                     <Show
-                      when={Boolean(document?.data?.active)}
+                      when={Boolean(active)}
                       fallback={<span className="mx-1 inline-block h-2 w-2 rounded-full bg-red-400"></span>}
                     >
                       <span className="mx-1 inline-block h-2 w-2 rounded-full bg-green-400"></span>
@@ -374,11 +397,10 @@ const EditDocument = () => {
                   <Switch
                     id="release"
                     onCheckedChange={() => setRelease(!release)}
-                    defaultChecked={document?.data?.release}
-                    checked={document?.data?.release} />
+                    checked={release} />
                   <Label htmlFor="release">
                     <Show
-                      when={Boolean(document?.data?.release)}
+                      when={Boolean(release)}
                       fallback={<span className="mx-1 inline-block h-2 w-2 rounded-full bg-red-400"></span>}
                     >
                       <span className="mx-1 inline-block h-2 w-2 rounded-full bg-green-400"></span>
@@ -401,7 +423,7 @@ const EditDocument = () => {
           </form>
 
           {/* placeholders container */}
-          <div className="grid grid-cols-1 gap-x-6 px-6 py-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-x-6 px-6 py-10 sm:grid-cols-2">
             {/* list placeholders */}
             <section className="min-h-[15.813rem] bg-white">
               <div className="rounded-tl-md rounded-tr-md bg-[#F2F5F6] p-4">
@@ -414,7 +436,7 @@ const EditDocument = () => {
                   {placeholders?.data?.map((placeholder) => (
                     <React.Fragment key={placeholder.placeholder_id}>
                       <div className="flex min-h-[3.313rem] items-center justify-start px-4 py-2">
-                        <p>{placeholder.name}</p>
+                        <p className='text-sm'>{placeholder.name}</p>
                       </div>
                       <Separator />
                     </React.Fragment>
@@ -433,7 +455,7 @@ const EditDocument = () => {
                   {customParams?.map((placeholder) => (
                     <React.Fragment key={placeholder.placeholder_id}>
                       <div className="flex min-h-[3.313rem] items-center justify-between px-4 py-2">
-                        <p>{placeholder.name}</p>
+                        <p className='text-sm'>{placeholder.name}</p>
                         <Sheet>
                           <SheetTrigger asChild>
                             {/* // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}

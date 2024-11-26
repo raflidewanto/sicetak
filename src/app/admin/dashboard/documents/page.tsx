@@ -2,11 +2,13 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 'use client';
 
-import EditIcon from '@/assets/icons/ic-edit.svg';
 import AddCategoryIcon from '@/assets/icons/ic-add-category.svg';
-import AddSubCategoryIcon from '@/assets/icons/ic-subcategory.svg';
 import AddDocumentIcon from '@/assets/icons/ic-add-document.svg';
+import EditIcon from '@/assets/icons/ic-edit.svg';
 import AddParamIcon from '@/assets/icons/ic-setting-param.svg';
+import AddSubCategoryIcon from '@/assets/icons/ic-subcategory.svg';
+import { AdminTableBodySkeleton } from '@/components/admin/DocumentTableSkeleton';
+import Show from '@/components/elements/Show';
 import PageContainer from '@/components/layout/PageContainer';
 import { Button } from '@/components/ui/Button';
 import {
@@ -30,7 +32,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip';
 import { CATEGORY, DOCUMENT_NAME, DOCUMENT_TYPE, SUBCATEGORY } from '@/constants/data';
 import { useDebounceValue } from '@/hooks/useDebounceValue';
-import useDisclosure from '@/hooks/useDisclosure';
+import { useModal } from '@/hooks/useModal';
 import { cN } from '@/lib/utils';
 import { useDocuments } from '@/services/documents/queries/useDocuments';
 import { useSubCategories } from '@/services/subcategories/queries/useSubcategories';
@@ -38,14 +40,11 @@ import { getErrorMessage } from '@/utils/error';
 import { DownloadCloud, Edit, Plus, Printer, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useQueryState } from 'nuqs';
-import { Suspense, useState } from 'react';
-import { TableBodySkeleton } from '@/components/admin/DocumentTableSkeleton';
-import Show from '@/components/elements/Show';
+import { Suspense } from 'react';
 
 const AdminPage = () => {
   // UI states
-  const { onOpen, onClose, isOpen } = useDisclosure();
-  const [errorMessage, setErrorMessage] = useState('');
+  const { openModal, closeModal, modalState } = useModal();
 
   // query state
   const [categoryQuery, setCategoryQuery] = useQueryState(CATEGORY);
@@ -82,8 +81,11 @@ const AdminPage = () => {
       const pdfWindow = window.open('') as WindowProxy;
       pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
     } catch (error) {
-      setErrorMessage(getErrorMessage(error));
-      onOpen();
+      if (error instanceof Error) {
+        openModal("Error", `Error downloading the file: ${error.message}`, 'error');
+        return;
+      }
+      openModal("Error", `${getErrorMessage(error) ?? 'Something went wrong'}`, 'error');
       return;
     }
   }
@@ -144,8 +146,8 @@ const AdminPage = () => {
             </Select>
             <DropdownMenu dir="ltr">
               <DropdownMenuTrigger asChild>
-                <Button>
-                  <Plus className="text-white" />
+                <Button className='text-white'>
+                  <Plus size={28} className="text-white" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="relative right-3 w-full" align="start">
@@ -231,22 +233,18 @@ const AdminPage = () => {
                       <TooltipContent>
                         <p>{subcategory?.subcategory_name}</p>
                       </TooltipContent>
-                      <Edit size={12} color="#F97316" />
+                      <Link href={`/admin/dashboard/documents/categories/sub-category/${subcategory?.subcategory_id}`}>
+                        <Edit
+                          className='font-bold cursor-pointer'
+                          size={12}
+                          color="#F97316"
+                        />
+                      </Link>
                     </div>
                   </TooltipTrigger>
                 </Tooltip>
               </TooltipProvider>
             ))}
-            {/* add new sub category button */}
-            <Link
-              href="/admin/dashboard/documents/categories/sub-category/new"
-              className={cN(
-                `flex min-h-[3rem] w-full items-center justify-between border-b border-gray-300 bg-white px-4 py-2 transition-all hover:border-l-4 hover:border-l-[#173E55] hover:bg-background`
-              )}
-            >
-              <p className={cN(`text-sm font-semibold capitalize`)}>Tambah Sub Kategori</p>
-              <Plus size={16} color="#F97316" />
-            </Link>
           </section>
           {/* table */}
           <section className="min-h-max flex-1 overflow-x-scroll px-4">
@@ -262,7 +260,7 @@ const AdminPage = () => {
                   </TableHeader>
                   <Show
                     when={Boolean(documents?.data) && !isDocumentsLoading}
-                    fallback={<TableBodySkeleton />}>
+                    fallback={<AdminTableBodySkeleton />}>
                     <TableBody className="bg-white">
                       {documents?.data?.map((doc) => (
                         <TableRow key={doc.id} className="h-[3.313rem] border-b">
@@ -312,11 +310,13 @@ const AdminPage = () => {
           </section>
         </main>
       </div>
-      <Modal title="Error" description={errorMessage ?? 'Something went wrong'} isOpen={isOpen} onClose={onClose} type='error'>
-        <Button variant="destructive" onClick={onClose}>
-          Close
-        </Button>
-      </Modal>
+      <Modal
+        title="Error"
+        description={modalState?.description ?? 'Something went wrong'}
+        isOpen={modalState?.isOpen}
+        onClose={closeModal}
+        type='error'
+      />
     </PageContainer>
   );
 };

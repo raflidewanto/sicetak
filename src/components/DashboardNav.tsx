@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Icons } from '@/components/Icons';
@@ -10,6 +10,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/Tooltip';
 import { useSidebar } from './contexts/SidebarContext';
 import Show from './elements/Show';
+import { ChevronDown, ChevronRight, User } from 'lucide-react';
 
 interface DashboardNavProps {
   items: NavItem[];
@@ -20,6 +21,8 @@ interface DashboardNavProps {
 export function DashboardNav({ items, setOpen, isMobileNav = false }: DashboardNavProps) {
   const path = usePathname();
   const { isMinimized } = useSidebar();
+  const [isAdminOpen, setIsAdminOpen] = useState(true);
+  const isActiveRoute = (route: string) => path.startsWith(route);
 
   if (!items?.length) {
     return null;
@@ -75,6 +78,54 @@ export function DashboardNav({ items, setOpen, isMobileNav = false }: DashboardN
             );
           })}
         </Show>
+        {/* admin collapsible menu */}
+        <div>
+          <button
+            className={cN(`flex h-[3rem] items-center gap-2 overflow-hidden py-2 text-sm font-medium transition-all hover:border-l-4 hover:border-l-orange-600 hover:bg-sidebarBgHover justify-between w-full p-2`, {
+              "border-l-4 border-l-orange-600 bg-sidebarBgHover text-white": isActiveRoute("/admin"),
+            })}
+            onClick={() => setIsAdminOpen(!isAdminOpen)}
+          >
+            <div className="flex items-center space-x-2">
+              <span className="text-white">
+                <User />
+              </span>
+              <span className="text-white">Admin</span>
+            </div>
+            <span className="text-white">{isAdminOpen ? <ChevronDown /> : <ChevronRight />}</span>
+          </button>
+          {isAdminOpen && (
+            <div>
+              {/* Child Links */}
+              <a
+                href="/admin/dashboard/documents"
+                className={cN(`block py-[0.95rem] pl-9 text-[0.875rem]`, {
+                  "bg-sidebarBgHover border-l-4 border-l-orange-600 text-white": isActiveRoute("/admin/dashboard/documents")
+                })}
+              >
+                Dokumen
+              </a>
+              <a
+                href="/admin/dashboard/parameters"
+                className={`block py-[0.95rem] pl-9 text-[0.875rem] ${isActiveRoute("/admin/dashboard/parameter")
+                  ? "bg-sidebarBgHover border-l-4 border-l-orange-600 text-white"
+                  : "hover:bg-[#0f283b] text-gray-400"
+                  }`}
+              >
+                Parameter
+              </a>
+              <a
+                href="/admin/dashboard/category"
+                className={`block py-[0.95rem] pl-9 text-[0.875rem] ${isActiveRoute("/admin/dashboard/categories")
+                  ? "bg-sidebarBgHover border-l-4 border-l-orange-600 text-white"
+                  : "hover:bg-[#0f283b] text-gray-400"
+                  }`}
+              >
+                Kategori
+              </a>
+            </div>
+          )}
+        </div>
       </TooltipProvider>
     </nav>
   );

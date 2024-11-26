@@ -1,6 +1,11 @@
 import { NavItem } from '@/types';
 
 // =====================================================
+// number constants
+export const FIVE_MINUTES_IN_MS = 5 * 60 * 1000;
+// =====================================================
+
+// =====================================================
 // search params
 export const AGREEMENT_NO_QUERY = 'agreement-no';
 export const DOCUMENT_ID_QUERY = 'id';
@@ -8,6 +13,7 @@ export const CATEGORY = 'category';
 export const SUBCATEGORY = 'subcategory';
 export const DOCUMENT_NAME = 'document-name';
 export const DOCUMENT_TYPE = 'document-type'; // personal or corporate
+export const TAB = 'tab';
 // =====================================================
 
 export const navItems: NavItem[] = [
@@ -17,12 +23,6 @@ export const navItems: NavItem[] = [
     icon: 'fileUp',
     label: 'Dokumen'
   },
-  {
-    title: 'Admin',
-    href: '/admin/dashboard/documents',
-    icon: 'user',
-    label: 'Admin'
-  }
 ];
 
 export const validPlaceholders = [

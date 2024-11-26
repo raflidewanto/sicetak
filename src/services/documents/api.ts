@@ -1,13 +1,7 @@
 import apiResolver, { newAbortSignal } from '@/utils/api';
-import { createAxiosInstance } from '../axiosInstance';
+import { createAxiosInstance, Response } from '../axiosInstance';
 
 const axios = createAxiosInstance('documents');
-
-export type Response<T = undefined> = {
-  success: boolean;
-  message: string;
-  data?: T;
-};
 
 const FIFTEEN_SECONDS = 15_000;
 

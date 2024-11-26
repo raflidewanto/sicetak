@@ -2,6 +2,12 @@ import Axios from 'axios';
 
 const baseURL = process.env.NEXT_PUBLIC_SICETAK_API_BASE_URL;
 
+export type Response<T = undefined> = {
+  success: boolean;
+  message: string;
+  data?: T;
+};
+
 if (!baseURL) {
   throw new Error('NEXT_PUBLIC_SICETAK_API_BASE_URL is not defined');
 }

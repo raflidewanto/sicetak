@@ -1,8 +1,8 @@
-import { Skeleton } from "../ui/Skeleton";
-import { TableBody, TableCell, TableRow } from "../ui/Table";
+import { Skeleton } from "./ui/Skeleton";
+import { TableBody, TableCell, TableRow } from "./ui/Table";
 
 
-export const AdminTableBodySkeleton = () => {
+export const DocumentsTableSkeleton = () => {
   const rows = Array.from({ length: 5 });
 
   return (
@@ -20,11 +20,6 @@ export const AdminTableBodySkeleton = () => {
               <Skeleton className="h-6 w-6 rounded-lg" />
               <Skeleton className="h-6 w-6 rounded-lg" />
             </div>
-          </TableCell>
-
-          {/* Skeleton for Edit Icon */}
-          <TableCell className="px-4 py-2 flex items-center justify-center translate-y-[15%] h-full flex-1">
-            <Skeleton className="h-6 w-6 rounded-lg" />
           </TableCell>
         </TableRow>
       ))}

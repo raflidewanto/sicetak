@@ -15,11 +15,7 @@ type SidebarProps = {
 };
 
 export default function Sidebar({ className }: SidebarProps) {
-  const { isMinimized, toggle } = useSidebar();
-
-  const handleToggle = () => {
-    toggle();
-  };
+  const { isMinimized } = useSidebar();
 
   return (
     <aside
@@ -44,13 +40,6 @@ export default function Sidebar({ className }: SidebarProps) {
           </Show>
         </Link>
       </div>
-      <ChevronLeft
-        className={cN(
-          'absolute -right-3 top-10 z-50 cursor-pointer rounded-full border bg-white text-3xl text-zinc-950   ', // Dark mode for Chevron
-          isMinimized && 'rotate-180'
-        )}
-        onClick={handleToggle}
-      />
       <div className="space-y-4 py-4">
         <div className="py-2">
           <div className="mt-3 space-y-3">
