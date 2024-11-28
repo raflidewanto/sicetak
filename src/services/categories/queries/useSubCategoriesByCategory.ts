@@ -6,6 +6,7 @@ export function useSubCategoriesByCategory(categoryId: string) {
   return useQuery({
     queryKey: ['subcategories', categoryId],
     queryFn: () => getSubCategoriesByCategory(categoryId),
-    staleTime: FIVE_MINUTES_IN_MS
+    staleTime: FIVE_MINUTES_IN_MS,
+    enabled: !!categoryId
   });
 }

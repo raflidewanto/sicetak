@@ -23,6 +23,12 @@ export const navItems: NavItem[] = [
     icon: 'fileUp',
     label: 'Dokumen'
   },
+  {
+    title: 'Cetak Isi',
+    href: '/dashboard/documents/print',
+    icon: 'surat',
+    label: 'Cetak Isi'
+  },
 ];
 
 export const validPlaceholders = [

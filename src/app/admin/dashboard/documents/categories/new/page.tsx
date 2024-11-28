@@ -27,10 +27,12 @@ const AddCategoryPage = () => {
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append('categoryName', categoryName.toLocaleLowerCase().split(' ').join('_'));
-    formData.append('categoryDesc', categoryDesc);
-    createCategoryMutation.mutate(formData, {
+
+    createCategoryMutation.mutate({
+      category_active: false,
+      category_description: categoryDesc,
+      category_name: categoryName.toLocaleLowerCase().replaceAll(' ', '_'),
+    }, {
       onSuccess() {
         openModal('Success', 'Category created successfully', 'success');
         resetForm();

@@ -59,7 +59,7 @@ const EditDocument = () => {
 
   // PDF states
   const [file, setFile] = useState<File | null>();
-  const [fileName, setFileName] = useState<string>('');
+  const [fileName, setFileName] = useState<string>(document?.data?.name ?? '');
   const [fileDescription, setFileDescription] = useState<string>('');
   const [fileCategory, setFileCategory] = useState<string>(document?.data?.category_name ?? '');
   const [fileSubCategory, setFileSubCategory] = useState<string>(document?.data?.subcategory_name ?? '');
@@ -82,12 +82,16 @@ const EditDocument = () => {
   const { openModal, closeModal, modalState } = useModal();
 
   const customParams = useMemo(() => {
-    return placeholders?.data?.sort((a, b) => a.name.localeCompare(b.name)).filter(p => customParamPlaceholders.includes(p.name));
+    return placeholders?.data?.sort((a, b) => a.placeholder_name.localeCompare(b.placeholder_name)).filter(p => customParamPlaceholders.includes(p.placeholder_name));
   }, [placeholders]);
 
   useEffect(() => {
+    setFileName(document?.data?.name ?? "");
+    setFileDescription(document?.data?.description ?? "");
     setFileCategory(document?.data?.category_name ?? "");
     setFileSubCategory(document?.data?.subcategory_name ?? "");
+    setActive(document?.data?.active ?? false);
+    setRelease(document?.data?.release ?? false);
   }, [document]);
 
   const onLoadPDFJS = async (pdfjs: any) => {
@@ -187,9 +191,9 @@ const EditDocument = () => {
     formData.append('file', file as Blob);
     formData.append('name', fileName);
     formData.append('description', fileDescription);
-    formData.append('category', fileCategory);
-    formData.append('subcategory', fileSubCategory);
-    formData.append('document-type', docType);
+    formData.append('category_code', fileCategory);
+    formData.append('subcategory_code', fileSubCategory);
+    formData.append('document_type', docType);
     formData.append('placeholders', JSON.stringify(bracketCoordinates));
     formData.append('active', active.valueOf().toString());
     formData.append('release', release.valueOf().toString());
@@ -242,13 +246,16 @@ const EditDocument = () => {
 
   const handleUpdatePlaceholder = (e: React.FormEvent) => {
     e.preventDefault();
-    const payload = {
-      doc_id: documentId,
-      placeholder_name: selectedPlaceholder?.name ?? "",
-      value: placeholderValue ?? "",
-      placeholder_id: selectedPlaceholder?.placeholder_id ?? ""
-    };
-    updatePlaceholderMutation.mutate(payload, {
+    if (!selectedPlaceholder?.placeholder_name) {
+        openModal("Error", `Please select a placeholder`, 'warning');
+        return;
+    }
+
+    updatePlaceholderMutation.mutate({
+      custom_value: placeholderValue,
+      placeholder_name: selectedPlaceholder?.placeholder_name,
+      document_code: documentId,
+    }, {
       onSuccess: (data) => {
         if (data.success) {
           openModal("Success", `${data.message}`, 'success');
@@ -274,29 +281,28 @@ const EditDocument = () => {
                   id="file-name"
                   placeholder="Value"
                   className="mt-1"
-                  defaultValue={document?.data?.name}
+                  value={fileName}
                   onChange={(e) => setFileName(e.target.value)}
                 />
               </div>
 
               {/* category & subcategory */}
-              <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
                 <section className="w-full space-y-2">
-                  {/* TODO: get categories from db */}
                   <Label className="block text-sm font-medium text-gray-700">Kategori</Label>
                   <Select
                     onValueChange={(v) => setFileCategory(v)}
                     value={fileCategory}
                   >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full capitalize">
                       <SelectValue placeholder="Pilih Kategori" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
                         <SelectLabel>Kategori</SelectLabel>
                         {categories?.data?.map((category) => (
-                          <SelectItem value={category.category_name} key={category.category_id} className="capitalize">
-                            {category.category_name.split('-').join(' ')}
+                          <SelectItem value={category.category_code} key={category.category_code} className="capitalize">
+                            {category.category_name.split('_').join(' ')}
                           </SelectItem>
                         ))}
                       </SelectGroup>
@@ -305,11 +311,10 @@ const EditDocument = () => {
                 </section>
                 {/* sub category */}
                 <section className="w-full space-y-2">
-                  {/* TODO: get subcategories by selected category from db */}
                   <Label className="block text-sm font-medium text-gray-700">Sub Kategori</Label>
                   <Select
                     onValueChange={(v) => setFileSubCategory(v)}
-                    value={document?.data?.subcategory_name}
+                    value={fileSubCategory}
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Pilih Sub Kategori" />
@@ -318,8 +323,8 @@ const EditDocument = () => {
                       <SelectGroup>
                         <SelectLabel>Sub Kategori</SelectLabel>
                         {subCategories?.data?.map(subCategory => (
-                          <SelectItem value={subCategory.subcategory_name} key={subCategory.subcategory_id} className="capitalize">
-                            {subCategory.subcategory_name.split('-').join(' ')}
+                          <SelectItem value={subCategory.subcategory_code} key={subCategory.subcategory_code} className="capitalize">
+                            {subCategory.subcategory_name.split('_').join(' ')}
                           </SelectItem>
                         ))}
                       </SelectGroup>
@@ -336,7 +341,7 @@ const EditDocument = () => {
                   id="file-description"
                   placeholder="Value"
                   className="mt-1 h-32"
-                  defaultValue={document?.data?.description}
+                  value={fileDescription}
                   onChange={(e) => setFileDescription(e.target.value)}
                 />
               </div>
@@ -434,9 +439,9 @@ const EditDocument = () => {
                   <p>No data</p>
                 }>
                   {placeholders?.data?.map((placeholder) => (
-                    <React.Fragment key={placeholder.placeholder_id}>
+                    <React.Fragment key={placeholder.placeholder_code}>
                       <div className="flex min-h-[3.313rem] items-center justify-start px-4 py-2">
-                        <p className='text-sm'>{placeholder.name}</p>
+                        <p className='text-sm'>{placeholder.placeholder_name}</p>
                       </div>
                       <Separator />
                     </React.Fragment>
@@ -453,9 +458,9 @@ const EditDocument = () => {
                   <p>No data</p>
                 }>
                   {customParams?.map((placeholder) => (
-                    <React.Fragment key={placeholder.placeholder_id}>
+                    <React.Fragment key={placeholder.placeholder_code}>
                       <div className="flex min-h-[3.313rem] items-center justify-between px-4 py-2">
-                        <p className='text-sm'>{placeholder.name}</p>
+                        <p className='text-sm'>{placeholder.placeholder_name}</p>
                         <Sheet>
                           <SheetTrigger asChild>
                             {/* // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
@@ -474,7 +479,7 @@ const EditDocument = () => {
                                 <div className="w-full">
                                   <div className='mb-4'>
                                     <Input
-                                      defaultValue={placeholder?.name ?? ""}
+                                      defaultValue={placeholder?.placeholder_name ?? ""}
                                       className="focus-visible:outline-none w-full text-gray-950"
                                       disabled
                                     />

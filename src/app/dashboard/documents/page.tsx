@@ -26,8 +26,7 @@ import { cN } from '@/lib/utils';
 import { useDocuments } from '@/services/documents/queries/useDocuments';
 import { useSubCategories } from '@/services/subcategories/queries/useSubcategories';
 import { getErrorMessage } from '@/utils/error';
-import { DownloadCloud, Printer, Search } from 'lucide-react';
-import Link from 'next/link';
+import { DownloadCloud, Search } from 'lucide-react';
 import { useQueryState } from 'nuqs';
 import { Suspense, useState } from 'react';
 
@@ -151,39 +150,41 @@ const DocumentsPage = () => {
                 </TooltipTrigger>
               </Tooltip>
             </TooltipProvider>
-            {subCategories?.data?.map((subcategory) => (
-              <TooltipProvider key={subcategory?.subcategory_id}>
-                <Tooltip>
-                  <TooltipTrigger className="w-full">
-                    <div
-                      onClick={() =>
-                        setSubCategoryQuery(subcategory?.subcategory_name.split(' ').join('-').toLowerCase())
-                      }
-                      className={cN(
-                        `flex min-h-[3rem] w-full items-center justify-between border-b border-gray-300 bg-white px-4 py-2 transition-all hover:border-l-4 hover:border-l-[#173E55] hover:bg-background`,
-                        {
-                          'border-l-4 border-l-[#173E55] bg-background':
-                            subCategoryQuery === subcategory?.subcategory_name.split(' ').join('-').toLowerCase()
+            <Show when={Boolean(subCategories?.data)}>
+              {subCategories?.data?.map((subcategory) => (
+                <TooltipProvider key={subcategory?.category_code}>
+                  <Tooltip>
+                    <TooltipTrigger className="w-full">
+                      <div
+                        onClick={() =>
+                          setSubCategoryQuery(subcategory?.subcategory_name.split(' ').join('_').toLowerCase())
                         }
-                      )}
-                    >
-                      <p
-                        className={cN(`text-sm font-semibold capitalize`, {
-                          'line-clamp-1': subcategory?.subcategory_name.length > 17
-                        })}
+                        className={cN(
+                          `flex min-h-[3rem] w-full items-center justify-between border-b border-gray-300 bg-white px-4 py-2 transition-all hover:border-l-4 hover:border-l-[#173E55] hover:bg-background`,
+                          {
+                            'border-l-4 border-l-[#173E55] bg-background':
+                              subCategoryQuery === subcategory?.subcategory_name.split(' ').join('_').toLowerCase()
+                          }
+                        )}
                       >
-                        {(subcategory?.subcategory_name?.toString().length ?? 0) > 18
-                          ? subcategory?.subcategory_name.substring(0, 17) + '...'
-                          : subcategory?.subcategory_name}
-                      </p>
-                      <TooltipContent>
-                        <p>{subcategory?.subcategory_name}</p>
-                      </TooltipContent>
-                    </div>
-                  </TooltipTrigger>
-                </Tooltip>
-              </TooltipProvider>
-            ))}
+                        <p
+                          className={cN(`text-sm font-semibold capitalize`, {
+                            'line-clamp-1': subcategory?.subcategory_name.length > 17
+                          })}
+                        >
+                          {(subcategory?.subcategory_name?.toString().length ?? 0) > 18
+                            ? subcategory?.subcategory_name.split("_").join(" ").substring(0, 17) + '...'
+                            : subcategory?.subcategory_name.split("_").join(" ")}
+                        </p>
+                        <TooltipContent>
+                          <p>{subcategory?.subcategory_name.split("_").join(" ")}</p>
+                        </TooltipContent>
+                      </div>
+                    </TooltipTrigger>
+                  </Tooltip>
+                </TooltipProvider>
+              ))}
+            </Show>
           </section>
           {/* table */}
           <section className="min-h-max flex-1 overflow-x-scroll px-4">
@@ -196,12 +197,14 @@ const DocumentsPage = () => {
                       <TableHead className="px-4 py-2 text-center">Download Dokumen</TableHead>
                     </TableRow>
                   </TableHeader>
+                  <Show when={isDocumentsLoading}>
+                    <DocumentsTableSkeleton />
+                  </Show>
                   <Show
-                    when={Boolean(documents?.data) && !isDocumentsLoading}
-                    fallback={<DocumentsTableSkeleton />}>
+                    when={!isDocumentsLoading && (documents?.data?.length ?? 0) > 0}>
                     <TableBody className="bg-white">
                       {documents?.data?.map((doc) => (
-                        <TableRow key={doc.id} className="h-[3.313rem] border-b">
+                        <TableRow key={doc.document_code} className="h-[3.313rem] border-b">
                           <TableCell className="px-4 py-2">{doc.name}</TableCell>
                           <TableCell className="px-4 py-2 text-center">
                             <div className="flex items-center justify-evenly gap-x-2">
@@ -216,22 +219,21 @@ const DocumentsPage = () => {
                                   <TooltipContent>Download Template</TooltipContent>
                                 </Tooltip>
                               </TooltipProvider>
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Link href={`/admin/dashboard/documents/${doc.file_id}/print`}>
-                                      <Printer
-                                        className="inline-block cursor-pointer text-[#3B3B3B]"
-                                        size={18} />
-                                    </Link>
-                                  </TooltipTrigger>
-                                  <TooltipContent>Cetak isi</TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
                             </div>
                           </TableCell>
                         </TableRow>
                       ))}
+                    </TableBody>
+                  </Show>
+                  <Show when={Boolean(!documents?.data) && !isDocumentsLoading} >
+                    <TableBody>
+                      <TableRow>
+                        <TableCell className="px-4 py-2 w-full">
+                          <div className="flex items-center justify-center w-full">
+                            <p className="text-center text-gray-500 w-full">No data</p>
+                          </div>
+                        </TableCell>
+                      </TableRow>
                     </TableBody>
                   </Show>
                 </Table>

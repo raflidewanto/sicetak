@@ -16,7 +16,7 @@ export const AlertModal: React.FC<AlertModalProps> = ({
   onClose,
   onConfirm,
   loading,
-  actionName = 'Continue'
+  actionName = 'Confirm'
 }) => {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -31,7 +31,7 @@ export const AlertModal: React.FC<AlertModalProps> = ({
   return (
     <Modal type='warning' title="Are you sure?" description="This action cannot be undone." isOpen={isOpen} onClose={onClose}>
       <div className="flex w-full items-center justify-end space-x-2 pt-6">
-        <Button disabled={loading} variant="outline" onClick={onClose}>
+        <Button disabled={loading} variant="ghost" onClick={onClose}>
           Cancel
         </Button>
         <Button disabled={loading} variant="destructive" onClick={onConfirm}>

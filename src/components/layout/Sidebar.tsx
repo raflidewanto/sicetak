@@ -1,14 +1,11 @@
 'use client';
 
-import { DashboardNav } from '@/components/DashboardNav';
-import { navItems } from '@/constants/data';
-import React from 'react';
-import { cN } from '@/lib/utils';
-import { ChevronLeft } from 'lucide-react';
-import Link from 'next/link';
-import Show from '../elements/Show';
 import PrinterIcon from '@/assets/icons/ic-printer.svg';
+import { DashboardNav } from '@/components/DashboardNav';
+import { cN } from '@/lib/utils';
+import Link from 'next/link';
 import { useSidebar } from '../contexts/SidebarContext';
+import Show from '../elements/Show';
 
 type SidebarProps = {
   className?: string;
@@ -43,7 +40,7 @@ export default function Sidebar({ className }: SidebarProps) {
       <div className="space-y-4 py-4">
         <div className="py-2">
           <div className="mt-3 space-y-3">
-            <DashboardNav items={navItems} />
+            <DashboardNav />
           </div>
         </div>
       </div>

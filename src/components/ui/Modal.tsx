@@ -31,9 +31,9 @@ export const Modal: React.FC<ModalProps> = ({ title, description, isOpen, onClos
   return (
     <Dialog open={isOpen} onOpenChange={onChange}>
       <DialogContent>
-        <DialogHeader className='flex flex-row items-start justify-start gap-4'>
+        <DialogHeader className='flex flex-col items-center justify-start gap-4'>
           {Icons[type] || icon}
-          <div className='flex flex-col items-start justify-start gap-2 relative -top-1'>
+          <div className='flex flex-col items-center justify-start gap-2 relative -top-1'>
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription className='max-w-md'>
               <p className=''>{description}</p>

@@ -25,6 +25,8 @@ import { DocumentType } from '@/constants/data';
 import { useModal } from '@/hooks/useModal';
 import { usePDFJS } from '@/hooks/usePdfjs';
 import { cN } from '@/lib/utils';
+import { useCategories } from '@/services/categories/queries/useCategories';
+import { useSubCategoriesByCategory } from '@/services/categories/queries/useSubCategoriesByCategory';
 import { useUploadDoc } from '@/services/documents/mutations/useUploadDocument';
 import { bracketPlaceholder } from '@/types';
 import { getErrorMessage } from '@/utils/error';
@@ -35,10 +37,8 @@ import { useRouter } from 'next/navigation';
 import { memo, useState } from 'react';
 
 const AddNewDocumentPage = () => {
-  // route
+  const { data: categories } = useCategories();
   const router = useRouter();
-
-  // PDF states
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string>('');
   const [fileDescription, setFileDescription] = useState<string>('');
@@ -48,11 +48,8 @@ const AddNewDocumentPage = () => {
   const [docType, setDocType] = useState<DocumentType>('personal');
   const [release, setRelease] = useState<boolean>(false);
   const [active, setActive] = useState<boolean>(false);
-
-  // hooks
   const { openModal, closeModal, modalState } = useModal();
-
-  // mutations
+  const { data: subCategories } = useSubCategoriesByCategory(fileCategory);
   const uploadMutation = useUploadDoc();
 
   const onLoadPDFJS = async (pdfjs: any) => {
@@ -147,9 +144,9 @@ const AddNewDocumentPage = () => {
     formData.append('file', file as Blob);
     formData.append('name', fileName);
     formData.append('description', fileDescription);
-    formData.append('category', fileCategory);
-    formData.append('subcategory', fileSubCategory);
-    formData.append('document-type', docType);
+    formData.append('category_code', fileCategory);
+    formData.append('subcategory_code', fileSubCategory);
+    formData.append('document_type', docType);
     formData.append('placeholders', JSON.stringify(bracketCoordinates));
     formData.append('active', active.valueOf().toString());
     formData.append('release', release.valueOf().toString());
@@ -202,37 +199,52 @@ const AddNewDocumentPage = () => {
               </div>
 
               {/* category & subcategory */}
-              <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2">
                 <section className="w-full space-y-2">
-                  {/* TODO: get categories from db */}
                   <Label className="block text-sm font-medium text-gray-700">Kategori</Label>
-                  <Select onValueChange={(v) => setFileCategory(v)}>
+                  <Select
+                    value={fileCategory}
+                    onValueChange={(v) => setFileCategory(v)}>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Pilih Kategori" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
                         <SelectLabel>Kategori</SelectLabel>
-                        <SelectItem value="financing-agreement">Financing Agreement</SelectItem>
-                        <SelectItem value="agreement-transfer">Agreement Transfer</SelectItem>
+                        <Show when={Boolean(categories)} fallback={(
+                          <p>Something went wrong</p>
+                        )}>
+                          {categories?.data?.map(category => (
+                            <SelectItem
+                              value={category.category_code}
+                              key={category.category_code}
+                              className="capitalize">
+                              {category.category_name.split('_').join(' ')}
+                            </SelectItem>
+                          ))}
+                        </Show>
                       </SelectGroup>
                     </SelectContent>
                   </Select>
                 </section>
                 {/* sub category */}
                 <section className="w-full space-y-2">
-                  {/* TODO: get subcategories by selected category from db */}
                   <Label className="block text-sm font-medium text-gray-700">Sub Kategori</Label>
-                  <Select onValueChange={(v) => setFileSubCategory(v)}>
+                  <Select
+                    value={fileSubCategory}
+                    onValueChange={(v) => setFileSubCategory(v)}
+                  >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Pilih Sub Kategori" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
                         <SelectLabel>Sub Kategori</SelectLabel>
-                        <SelectItem value="fasilitas-dana">Fasilitas Dana</SelectItem>
-                        <SelectItem value="fasilitas-modal-usaha">Fasilitas Modal Usaha</SelectItem>
-                        <SelectItem value="installment-financing">Installment Financing</SelectItem>
+                        {subCategories?.data?.map(subCategory => (
+                          <SelectItem value={subCategory.subcategory_code} key={subCategory.subcategory_code}>
+                            {subCategory.subcategory_name.split('_').join(' ')}
+                          </SelectItem>
+                        ))}
                       </SelectGroup>
                     </SelectContent>
                   </Select>

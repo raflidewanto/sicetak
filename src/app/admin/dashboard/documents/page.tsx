@@ -121,8 +121,8 @@ const AdminPage = () => {
                 <SelectGroup>
                   <SelectLabel>Pilih Kategori</SelectLabel>
                   <SelectItem value={''}>Semua</SelectItem>
-                  <SelectItem value="financing-agreement">Financing Agreement</SelectItem>
-                  <SelectItem value="agreement-transfer">Agreement Transfer</SelectItem>
+                  <SelectItem value="financing_agreement">Financing Agreement</SelectItem>
+                  <SelectItem value="agreement_transfer">Agreement Transfer</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -205,46 +205,48 @@ const AdminPage = () => {
                 </TooltipTrigger>
               </Tooltip>
             </TooltipProvider>
-            {subCategories?.data?.map((subcategory) => (
-              <TooltipProvider key={subcategory?.subcategory_id}>
-                <Tooltip>
-                  <TooltipTrigger className="w-full">
-                    <div
-                      onClick={() =>
-                        setSubCategoryQuery(subcategory?.subcategory_name.split(' ').join('-').toLowerCase())
-                      }
-                      className={cN(
-                        `flex min-h-[3rem] w-full items-center justify-between border-b border-gray-300 bg-white px-4 py-2 transition-all hover:border-l-4 hover:border-l-[#173E55] hover:bg-background`,
-                        {
-                          'border-l-4 border-l-[#173E55] bg-background':
-                            subCategoryQuery === subcategory?.subcategory_name.split(' ').join('-').toLowerCase()
+            <Show when={Boolean(subCategories?.data)}>
+              {subCategories?.data?.map((subcategory) => (
+                <TooltipProvider key={subcategory?.category_code}>
+                  <Tooltip>
+                    <TooltipTrigger className="w-full">
+                      <div
+                        onClick={() =>
+                          setSubCategoryQuery(subcategory?.subcategory_name.split(' ').join('_').toLowerCase())
                         }
-                      )}
-                    >
-                      <p
-                        className={cN(`text-sm font-semibold capitalize`, {
-                          'line-clamp-1': subcategory?.subcategory_name.length > 17
-                        })}
+                        className={cN(
+                          `flex min-h-[3rem] w-full items-center justify-between border-b border-gray-300 bg-white px-4 py-2 transition-all hover:border-l-4 hover:border-l-[#173E55] hover:bg-background`,
+                          {
+                            'border-l-4 border-l-[#173E55] bg-background':
+                              subCategoryQuery === subcategory?.subcategory_name.split(' ').join('_').toLowerCase()
+                          }
+                        )}
                       >
-                        {(subcategory?.subcategory_name?.toString().length ?? 0) > 18
-                          ? subcategory?.subcategory_name.substring(0, 17) + '...'
-                          : subcategory?.subcategory_name}
-                      </p>
-                      <TooltipContent>
-                        <p>{subcategory?.subcategory_name}</p>
-                      </TooltipContent>
-                      <Link href={`/admin/dashboard/documents/categories/sub-category/${subcategory?.subcategory_id}`}>
-                        <Edit
-                          className='font-bold cursor-pointer'
-                          size={12}
-                          color="#F97316"
-                        />
-                      </Link>
-                    </div>
-                  </TooltipTrigger>
-                </Tooltip>
-              </TooltipProvider>
-            ))}
+                        <p
+                          className={cN(`text-sm font-semibold capitalize`, {
+                            'line-clamp-1': subcategory?.subcategory_name.length > 17
+                          })}
+                        >
+                          {(subcategory?.subcategory_name?.toString().length ?? 0) > 18
+                            ? subcategory?.subcategory_name.split("_").join(" ").substring(0, 17) + '...'
+                            : subcategory?.subcategory_name.split("_").join(" ")}
+                        </p>
+                        <TooltipContent>
+                          <p>{subcategory?.subcategory_name.split("_").join(" ")}</p>
+                        </TooltipContent>
+                        <Link href={`/admin/dashboard/documents/categories/sub-category/${subcategory?.category_code}`}>
+                          <Edit
+                            className='font-bold cursor-pointer'
+                            size={12}
+                            color="#F97316"
+                          />
+                        </Link>
+                      </div>
+                    </TooltipTrigger>
+                  </Tooltip>
+                </TooltipProvider>
+              ))}
+            </Show>
           </section>
           {/* table */}
           <section className="min-h-max flex-1 overflow-x-scroll px-4">
@@ -258,12 +260,14 @@ const AdminPage = () => {
                       <TableHead className="px-4 py-2 text-center">Action</TableHead>
                     </TableRow>
                   </TableHeader>
+                  <Show when={isDocumentsLoading}>
+                    <AdminTableBodySkeleton />
+                  </Show>
                   <Show
-                    when={Boolean(documents?.data) && !isDocumentsLoading}
-                    fallback={<AdminTableBodySkeleton />}>
+                    when={!isDocumentsLoading && (documents?.data?.length ?? 0) > 0}>
                     <TableBody className="bg-white">
                       {documents?.data?.map((doc) => (
-                        <TableRow key={doc.id} className="h-[3.313rem] border-b">
+                        <TableRow key={doc.document_code} className="h-[3.313rem] border-b">
                           <TableCell className="px-4 py-2">{doc.name}</TableCell>
                           <TableCell className="px-4 py-2 text-center">
                             <div className="flex items-center justify-evenly gap-x-2">
@@ -281,7 +285,7 @@ const AdminPage = () => {
                               <TooltipProvider>
                                 <Tooltip>
                                   <TooltipTrigger asChild>
-                                    <Link href={`/admin/dashboard/documents/${doc.file_id}/print`}>
+                                    <Link href={`/admin/dashboard/documents/${doc.document_code}/print`}>
                                       <Printer
                                         className="inline-block cursor-pointer text-[#3B3B3B]"
                                         size={18} />
@@ -294,7 +298,7 @@ const AdminPage = () => {
                           </TableCell>
                           <TableCell className="px-4 py-2 text-center">
                             <Link
-                              href={`/admin/dashboard/documents/${doc.file_id}/edit`}
+                              href={`/admin/dashboard/documents/${doc.document_code}/edit`}
                               className="flex cursor-pointer items-center justify-center gap-2"
                             >
                               <EditIcon />
@@ -302,6 +306,17 @@ const AdminPage = () => {
                           </TableCell>
                         </TableRow>
                       ))}
+                    </TableBody>
+                  </Show>
+                  <Show when={Boolean(!documents?.data) && !isDocumentsLoading} >
+                    <TableBody>
+                      <TableRow>
+                        <TableCell className="px-4 py-2 w-full">
+                          <div className="flex items-center justify-center w-full">
+                            <p className="text-center text-gray-500 w-full">No data</p>
+                          </div>
+                        </TableCell>
+                      </TableRow>
                     </TableBody>
                   </Show>
                 </Table>

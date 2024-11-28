@@ -1,88 +1,67 @@
 'use client';
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Icons } from '@/components/Icons';
+import useDisclosure from '@/hooks/useDisclosure';
 import { cN } from '@/lib/utils';
-import { NavItem } from '@/types';
-import { Dispatch, SetStateAction } from 'react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/Tooltip';
-import { useSidebar } from './contexts/SidebarContext';
+import { ChevronDown, ChevronRight, Newspaper, User } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 import Show from './elements/Show';
-import { ChevronDown, ChevronRight, User } from 'lucide-react';
+import { Separator } from './ui/Separator';
+import { TooltipProvider } from './ui/Tooltip';
 
-interface DashboardNavProps {
-  items: NavItem[];
-  setOpen?: Dispatch<SetStateAction<boolean>>;
-  isMobileNav?: boolean;
-}
-
-export function DashboardNav({ items, setOpen, isMobileNav = false }: DashboardNavProps) {
+export function DashboardNav() {
   const path = usePathname();
-  const { isMinimized } = useSidebar();
-  const [isAdminOpen, setIsAdminOpen] = useState(true);
   const isActiveRoute = (route: string) => path.startsWith(route);
-
-  if (!items?.length) {
-    return null;
-  }
+  const [isAdminOpen, setIsAdminOpen] = useState(true);
+  const { isOpen, toggle } = useDisclosure(isActiveRoute('/dashboard'));
 
   return (
     <nav className="grid items-start gap-2">
       <TooltipProvider>
-        <Show when={items.length > 0}>
-          {items.map((item, index) => {
-            const Icon = Icons[item.icon || 'arrowRight'];
-            return (
-              item.href && (
-                <Tooltip key={index}>
-                  <TooltipTrigger asChild>
-                    <Link
-                      href={item.disabled ? '/' : item.href}
-                      className={cN(
-                        `flex h-[3rem] items-center gap-2 overflow-hidden py-2 text-sm font-medium transition-all hover:border-l-4 hover:border-l-orange-600 hover:bg-sidebarBgHover`,
-                        path === item.href || path.split('/')[1] === item.href.split('/')[1]
-                          ? `border-l-4 border-l-orange-600 bg-sidebarBgHover text-white`
-                          : 'transparent',
-                        item.disabled && 'cursor-not-allowed opacity-80',
-                        item.label?.toLowerCase() === 'logout' &&
-                        `:border :border-red-500 :bg-red-950  hover:border hover:border-red-300 hover:text-red-500`
-                      )}
-                      onClick={() => {
-                        if (setOpen) setOpen(false);
-                      }}
-                    >
-                      <Icon className={`ml-3 size-5 flex-none `} />
-
-                      {isMobileNav || (!isMinimized && !isMobileNav) ? (
-                        <span className="mr-2 truncate">{item.title}</span>
-                      ) : (
-                        ''
-                      )}
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent
-                    align="center"
-                    side="right"
-                    sideOffset={8}
-                    className={cN(
-                      !isMinimized ? 'hidden' : 'inline-block',
-                      item.label?.toLowerCase() === 'logout' ? 'bg-red-500' : ''
-                    )}
-                  >
-                    {item.title}
-                  </TooltipContent>
-                </Tooltip>
-              )
-            );
-          })}
-        </Show>
+        {/* user collapsible menu */}
+        <div>
+          <button
+            className={cN(`flex h-[3rem] items-center gap-2 overflow-hidden py-2 text-sm font-medium transition-all hover:border-l-4 hover:border-l-[#F68833] hover:bg-sidebarBgHover justify-between w-full p-2`, {
+              "border-l-4 border-l-[#F68833] bg-sidebarBgHover text-white": isActiveRoute("/dashboard"),
+            })}
+            onClick={() => toggle()}
+          >
+            <div className="flex items-center space-x-2">
+              <span className="text-white">
+                <Newspaper />
+              </span>
+              <span className="text-white">Dokumen</span>
+            </div>
+            <span className="text-white">{isOpen ? <ChevronDown /> : <ChevronRight />}</span>
+          </button>
+          <Show when={isOpen}>
+            <div>
+              {/* Child Links */}
+              <a
+                href="/dashboard/documents"
+                className={cN(`hover:bg- block py-[0.95rem] pl-9 text-[0.875rem] hover:border-l-4 hover:border-l-[#F68833] transition-all`, {
+                  "bg-sidebarBgHover border-l-4 border-l-[#F68833] text-white": path === "/dashboard/documents"
+                })}
+              >
+                Cetak Template
+              </a>
+              <a
+                href="/dashboard/documents/print"
+                className={cN(`block py-[0.95rem] pl-9 text-[0.875rem] hover:border-l-4 hover:border-l-[#F68833] transition-all`, {
+                  "bg-sidebarBgHover border-l-4 border-l-[#F68833] text-white": path === "/dashboard/documents/print"
+                })}
+              >
+                Cetak Isi
+              </a>
+            </div>
+          </Show>
+        </div>
+        <Separator color='#15374C' className='bg-slate-500' />
         {/* admin collapsible menu */}
         <div>
           <button
-            className={cN(`flex h-[3rem] items-center gap-2 overflow-hidden py-2 text-sm font-medium transition-all hover:border-l-4 hover:border-l-orange-600 hover:bg-sidebarBgHover justify-between w-full p-2`, {
-              "border-l-4 border-l-orange-600 bg-sidebarBgHover text-white": isActiveRoute("/admin"),
+            className={cN(`flex h-[3rem] items-center gap-2 overflow-hidden py-2 text-sm font-medium transition-all hover:border-l-4 hover:border-l-[#F68833] hover:bg-sidebarBgHover justify-between w-full p-2`, {
+              "border-l-4 border-l-[#F68833] bg-sidebarBgHover text-white": isActiveRoute("/admin"),
             })}
             onClick={() => setIsAdminOpen(!isAdminOpen)}
           >
@@ -94,37 +73,35 @@ export function DashboardNav({ items, setOpen, isMobileNav = false }: DashboardN
             </div>
             <span className="text-white">{isAdminOpen ? <ChevronDown /> : <ChevronRight />}</span>
           </button>
-          {isAdminOpen && (
+          <Show when={isAdminOpen}>
             <div>
               {/* Child Links */}
               <a
                 href="/admin/dashboard/documents"
-                className={cN(`block py-[0.95rem] pl-9 text-[0.875rem]`, {
-                  "bg-sidebarBgHover border-l-4 border-l-orange-600 text-white": isActiveRoute("/admin/dashboard/documents")
+                className={cN(`block py-[0.95rem] pl-9 text-[0.875rem] hover:border-l-4 hover:border-l-[#F68833] transition-all`, {
+                  "bg-sidebarBgHover border-l-4 border-l-[#F68833] text-white": isActiveRoute("/admin/dashboard/documents")
                 })}
               >
                 Dokumen
               </a>
               <a
                 href="/admin/dashboard/parameters"
-                className={`block py-[0.95rem] pl-9 text-[0.875rem] ${isActiveRoute("/admin/dashboard/parameter")
-                  ? "bg-sidebarBgHover border-l-4 border-l-orange-600 text-white"
-                  : "hover:bg-[#0f283b] text-gray-400"
-                  }`}
+                className={cN(`block py-[0.95rem] pl-9 text-[0.875rem] hover:border-l-4 hover:border-l-[#F68833] transition-all`, {
+                  "bg-sidebarBgHover border-l-4 border-l-[#F68833] text-white": isActiveRoute("/admin/dashboard/parameters")
+                })}
               >
                 Parameter
               </a>
               <a
-                href="/admin/dashboard/category"
-                className={`block py-[0.95rem] pl-9 text-[0.875rem] ${isActiveRoute("/admin/dashboard/categories")
-                  ? "bg-sidebarBgHover border-l-4 border-l-orange-600 text-white"
-                  : "hover:bg-[#0f283b] text-gray-400"
-                  }`}
+                href="/admin/dashboard/categories"
+                className={cN(`block py-[0.95rem] pl-9 text-[0.875rem] hover:border-l-4 hover:border-l-[#F68833] transition-all`, {
+                  "bg-sidebarBgHover border-l-4 border-l-[#F68833] text-white": isActiveRoute("/admin/dashboard/categories")
+                })}
               >
                 Kategori
               </a>
             </div>
-          )}
+          </Show>
         </div>
       </TooltipProvider>
     </nav>

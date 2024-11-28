@@ -6,19 +6,20 @@ const axios = createAxiosInstance('documents');
 const FIFTEEN_SECONDS = 15_000;
 
 export type Document = {
-	id: string;
-  file_id: string;
-	name: string;
-	file: string // base64
-	raw_file: string //base64
-	description: string;
-	type: string;
+  document_code: string;
+  name: string;
+  file: string;
+  raw_file: string;
+  description: string;
+  type: string;
   category_name: string;
-	subcategory_name: string;
+  subcategory_name: string;
   release: boolean;
   active: boolean;
-	created_at: number;
-	updated_at: number;
+  created_by: number;
+  created_at: string;
+  updated_by: number;
+  updated_at: string;
 }
 
 type UploadResponse = {
@@ -53,10 +54,10 @@ export function getDocuments({
     axios.get(``, {
       signal: AbortSignal.timeout(FIFTEEN_SECONDS),
       params: {
-        'doc-name': documentName,
-        'doc-category': documentCategory,
-        'doc-subcategory': documentSubCategory,
-        'doc-type': documentType
+        'document_name': documentName,
+        'category_name': documentCategory,
+        'subcategory_name': documentSubCategory,
+        'document_type': documentType
       }
     })
   );
@@ -90,19 +91,18 @@ export function reuploadDocument(formData: FormData, id: string): Promise<Respon
 }
 
 export type PlaceholderResponseDTO = {
-  id: number;
-  placeholder_id: string;
-  name: string;
+  placeholder_code: string;
+  placeholder_name: string;
+  custom_value: string;
   x: number;
   y: number;
   page: number;
   page_width: number;
   page_height: number;
-  custom_value: string;
-  document_id: string;
-  created_at: number;
-  updated_at: number;
-};
+  document_code: string;
+  created_at: string;
+  updated_at: string;
+}
 
 export function getPlaceholders(id: string): Promise<Response<PlaceholderResponseDTO[]>> {
   return apiResolver<Response<PlaceholderResponseDTO[]>>(() => axios.get(`/placeholders/${id}`));
@@ -113,14 +113,13 @@ export function getDocumentById(id: string): Promise<Response<Document>> {
 }
 
 type UpdatePlaceholderValuePayload = {
-  doc_id: string;
   placeholder_name: string;
-  value: string;
-  placeholder_id: string;
-};
+  custom_value: string;
+  document_code: string;
+}
 
 export function updatePlaceholderValue(payload: UpdatePlaceholderValuePayload): Promise<Response> {
-  return apiResolver<Response>(() => axios.post(`/placeholders/update`, payload));
+  return apiResolver<Response>(() => axios.post(`/placeholders/update/${payload?.document_code}`, payload));
 }
 
 export function toggleActive(id: string): Promise<Response> {
