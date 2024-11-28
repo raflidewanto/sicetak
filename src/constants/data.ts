@@ -10,6 +10,7 @@ export const FIVE_MINUTES_IN_MS = 5 * 60 * 1000;
 export const AGREEMENT_NO_QUERY = 'agreement-no';
 export const DOCUMENT_ID_QUERY = 'id';
 export const CATEGORY = 'category';
+export const CATEGORY_CODE = 'category-code';
 export const SUBCATEGORY = 'subcategory';
 export const DOCUMENT_NAME = 'document-name';
 export const DOCUMENT_TYPE = 'document-type'; // personal or corporate

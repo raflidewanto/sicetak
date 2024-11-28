@@ -13,10 +13,17 @@ import { useModal } from "@/hooks/useModal";
 import { Modal } from "@/components/ui/Modal";
 import { AxiosError } from "axios";
 import { getErrorMessage } from "@/utils/error";
+import { useSubCategories } from "@/services/subcategories/queries/useSubcategories";
+import Show from "@/components/elements/Show";
+import { Skeleton } from "@/components/ui/Skeleton";
+import SubCategoriesList from "@/components/SubcategoryList";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/Select";
+import Link from "next/link";
 
 const EditCategoryPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const { data: category } = useCategoryByCode(slug);
+  const { data: subCategories, isPending: loadingSubCategories } = useSubCategories();
 
   const [categoryName, setCategoryName] = useState(category?.data?.category_name ?? "");
   const [categoryDescription, setCategoryDescription] = useState(category?.data?.category_description ?? "");
@@ -99,13 +106,18 @@ const EditCategoryPage = () => {
                     >
                       Nama Kategori
                     </label>
-                    <Input
-                      id="nama-kategori"
-                      placeholder="Nama Kategori"
-                      value={categoryName?.replaceAll("_", " ")}
-                      onChange={e => setCategoryName(e.target.value)}
-                      className="mt-1"
-                    />
+                    <Show
+                      when={Boolean(categoryName)}
+                      fallback={<Skeleton className="w-full h-10" />}
+                    >
+                      <Input
+                        id="nama-kategori"
+                        placeholder="Nama Kategori"
+                        value={categoryName?.replaceAll("_", " ")}
+                        onChange={e => setCategoryName(e.target.value)}
+                        className="mt-1"
+                      />
+                    </Show>
                   </div>
                   <div>
                     <label
@@ -114,13 +126,18 @@ const EditCategoryPage = () => {
                     >
                       Description
                     </label>
-                    <Textarea
-                      id="description"
-                      placeholder="Description"
-                      value={categoryDescription}
-                      onChange={e => setCategoryDescription(e.target.value)}
-                      className="mt-1"
-                    />
+                    <Show
+                      when={Boolean(categoryDescription)}
+                      fallback={<Skeleton className="w-full h-10" />}
+                    >
+                      <Textarea
+                        id="description"
+                        placeholder="Description"
+                        value={categoryDescription}
+                        onChange={e => setCategoryDescription(e.target.value)}
+                        className="mt-1"
+                      />
+                    </Show>
                   </div>
                 </div>
                 {/* Buttons */}
@@ -132,8 +149,25 @@ const EditCategoryPage = () => {
             </TabsContent>
 
             <TabsContent value="subcategory">
-              {/* Sub Kategori Placeholder */}
-              <p className="text-sm text-gray-500">Sub kategori content goes here...</p>
+              {/* filtering */}
+              <section className="flex flex-wrap gap-4 flex-col sm:flex-row justify-end lg:-mt-14">
+                <Select>
+                  <SelectTrigger className="w-[8.5rem]">
+                    Status
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="inactive">Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Input placeholder="Search" className="w-[14.063rem]" />
+                <Link href="/admin/dashboard/categories/subcategories/new">
+                  <Button>
+                    Tambah Sub Kategori
+                  </Button>
+                </Link>
+              </section>
+              <SubCategoriesList categoryCode={slug} />
             </TabsContent>
           </Tabs>
         </CardContent>
