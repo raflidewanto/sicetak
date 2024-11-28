@@ -19,6 +19,10 @@ export function getAllCategories() {
   return apiResolver<Response<CategoryResponseDTO[]>>(() => axios.get(''));
 }
 
+export function getCategoryByCode(id: string){
+  return apiResolver<Response<CategoryResponseDTO>>(() => axios.get(`/${id}`));
+}
+
 export function getSubCategoriesByCategory(categoryId: string) {
   return apiResolver<Response<SubCategoryResponseDTO[]>>(() => axios.get(`/sub-categories/${categoryId}`));
 }
@@ -31,4 +35,18 @@ type AddCategoryRequestDTO = {
 
 export function createCategory(payload: AddCategoryRequestDTO) {
   return apiResolver<Response<CategoryResponseDTO>>(() => axios.post('/add', payload));
+}
+
+type UpdateCategoryRequestDTO = {
+  category_code: string;
+  category_name: string;
+  category_description: string;
+}
+
+export function updateCategory(payload: UpdateCategoryRequestDTO) {
+  return apiResolver<Response>(() => axios.post(`/update/${payload.category_code}`, payload, {
+    headers: {
+      "Content-Type": "application/json",
+    }
+  }));
 }
