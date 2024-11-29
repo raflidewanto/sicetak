@@ -3,10 +3,10 @@ import { getDocumentById, getDocumentBySubcategory, getDocuments } from '../api'
 import { FIVE_MINUTES_IN_MS } from '@/constants/data';
 
 export function useDocuments(
-  documentName: string,
-  documentCategory: string,
-  documentSubCategory: string,
-  documentType: string
+  documentName?: string,
+  documentCategory?: string,
+  documentSubCategory?: string,
+  documentType?: string
 ) {
   return useQuery({
     queryKey: ['documents', documentName, documentCategory, documentSubCategory, documentType],

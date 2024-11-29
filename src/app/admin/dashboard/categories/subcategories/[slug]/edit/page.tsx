@@ -93,7 +93,7 @@ const EditSubCategoryPage = () => {
     <PageContainer>
       <Card>
         <CardContent className="p-5">
-          <h1 className="text-lg font-bold capitalize">Edit Sub Kategori</h1>
+          <h1 className="text-lg font-bold capitalize">Ubah Sub Kategori</h1>
           <div className="p-4 w-full">
             <Tabs defaultValue="detail">
               <TabsList>
@@ -191,7 +191,7 @@ const EditSubCategoryPage = () => {
                 </form>
               </TabsContent>
               <TabsContent value="documents">
-                <Show when={Boolean(documents?.data?.length)}>
+                <Show when={Boolean(documents?.data?.length)} fallback={<div>Tidak ada dokumen</div>}>
                   <Table>
                     <TableHeader className="bg-[#F2F5F6] text-[#676767] font-medium">
                       <TableRow>

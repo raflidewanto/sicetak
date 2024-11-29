@@ -19,8 +19,11 @@ if (!baseURL) {
  * @returns {AxiosInstance} An Axios instance configured with the designated base URL and optional endpoint.
  */
 export const createAxiosInstance = (endpoint?: string) => {
+  if (endpoint && !endpoint.startsWith('/')) {
+    endpoint = `/${endpoint}`;
+  }
   const axios = Axios.create({
-    baseURL: `${baseURL}/${endpoint ?? ''}`
+    baseURL: `${baseURL}${endpoint ?? ''}`
   });
   return axios;
 };

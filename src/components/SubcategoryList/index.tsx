@@ -24,14 +24,19 @@ const SubCategoriesList = (props: SubCategoriesListProps) => {
             <TableHead className="text-right p-4">Action</TableHead>
           </TableRow>
         </TableHeader>
+        <Show when={!subCategories?.success}>
+          <p className="p-4">
+            Something went wrong
+          </p>
+        </Show>
         <Show when={!isPending && isError}>
           Something went wrong
         </Show>
         <Show when={subCategories?.data?.length === 0 && !isPending}>
           No data
         </Show>
-        <Show when={Boolean(subCategories?.data) && (subCategories?.data?.length ?? 0) > 0 && !isPending && !isError}>
-          <TableBody>
+        <TableBody>
+          <Show when={Boolean(subCategories?.data) && (subCategories?.data?.length ?? 0) > 0 && !isPending && !isError}>
             {subCategories?.data?.map(subcategory => (
               <TableRow key={subcategory?.category_code}>
                 <TableCell className="capitalize">
@@ -48,8 +53,8 @@ const SubCategoriesList = (props: SubCategoriesListProps) => {
                 </TableCell>
               </TableRow>
             ))}
-          </TableBody>
-        </Show>
+          </Show>
+        </TableBody>
       </Table>
     </div>
   );

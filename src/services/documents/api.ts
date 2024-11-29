@@ -45,10 +45,10 @@ export function getDocuments({
   documentSubCategory,
   documentType
 }: {
-  documentName: string;
-  documentCategory: string;
-  documentSubCategory: string;
-  documentType: string;
+  documentName?: string;
+  documentCategory?: string;
+  documentSubCategory?: string;
+  documentType?: string;
 }): Promise<Response<Document[]>> {
   return apiResolver<Response<Document[]>>(() =>
     axios.get(``, {
@@ -73,8 +73,13 @@ export function downloadDocument(id: string): Promise<DownloadDocResponse> {
   return apiResolver<DownloadDocResponse>(() => axios.get(`/template/${id}`));
 }
 
-export function printDocument(id: string, agreementNo: string): Promise<Response<string>> {
-  return apiResolver<Response<string>>(() => axios.post(`/print?id=${id}&agreement-no=${agreementNo}`));
+type PrintDocumentPayload = {
+  documentCode: string;
+  agreementNo: string;
+}
+
+export function printDocument(payload: PrintDocumentPayload): Promise<Response<string>> {
+  return apiResolver<Response<string>>(() => axios.post(`/print?id=${payload?.documentCode}&agreement_no=${payload?.agreementNo}`));
 }
 
 type DeleteResponse = {
