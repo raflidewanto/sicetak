@@ -1,29 +1,28 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Textarea } from "@/components/ui/Textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
-import { useParams } from "next/navigation";
-import { useCategoryByCode } from "@/services/categories/queries/useCategories";
-import { useEffect, useState } from "react";
-import { useUpdateCategory } from "@/services/categories/mutations/useUpdateCategory";
-import { useModal } from "@/hooks/useModal";
-import { Modal } from "@/components/ui/Modal";
-import { AxiosError } from "axios";
-import { getErrorMessage } from "@/utils/error";
-import { useSubCategories } from "@/services/subcategories/queries/useSubcategories";
 import Show from "@/components/elements/Show";
-import { Skeleton } from "@/components/ui/Skeleton";
 import SubCategoriesList from "@/components/SubcategoryList";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import { Modal } from "@/components/ui/Modal";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/Select";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
+import { Textarea } from "@/components/ui/Textarea";
+import { useModal } from "@/hooks/useModal";
+import { useUpdateCategory } from "@/services/categories/mutations/useUpdateCategory";
+import { useCategoryByCode } from "@/services/categories/queries/useCategories";
+import { getErrorMessage } from "@/utils/error";
+import { AxiosError } from "axios";
 import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const EditCategoryPage = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { data: category } = useCategoryByCode(slug);
-  const { data: subCategories, isPending: loadingSubCategories } = useSubCategories();
+  const { data: category, isLoading: loadingCategory } = useCategoryByCode(slug);
+  const router = useRouter();
 
   const [categoryName, setCategoryName] = useState(category?.data?.category_name ?? "");
   const [categoryDescription, setCategoryDescription] = useState(category?.data?.category_description ?? "");
@@ -107,7 +106,7 @@ const EditCategoryPage = () => {
                       Nama Kategori
                     </label>
                     <Show
-                      when={Boolean(categoryName)}
+                      when={!loadingCategory}
                       fallback={<Skeleton className="w-full h-10" />}
                     >
                       <Input
@@ -127,7 +126,7 @@ const EditCategoryPage = () => {
                       Description
                     </label>
                     <Show
-                      when={Boolean(categoryDescription)}
+                      when={!loadingCategory}
                       fallback={<Skeleton className="w-full h-10" />}
                     >
                       <Textarea
@@ -142,7 +141,7 @@ const EditCategoryPage = () => {
                 </div>
                 {/* Buttons */}
                 <div className="mt-6 flex justify-end space-x-4">
-                  <Button variant="ghost">Kembali</Button>
+                  <Button onClick={() => router.back()} variant="ghost">Kembali</Button>
                   <Button className="bg-orange-500 hover:bg-orange-600 text-white">Simpan</Button>
                 </div>
               </form>

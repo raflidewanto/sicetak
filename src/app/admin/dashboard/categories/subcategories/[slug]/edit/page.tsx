@@ -8,25 +8,31 @@ import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { Switch } from '@/components/ui/Switch';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { Textarea } from '@/components/ui/Textarea';
 import { CATEGORY_CODE } from '@/constants/data';
 import { useModal } from '@/hooks/useModal';
 import { useCategories, useCategoryByCode } from '@/services/categories/queries/useCategories';
+import { useDocumentBySubcategory } from '@/services/documents/queries/useDocuments';
 import { useUpdateSubCategory } from '@/services/subcategories/mutations/useUpdateSubCategory';
 import { useSubCategory } from '@/services/subcategories/queries/useSubcategories';
 import { getErrorMessage } from '@/utils/error';
 import { AxiosError } from 'axios';
-import { useParams } from 'next/navigation';
+import { Edit } from 'lucide-react';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
 import { useQueryState } from 'nuqs';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const EditSubCategoryPage = () => {
+  const router = useRouter();
   const { slug: subcategoryCode } = useParams<{ slug: string }>();
-  const [categoryCode,] = useQueryState(CATEGORY_CODE)
+  const [categoryCode,] = useQueryState(CATEGORY_CODE);
   const { data: subcategory } = useSubCategory(subcategoryCode);
   const { data: defaultCategory } = useCategoryByCode(categoryCode ?? "");
   const { data: categories } = useCategories();
+  const { data: documents } = useDocumentBySubcategory(subcategoryCode);
 
   // form  states
   const [subcategoryName, setSubcategoryName] = useState(subcategory?.data?.subcategory_name ?? "");
@@ -170,7 +176,12 @@ const EditSubCategoryPage = () => {
                     />
                   </div>
                   <div className="flex justify-end space-x-4">
-                    <Button type="button" variant="ghost" className="border border-gray-300 bg-white">
+                    <Button
+                      onClick={() => router.back()}
+                      type="button"
+                      variant="ghost"
+                      className="border border-gray-300 bg-white"
+                    >
                       Kembali
                     </Button>
                     <Button type="submit" className="bg-orange-500 text-white">
@@ -180,7 +191,36 @@ const EditSubCategoryPage = () => {
                 </form>
               </TabsContent>
               <TabsContent value="documents">
-
+                <Show when={Boolean(documents?.data?.length)}>
+                  <Table>
+                    <TableHeader className="bg-[#F2F5F6] text-[#676767] font-medium">
+                      <TableRow>
+                        <TableHead className="w-1/2 p-4">Nama Dokumen</TableHead>
+                        <TableHead className="text-right p-4">Action</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <Show when={Boolean(documents?.data?.length)}>
+                      <TableBody>
+                        {documents?.data?.map(doc => (
+                          <TableRow key={doc?.document_code}>
+                            <TableCell className="capitalize">
+                              {doc?.name?.replaceAll("_", " ")}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex items-center justify-end space-x-4">
+                                <Link href={`/admin/dashboard/documents/${doc?.document_code}/edit`}>
+                                  <Button variant="ghost" size="sm">
+                                    <Edit className="h-4 w-4 text-orange-500" />
+                                  </Button>
+                                </Link>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Show>
+                  </Table>
+                </Show>
               </TabsContent>
             </Tabs>
           </div>

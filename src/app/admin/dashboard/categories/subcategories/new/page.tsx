@@ -13,6 +13,7 @@ import { useCategories } from '@/services/categories/queries/useCategories';
 import { useCreateSubcategory } from '@/services/subcategories/mutations/useCreateSubcategories';
 import { getErrorMessage } from '@/utils/error';
 import { AxiosError } from 'axios';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 const AddSubCategoryPage = () => {
@@ -22,11 +23,12 @@ const AddSubCategoryPage = () => {
     isError: categoriesError
   } = useCategories();
   const createSubcategoryMutation = useCreateSubcategory();
+  const router = useRouter();
 
   // form  states
-  const [subcategoryName, setSubcategoryName] = useState("")
-  const [categoryCode, setCategoryCode] = useState("")
-  const [subcategoryActive, setSubcategoryActive] = useState(false)
+  const [subcategoryName, setSubcategoryName] = useState("");
+  const [categoryCode, setCategoryCode] = useState("");
+  const [subcategoryActive, setSubcategoryActive] = useState(false);
 
   const { closeModal, openModal, modalState } = useModal();
 
@@ -42,7 +44,7 @@ const AddSubCategoryPage = () => {
           openModal("Error", data.message, "error");
           return;
         }
-        openModal("Success", data?.message, "success");
+        router.back();
         return;
       },
       onError: (error) => {
@@ -121,7 +123,7 @@ const AddSubCategoryPage = () => {
                 />
               </div>
               <div className="flex justify-end space-x-4">
-                <Button type="button" variant="ghost" className="border border-gray-300 bg-white">
+                <Button onClick={() => router.back()} type="button" variant="ghost" className="border border-gray-300 bg-white">
                   Kembali
                 </Button>
                 <Button type="submit" className="bg-orange-500 text-white">

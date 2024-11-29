@@ -129,3 +129,7 @@ export function toggleActive(id: string): Promise<Response> {
 export function toggleRelease(id: string): Promise<Response> {
   return apiResolver<Response>(() => axios.post(`/release/${id}`));
 }
+
+export function getDocumentBySubcategory(id: string): Promise<Response<Document[]>> {
+  return apiResolver<Response<Document[]>>(() => axios.get(`/subcategory/${id}`));
+}

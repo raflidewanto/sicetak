@@ -2,7 +2,6 @@
 
 import Show from "@/components/elements/Show";
 import { Button } from "@/components/ui/Button";
-import { Switch } from "@/components/ui/Switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
 import { useSubCategoriesByCategory } from "@/services/categories/queries/useSubCategoriesByCategory";
 import { Edit } from "lucide-react";
@@ -45,7 +44,6 @@ const SubCategoriesList = (props: SubCategoriesListProps) => {
                         <Edit className="h-4 w-4 text-orange-500" />
                       </Button>
                     </Link>
-                    <Switch checked={subcategory.subcategory_active} />
                   </div>
                 </TableCell>
               </TableRow>

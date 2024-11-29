@@ -44,6 +44,7 @@ import { getErrorMessage } from '@/utils/error';
 import { extractBracketCoordinates } from '@/utils/pdf';
 import { AxiosError } from 'axios';
 import { EditIcon, X } from 'lucide-react';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import React, { memo, useEffect, useMemo, useState } from 'react';
 
@@ -247,8 +248,8 @@ const EditDocument = () => {
   const handleUpdatePlaceholder = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedPlaceholder?.placeholder_name) {
-        openModal("Error", `Please select a placeholder`, 'warning');
-        return;
+      openModal("Error", `Please select a placeholder`, 'warning');
+      return;
     }
 
     updatePlaceholderMutation.mutate({
@@ -418,9 +419,11 @@ const EditDocument = () => {
 
             {/* Buttons */}
             <div className="flex justify-end space-x-4 px-5">
-              <Button variant="ghost" className="border border-gray-300 bg-white" onClick={() => router.back()}>
-                Kembali
-              </Button>
+              <Link href="/admin/dashboard/documents">
+                <Button variant="ghost" className="border border-gray-300 bg-white">
+                  Kembali
+                </Button>
+              </Link>
               <Button type="submit" className="bg-orange-500 text-white">
                 Simpan
               </Button>
