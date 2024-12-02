@@ -5,12 +5,18 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
+import { CATEGORY } from "@/constants/data";
+import { useDebounceValue } from "@/hooks/useDebounceValue";
 import { useCategories } from "@/services/categories/queries/useCategories";
 import { Edit } from "lucide-react";
 import Link from "next/link";
+import { useQueryState } from "nuqs";
 
 const CategoriesPage = () => {
-  const { data: categoriesData, isPending, isError } = useCategories();
+  const [categoryQuery, setCategoryQuery] = useQueryState(CATEGORY);
+  const [categoryDebouncedQuery] = useDebounceValue(categoryQuery, 1000);
+
+  const { data: categoriesData, isPending, isError } = useCategories(categoryDebouncedQuery ?? "");
 
   return (
     <div suppressHydrationWarning className="p-6">
@@ -19,9 +25,13 @@ const CategoriesPage = () => {
           <CardTitle>Kategori List</CardTitle>
         </CardHeader>
         <CardContent>
-          {/* Search and Add Category Row */}
           <div className="flex items-center justify-between mb-4">
-            <Input placeholder="Search" className="w-1/3" />
+            <Input
+              placeholder="Search"
+              className="w-1/3"
+              value={categoryQuery ?? ""}
+              onChange={(e) => setCategoryQuery(e.target.value)}
+            />
             <Link href="/admin/dashboard/categories/new">
               <Button className="bg-orange-500 hover:bg-orange-600 text-white">Tambah Kategori</Button>
             </Link>

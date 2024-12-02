@@ -8,15 +8,19 @@ import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { Switch } from '@/components/ui/Switch';
+import { CATEGORY_CODE } from '@/constants/data';
 import { useModal } from '@/hooks/useModal';
 import { useCategories } from '@/services/categories/queries/useCategories';
 import { useCreateSubcategory } from '@/services/subcategories/mutations/useCreateSubcategories';
 import { getErrorMessage } from '@/utils/error';
 import { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
+import { useQueryState } from 'nuqs';
 import { useState } from 'react';
 
 const AddSubCategoryPage = () => {
+  const [categoryCodeQuery] = useQueryState(CATEGORY_CODE);
+
   const {
     data: categories,
     isPending: categoriesPending,
@@ -28,7 +32,7 @@ const AddSubCategoryPage = () => {
   // form  states
   const [subcategoryName, setSubcategoryName] = useState("");
   const [subcategoryDescription, setSubcategoryDescription] = useState("");
-  const [categoryCode, setCategoryCode] = useState("");
+  const [categoryCode, setCategoryCode] = useState(categoryCodeQuery ?? "");
   const [subcategoryActive, setSubcategoryActive] = useState(false);
 
   const { closeModal, openModal, modalState } = useModal();

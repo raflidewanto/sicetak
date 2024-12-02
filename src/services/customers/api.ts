@@ -29,7 +29,7 @@ type getConsumentPayload = {
 }
 
 export function getCustomers(payload: getConsumentPayload) {
-  return apiResolver<Response<getCustomersDetailResponse>>(() => axios.post(`/${payload?.agreement_no}`, payload));
+  return apiResolver<Response<getCustomersDetailResponse>>(() => axios.post(``, payload));
 }
 
 

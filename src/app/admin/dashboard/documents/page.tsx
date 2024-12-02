@@ -31,6 +31,7 @@ import { CATEGORY, DOCUMENT_NAME, DOCUMENT_TYPE, SUBCATEGORY } from '@/constants
 import { useDebounceValue } from '@/hooks/useDebounceValue';
 import { useModal } from '@/hooks/useModal';
 import { cN } from '@/lib/utils';
+import { usePrintDocument } from '@/services/documents/mutations/usePrintDocument';
 import { useDocuments } from '@/services/documents/queries/useDocuments';
 import { useSubCategories } from '@/services/subcategories/queries/useSubcategories';
 import { getErrorMessage } from '@/utils/error';
@@ -63,6 +64,9 @@ const AdminPage = () => {
     documentTypeDebouncedQuery ?? ''
   );
   const { data: subCategories } = useSubCategories();
+
+  // mutations
+  const printMutation = usePrintDocument();
 
   function handleDownloadTemplate(file: string) {
     try {
@@ -258,11 +262,34 @@ const AdminPage = () => {
                               <TooltipProvider>
                                 <Tooltip>
                                   <TooltipTrigger asChild>
-                                    <Link href={`/admin/dashboard/documents/${doc.document_code}/print`}>
-                                      <Printer
-                                        className="inline-block cursor-pointer text-[#3B3B3B]"
-                                        size={18} />
-                                    </Link>
+                                    <Printer
+                                      onClick={() =>
+                                        printMutation.mutate(
+                                          { agreementNo: "AGR123", documentCode: doc?.document_code },
+                                          {
+                                            onSuccess: (data) => {
+                                              if (data?.success && data.data) {
+                                                const byteString = atob(data.data);
+                                                const byteArray = new Uint8Array(byteString.length);
+                                                for (let i = 0; i < byteString.length; i++) {
+                                                  byteArray[i] = byteString.charCodeAt(i);
+                                                }
+
+                                                const blob = new Blob([byteArray], { type: "application/pdf" });
+                                                const url = URL.createObjectURL(blob);
+                                                const pdfWindow = window.open("") as WindowProxy;
+                                                pdfWindow.document.write(
+                                                  "<iframe width='100%' height='100%' src='" + url + "'></iframe>"
+                                                );
+                                              } else {
+                                                openModal("Error", "Failed to print document", "error");
+                                              }
+                                            }
+                                          }
+                                        )
+                                      }
+                                      className="inline-block cursor-pointer text-[#3B3B3B]"
+                                      size={18} />
                                   </TooltipTrigger>
                                   <TooltipContent>Cetak isi</TooltipContent>
                                 </Tooltip>

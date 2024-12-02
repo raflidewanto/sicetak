@@ -24,6 +24,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useQueryState } from 'nuqs';
 import { useEffect, useState } from 'react';
+import NoDataIcon from '@/assets/icons/ic-no-data.svg';
 
 const EditSubCategoryPage = () => {
   const router = useRouter();
@@ -46,6 +47,7 @@ const EditSubCategoryPage = () => {
     setSubcategoryName(subcategory?.data?.subcategory_name ?? "");
     setSubcategoryActive(subcategory?.data?.subcategory_active ?? false);
     setSelectedCategory(subcategory?.data?.category_code ?? "");
+    setSubcategoryDescription(subcategory?.data?.subcategory_desc ?? "");
   }, [subcategory]);
 
   useEffect(() => {
@@ -194,7 +196,7 @@ const EditSubCategoryPage = () => {
                 </form>
               </TabsContent>
               <TabsContent value="documents">
-                <Show when={Boolean(documents?.data?.length)} fallback={<div>Tidak ada dokumen</div>}>
+                <Show when={Boolean(documents?.data?.length)} fallback={<div className='grid place-items-center'><NoDataIcon /></div>}>
                   <Table>
                     <TableHeader className="bg-[#F2F5F6] text-[#676767] font-medium">
                       <TableRow>

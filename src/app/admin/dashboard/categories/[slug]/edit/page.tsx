@@ -160,7 +160,7 @@ const EditCategoryPage = () => {
                   </SelectContent>
                 </Select>
                 <Input placeholder="Search" className="w-[14.063rem]" />
-                <Link href="/admin/dashboard/categories/subcategories/new">
+                <Link href={`/admin/dashboard/categories/subcategories/new?category-code=${slug}`}>
                   <Button>
                     Tambah Sub Kategori
                   </Button>

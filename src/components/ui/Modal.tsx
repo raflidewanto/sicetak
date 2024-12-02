@@ -2,11 +2,12 @@
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
-import { Ban, CheckCircleIcon } from 'lucide-react';
+import { Ban } from 'lucide-react';
 import React from 'react';
+import SuccessIcon from '@/assets/icons/ic-modal-success.svg';
 
 const Icons = {
-  success: <CheckCircleIcon className="h-6 w-6 text-green-500" />,
+  success: <SuccessIcon className="h-6 w-6" />,
   warning: <ExclamationTriangleIcon className="h-6 w-6 text-yellow-500" />,
   error: <Ban className="h-6 w-6 text-red-500" />
 };
@@ -36,7 +37,7 @@ export const Modal: React.FC<ModalProps> = ({ title, description, isOpen, onClos
           <div className='flex flex-col items-center justify-start gap-2 relative -top-1'>
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription className='max-w-md'>
-              <p className=''>{description}</p>
+              {description}
             </DialogDescription>
           </div>
         </DialogHeader>

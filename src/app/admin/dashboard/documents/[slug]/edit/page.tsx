@@ -532,7 +532,7 @@ const EditDocument = () => {
                                   </Button>
                                 </div>
                               </section>
-                              {/* pdf viewer -> do not move outside sheet component it'll close the dialog due to onClickOutside event */}
+                              {/* ! pdf viewer -> do not move outside sheet component it'll close the dialog due to onClickOutside event */}
                               <div
                                 onClick={(e) => e.stopPropagation()}
                                 className="fixed left-1/2 top-1/2 z-[999999999999] h-screen w-[38rem] -translate-x-[80%] -translate-y-1/2 p-4 py-4 delay-0 duration-0"

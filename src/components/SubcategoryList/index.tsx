@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useSubCategoriesByCategory } from "@/services/categories/queries/useSubCategoriesByCategory";
 import { Edit } from "lucide-react";
 import Link from "next/link";
+import NoDataIcon from "@/assets/icons/ic-no-data.svg";
 
 type SubCategoriesListProps = {
   categoryCode: string
@@ -24,18 +25,26 @@ const SubCategoriesList = (props: SubCategoriesListProps) => {
             <TableHead className="text-right p-4">Action</TableHead>
           </TableRow>
         </TableHeader>
-        <Show when={!subCategories?.success}>
-          <p className="p-4">
-            Something went wrong
-          </p>
-        </Show>
-        <Show when={!isPending && isError}>
-          Something went wrong
-        </Show>
-        <Show when={subCategories?.data?.length === 0 && !isPending}>
-          No data
-        </Show>
         <TableBody>
+          <Show when={!subCategories?.success}>
+            <TableRow className="p-4 grid place-items-center min-w-full">
+              {subCategories?.message === "database empty" ? (
+                <TableCell colSpan={2}>
+                  <NoDataIcon />
+                </TableCell>
+              ) : (
+                <TableCell colSpan={2}>
+                  <p>{subCategories?.message ?? "Something went wrong"}</p>
+                </TableCell>
+              )}
+            </TableRow>
+          </Show>
+          <Show when={!isPending && isError}>
+            Something went wrong
+          </Show>
+          <Show when={subCategories?.data?.length === 0 && !isPending}>
+            <NoDataIcon />
+          </Show>
           <Show when={Boolean(subCategories?.data) && (subCategories?.data?.length ?? 0) > 0 && !isPending && !isError}>
             {subCategories?.data?.map(subcategory => (
               <TableRow key={subcategory?.category_code}>

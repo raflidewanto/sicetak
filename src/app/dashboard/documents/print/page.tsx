@@ -14,6 +14,7 @@ import { getCustomersDetailResponse } from '@/services/customers/api';
 import { useCustomer } from '@/services/customers/mutations/useConsument';
 import { usePrintDocument } from '@/services/documents/mutations/usePrintDocument';
 import { getErrorMessage } from '@/utils/error';
+import { formatRupiah } from '@/utils/string';
 import { AxiosError } from 'axios';
 import { Printer } from 'lucide-react';
 import { useQueryState } from 'nuqs';
@@ -23,9 +24,7 @@ const PrintDocumentPage = () => {
   const { modalState, closeModal, openModal } = useModal();
 
   const [customerDetails, setCustomerDetails] = useState<getCustomersDetailResponse | null>(null);
-  const [agreementNoQuery, setAgreementNoQuery] = useQueryState(AGREEMENT_NO_QUERY, {
-    clearOnDefault: true,
-  });
+  const [agreementNoQuery, setAgreementNoQuery] = useQueryState(AGREEMENT_NO_QUERY);
 
   const consumentMutation = useCustomer();
   const printMutation = usePrintDocument();
@@ -128,7 +127,7 @@ const PrintDocumentPage = () => {
                   </div>
                   <div className="flex py-1">
                     <span className="text-gray-600 font-medium min-w-[10rem]">OTR</span>
-                    <span className="flex-1">Rp.{customerDetails?.otr.toLocaleString()}</span>
+                    <span className="flex-1">{formatRupiah(customerDetails?.otr ?? -1)}</span>
                   </div>
                 </div>
               </section>
@@ -147,17 +146,14 @@ const PrintDocumentPage = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody className="bg-white">
-                    {customerDetails?.documents.map((doc) => (
-                      // @ts-expect-error
-                      <TableRow key={doc.DocumentCode} className="h-[3.313rem] border-b">
-                        {/* @ts-expect-error */}
-                        <TableCell className="px-4 py-2">{doc.Name ?? "N/A"}</TableCell>
+                    {customerDetails?.documents.map((doc, idx) => (
+                      <TableRow key={`${doc.document_code}-${idx}`} className="h-[3.313rem] border-b">
+                        <TableCell className="px-4 py-2">{doc.name ?? "N/A"}</TableCell>
                         <TableCell className="px-4 py-2 flex justify-center items-center">
                           <Printer
                             onClick={() =>
                               printMutation.mutate(
-                                // @ts-expect-error
-                                { agreementNo: agreementNoQuery ?? "", documentCode: doc.DocumentCode },
+                                { agreementNo: agreementNoQuery ?? "", documentCode: doc.document_code },
                                 {
                                   onSuccess: (data) => {
                                     if (data?.success && data.data) {

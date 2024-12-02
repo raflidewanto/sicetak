@@ -15,8 +15,12 @@ type CategoryResponseDTO = {
     updated_at: number;
   }
 
-export function getAllCategories() {
-  return apiResolver<Response<CategoryResponseDTO[]>>(() => axios.get(''));
+export function getAllCategories(categoryName?: string) {
+  return apiResolver<Response<CategoryResponseDTO[]>>(() => axios.get('', {
+    params: {
+      category_name: categoryName
+    }
+  }));
 }
 
 export function getCategoryByCode(id: string){
