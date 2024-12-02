@@ -1,20 +1,23 @@
 "use client";
 
+import NoDataIcon from "@/assets/icons/ic-no-data.svg";
 import Show from "@/components/elements/Show";
 import { Button } from "@/components/ui/Button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
 import { useSubCategoriesByCategory } from "@/services/categories/queries/useSubCategoriesByCategory";
 import { Edit } from "lucide-react";
 import Link from "next/link";
-import NoDataIcon from "@/assets/icons/ic-no-data.svg";
 
 type SubCategoriesListProps = {
   categoryCode: string
+  search?: string
+  active?: string
 }
 
 const SubCategoriesList = (props: SubCategoriesListProps) => {
-  const { categoryCode } = props;
-  const { data: subCategories, isPending, isError } = useSubCategoriesByCategory(categoryCode);
+  const { categoryCode, active, search } = props;
+
+  const { data: subCategories, isPending, isError } = useSubCategoriesByCategory(categoryCode, search, active);
 
   return (
     <div className="py-4">

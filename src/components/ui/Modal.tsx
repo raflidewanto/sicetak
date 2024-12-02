@@ -7,7 +7,7 @@ import React from 'react';
 import SuccessIcon from '@/assets/icons/ic-modal-success.svg';
 
 const Icons = {
-  success: <SuccessIcon className="h-6 w-6" />,
+  success: <SuccessIcon className="" />,
   warning: <ExclamationTriangleIcon className="h-6 w-6 text-yellow-500" />,
   error: <Ban className="h-6 w-6 text-red-500" />
 };

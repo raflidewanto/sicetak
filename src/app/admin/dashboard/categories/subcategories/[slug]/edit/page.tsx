@@ -11,7 +11,7 @@ import { Switch } from '@/components/ui/Switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { Textarea } from '@/components/ui/Textarea';
-import { CATEGORY_CODE } from '@/constants/data';
+import { CATEGORY_CODE_QUERY } from '@/constants/data';
 import { useModal } from '@/hooks/useModal';
 import { useCategories, useCategoryByCode } from '@/services/categories/queries/useCategories';
 import { useDocumentBySubcategory } from '@/services/documents/queries/useDocuments';
@@ -29,7 +29,7 @@ import NoDataIcon from '@/assets/icons/ic-no-data.svg';
 const EditSubCategoryPage = () => {
   const router = useRouter();
   const { slug: subcategoryCode } = useParams<{ slug: string }>();
-  const [categoryCode,] = useQueryState(CATEGORY_CODE);
+  const [categoryCode,] = useQueryState(CATEGORY_CODE_QUERY);
   const { data: subcategory } = useSubCategory(subcategoryCode);
   const { data: defaultCategory } = useCategoryByCode(categoryCode ?? "");
   const { data: categories } = useCategories();

@@ -10,6 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/u
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { Textarea } from "@/components/ui/Textarea";
+import { ACTIVE_QUERY, SUBCATEGORY_QUERY } from "@/constants/data";
+import { useDebounceValue } from "@/hooks/useDebounceValue";
 import { useModal } from "@/hooks/useModal";
 import { useUpdateCategory } from "@/services/categories/mutations/useUpdateCategory";
 import { useCategoryByCode } from "@/services/categories/queries/useCategories";
@@ -17,12 +19,20 @@ import { getErrorMessage } from "@/utils/error";
 import { AxiosError } from "axios";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 
 const EditCategoryPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const { data: category, isLoading: loadingCategory } = useCategoryByCode(slug);
   const router = useRouter();
+
+  // query params
+  const [search, setSearch] = useQueryState(SUBCATEGORY_QUERY);
+  const [active, setActive] = useQueryState(ACTIVE_QUERY);
+
+  const [debouncedSearch] = useDebounceValue(search, 1000);
+  const [debouncedActive] = useDebounceValue(active, 1000);
 
   const [categoryName, setCategoryName] = useState(category?.data?.category_name ?? "");
   const [categoryDescription, setCategoryDescription] = useState(category?.data?.category_description ?? "");
@@ -150,23 +160,35 @@ const EditCategoryPage = () => {
             <TabsContent value="subcategory">
               {/* filtering */}
               <section className="flex flex-wrap gap-4 flex-col sm:flex-row justify-end lg:-mt-14">
-                <Select>
+                <Select
+                  onValueChange={(v) => setActive(v)}
+                  value={active ?? "false"}
+                >
                   <SelectTrigger className="w-[8.5rem]">
                     Status
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
+                    <SelectItem value="true">Active</SelectItem>
+                    <SelectItem value="false">Inactive</SelectItem>
                   </SelectContent>
                 </Select>
-                <Input placeholder="Search" className="w-[14.063rem]" />
+                <Input
+                  placeholder="Search"
+                  className="w-[14.063rem]"
+                  value={search ?? ""}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
                 <Link href={`/admin/dashboard/categories/subcategories/new?category-code=${slug}`}>
                   <Button>
                     Tambah Sub Kategori
                   </Button>
                 </Link>
               </section>
-              <SubCategoriesList categoryCode={slug} />
+              <SubCategoriesList
+                categoryCode={slug}
+                search={debouncedSearch ?? ""}
+                active={debouncedActive ?? ""}
+              />
             </TabsContent>
           </Tabs>
         </CardContent>

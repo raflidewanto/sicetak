@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
-import { CATEGORY } from "@/constants/data";
+import { CATEGORY_QUERY } from "@/constants/data";
 import { useDebounceValue } from "@/hooks/useDebounceValue";
 import { useCategories } from "@/services/categories/queries/useCategories";
 import { Edit } from "lucide-react";
@@ -13,7 +13,7 @@ import Link from "next/link";
 import { useQueryState } from "nuqs";
 
 const CategoriesPage = () => {
-  const [categoryQuery, setCategoryQuery] = useQueryState(CATEGORY);
+  const [categoryQuery, setCategoryQuery] = useQueryState(CATEGORY_QUERY);
   const [categoryDebouncedQuery] = useDebounceValue(categoryQuery, 1000);
 
   const { data: categoriesData, isPending, isError } = useCategories(categoryDebouncedQuery ?? "");

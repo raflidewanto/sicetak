@@ -84,14 +84,14 @@ export function DashboardNav() {
               >
                 Dokumen
               </a>
-              <a
+              {/* <a
                 href="/admin/dashboard/parameters"
                 className={cN(`block py-[0.95rem] pl-9 text-[0.875rem] hover:border-l-4 hover:border-l-[#F68833] transition-all`, {
                   "bg-sidebarBgHover border-l-4 border-l-[#F68833] text-white": isActiveRoute("/admin/dashboard/parameters")
                 })}
               >
                 Parameter
-              </a>
+              </a> */}
               <a
                 href="/admin/dashboard/categories"
                 className={cN(`block py-[0.95rem] pl-9 text-[0.875rem] hover:border-l-4 hover:border-l-[#F68833] transition-all`, {

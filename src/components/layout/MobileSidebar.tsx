@@ -2,9 +2,8 @@
 
 import { DashboardNav } from '@/components/DashboardNav';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/Sheet';
-import { navItems } from '@/constants/data';
 import { MenuIcon } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 export function MobileSidebar() {
   const [open, setOpen] = useState(false);
@@ -19,7 +18,7 @@ export function MobileSidebar() {
             <div className="px-3 py-2">
               <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">Overview</h2>
               <div className="space-y-1">
-                <DashboardNav items={navItems} isMobileNav={true} setOpen={setOpen} />
+                <DashboardNav />
               </div>
             </div>
           </div>

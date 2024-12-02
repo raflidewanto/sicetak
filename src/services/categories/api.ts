@@ -27,8 +27,13 @@ export function getCategoryByCode(id: string){
   return apiResolver<Response<CategoryResponseDTO>>(() => axios.get(`/${id}`));
 }
 
-export function getSubCategoriesByCategory(categoryId: string) {
-  return apiResolver<Response<SubCategoryResponseDTO[]>>(() => axios.get(`/sub-categories/${categoryId}`));
+export function getSubCategoriesByCategory(categoryId: string, search?: string, active?: string) {
+  return apiResolver<Response<SubCategoryResponseDTO[]>>(() => axios.get(`/sub-categories/${categoryId}`, {
+    params: {
+      "subcategory_name": search,
+      "subcategory_active": active === "true" ? true : active === 'false' ? false : null
+    }
+  }));
 }
 
 type AddCategoryRequestDTO = {

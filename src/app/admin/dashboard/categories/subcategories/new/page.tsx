@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { Switch } from '@/components/ui/Switch';
-import { CATEGORY_CODE } from '@/constants/data';
+import { CATEGORY_CODE_QUERY } from '@/constants/data';
 import { useModal } from '@/hooks/useModal';
 import { useCategories } from '@/services/categories/queries/useCategories';
 import { useCreateSubcategory } from '@/services/subcategories/mutations/useCreateSubcategories';
@@ -19,7 +19,7 @@ import { useQueryState } from 'nuqs';
 import { useState } from 'react';
 
 const AddSubCategoryPage = () => {
-  const [categoryCodeQuery] = useQueryState(CATEGORY_CODE);
+  const [categoryCodeQuery] = useQueryState(CATEGORY_CODE_QUERY);
 
   const {
     data: categories,

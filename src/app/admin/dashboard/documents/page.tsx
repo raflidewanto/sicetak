@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/Select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip';
-import { CATEGORY, DOCUMENT_NAME, DOCUMENT_TYPE, SUBCATEGORY } from '@/constants/data';
+import { CATEGORY_QUERY, DOCUMENT_NAME_QUERY, DOCUMENT_TYPE_QUERY, SUBCATEGORY_QUERY } from '@/constants/data';
 import { useDebounceValue } from '@/hooks/useDebounceValue';
 import { useModal } from '@/hooks/useModal';
 import { cN } from '@/lib/utils';
@@ -45,10 +45,10 @@ const AdminPage = () => {
   const { openModal, closeModal, modalState } = useModal();
 
   // query state
-  const [categoryQuery, setCategoryQuery] = useQueryState(CATEGORY);
-  const [subCategoryQuery, setSubCategoryQuery] = useQueryState(SUBCATEGORY);
-  const [documentQuery, setDocumentQuery] = useQueryState(DOCUMENT_NAME);
-  const [documentType, setDocumentType] = useQueryState(DOCUMENT_TYPE);
+  const [categoryQuery, setCategoryQuery] = useQueryState(CATEGORY_QUERY);
+  const [subCategoryQuery, setSubCategoryQuery] = useQueryState(SUBCATEGORY_QUERY);
+  const [documentQuery, setDocumentQuery] = useQueryState(DOCUMENT_NAME_QUERY);
+  const [documentType, setDocumentType] = useQueryState(DOCUMENT_TYPE_QUERY);
 
   // debounced query state
   const [categoryDebouncedQuery] = useDebounceValue(categoryQuery, 1500);

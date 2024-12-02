@@ -9,28 +9,14 @@ export const FIVE_MINUTES_IN_MS = 5 * 60 * 1000;
 // search params
 export const AGREEMENT_NO_QUERY = 'agreement-no';
 export const DOCUMENT_ID_QUERY = 'id';
-export const CATEGORY = 'category';
-export const CATEGORY_CODE = 'category-code';
-export const SUBCATEGORY = 'subcategory';
-export const DOCUMENT_NAME = 'document-name';
-export const DOCUMENT_TYPE = 'document-type'; // personal or corporate
-export const TAB = 'tab';
+export const CATEGORY_QUERY = 'category';
+export const CATEGORY_CODE_QUERY = 'category-code';
+export const SUBCATEGORY_QUERY = 'subcategory';
+export const DOCUMENT_NAME_QUERY = 'document-name';
+export const DOCUMENT_TYPE_QUERY = 'document-type'; // personal or corporate
+export const TAB_QUERY = 'tab';
+export const ACTIVE_QUERY = 'active';
 // =====================================================
-
-export const navItems: NavItem[] = [
-  {
-    title: 'Dokumen',
-    href: '/dashboard/documents',
-    icon: 'fileUp',
-    label: 'Dokumen'
-  },
-  {
-    title: 'Cetak Isi',
-    href: '/dashboard/documents/print',
-    icon: 'surat',
-    label: 'Cetak Isi'
-  },
-];
 
 export const validPlaceholders = [
   '{{ $name }}',
