@@ -37,13 +37,15 @@ const EditSubCategoryPage = () => {
   // form  states
   const [subcategoryName, setSubcategoryName] = useState(subcategory?.data?.subcategory_name ?? "");
   const [subcategoryActive, setSubcategoryActive] = useState(subcategory?.data?.subcategory_active ?? false);
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>(subcategory?.data?.category_code ?? "");
+  const [subcategoryDescription, setSubcategoryDescription] = useState(subcategory?.data?.subcategory_desc ?? "");
 
   const { closeModal, openModal, modalState } = useModal();
 
   useEffect(() => {
     setSubcategoryName(subcategory?.data?.subcategory_name ?? "");
     setSubcategoryActive(subcategory?.data?.subcategory_active ?? false);
+    setSelectedCategory(subcategory?.data?.category_code ?? "");
   }, [subcategory]);
 
   useEffect(() => {
@@ -64,6 +66,7 @@ const EditSubCategoryPage = () => {
       category_code: categoryCode,
       subcategory_code: subcategoryCode,
       subcategory_name: subcategoryName,
+      subcategory_desc: subcategoryDescription,
     }, {
       onSuccess: (data) => {
         if (!data.success) {
@@ -158,8 +161,8 @@ const EditSubCategoryPage = () => {
                         id="subcategory-description"
                         placeholder="Value"
                         className="mt-1 capitalize"
-                        value={subcategoryName.replaceAll("_", " ")}
-                        onChange={e => setSubcategoryName(e.target.value)}
+                        value={subcategoryDescription}
+                        onChange={e => setSubcategoryDescription(e.target.value)}
                       />
                     </div>
                   </section>

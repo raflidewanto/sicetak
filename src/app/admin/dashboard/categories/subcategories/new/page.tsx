@@ -27,6 +27,7 @@ const AddSubCategoryPage = () => {
 
   // form  states
   const [subcategoryName, setSubcategoryName] = useState("");
+  const [subcategoryDescription, setSubcategoryDescription] = useState("");
   const [categoryCode, setCategoryCode] = useState("");
   const [subcategoryActive, setSubcategoryActive] = useState(false);
 
@@ -37,7 +38,8 @@ const AddSubCategoryPage = () => {
     createSubcategoryMutation.mutate({
       subcategory_name: subcategoryName,
       category_code: categoryCode,
-      subcategory_active: subcategoryActive
+      subcategory_active: subcategoryActive,
+      subcategory_desc: subcategoryDescription
     }, {
       onSuccess: (data) => {
         if (!data.success) {
@@ -108,6 +110,18 @@ const AddSubCategoryPage = () => {
                   className="mt-1"
                   value={subcategoryName}
                   onChange={e => setSubcategoryName(e.target.value)}
+                />
+              </div>
+              <div className='space-y-2'>
+                <label htmlFor="subcategory-description" className="block text-sm font-medium text-gray-700">
+                  Deskripsi
+                </label>
+                <Input
+                  id="subcategory-description"
+                  placeholder="Value"
+                  className="mt-1"
+                  value={subcategoryDescription}
+                  onChange={e => setSubcategoryDescription(e.target.value)}
                 />
               </div>
               <div className='space-y-2'>

@@ -2,11 +2,8 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 'use client';
 
-import AddCategoryIcon from '@/assets/icons/ic-add-category.svg';
 import AddDocumentIcon from '@/assets/icons/ic-add-document.svg';
 import EditIcon from '@/assets/icons/ic-edit.svg';
-import AddParamIcon from '@/assets/icons/ic-setting-param.svg';
-import AddSubCategoryIcon from '@/assets/icons/ic-subcategory.svg';
 import { AdminTableBodySkeleton } from '@/components/admin/DocumentTableSkeleton';
 import Show from '@/components/elements/Show';
 import PageContainer from '@/components/layout/PageContainer';
@@ -152,34 +149,10 @@ const AdminPage = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="relative right-3 w-full" align="start">
                 <DropdownMenuItem asChild>
-                  <Link href="/admin/dashboard/documents/categories/new">
-                    <p className='flex items-center gap-x-2 text-sm font-medium text-gray-700'>
-                      <AddCategoryIcon />
-                      Tambah Kategori
-                    </p>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/admin/dashboard/documents/categories/sub-category/new">
-                    <p className='flex items-center gap-x-2 text-sm font-medium text-gray-700'>
-                      <AddSubCategoryIcon />
-                      Tambah SubKategori
-                    </p>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
                   <Link href="/admin/dashboard/documents/upload">
                     <p className='flex items-center gap-x-2 text-sm font-medium text-gray-700'>
                       <AddDocumentIcon />
                       Tambah Dokumen
-                    </p>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/admin/dashboard/documents/custom-param/{id}">
-                    <p className='flex items-center gap-x-2 text-sm font-medium text-gray-700'>
-                      <AddParamIcon />
-                      Tambah Parameter
                     </p>
                   </Link>
                 </DropdownMenuItem>

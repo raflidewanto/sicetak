@@ -36,8 +36,8 @@ export type bracketPlaceholder = {
   x: number;
   y: number;
   page: number;
-  pageWidth: number;
-  pageHeight: number;
+  pag_width: number;
+  page_height: number;
 };
 
 export type ReuploadDocumentPayload = {

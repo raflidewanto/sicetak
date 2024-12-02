@@ -20,6 +20,7 @@ export function getAllSubCategories() {
 
 export type AddSubcategoryRequestDTO = {
   subcategory_name: string;
+  subcategory_desc: string;
   category_code: string;
   subcategory_active: boolean;
 }
@@ -31,6 +32,7 @@ export function createSubcategory(payload: AddSubcategoryRequestDTO) {
 type SubcategoryResponseDTO = { 
   subcategory_code: string;
   subcategory_name: string;
+  subcategory_desc: string;
   category_code: string;
   subcategory_active: boolean;
   created_by: number;
@@ -46,6 +48,7 @@ export function getSubcategory(subcategoryCode: string) {
 type UpdateSubcategoryRequestDTO = {
   subcategory_code: string;
   subcategory_name: string;
+  subcategory_desc: string;
   category_code: string;
 }
 

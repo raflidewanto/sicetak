@@ -14,7 +14,7 @@ export type Customer = {
   documents: Document[];
 }
 
-type getCustomersDetailResponse = {
+export type getCustomersDetailResponse = {
   agreement_no: string;
   name: string;
   plate_no: string;
@@ -24,8 +24,12 @@ type getCustomersDetailResponse = {
   documents: Document[];
 }
 
-export function getCustomers(agreementNo: string) {
-  return apiResolver<Response<getCustomersDetailResponse>>(() => axios.post(`/${agreementNo}`));
+type getConsumentPayload = {
+  agreement_no: string;
+}
+
+export function getCustomers(payload: getConsumentPayload) {
+  return apiResolver<Response<getCustomersDetailResponse>>(() => axios.post(`/${payload?.agreement_no}`, payload));
 }
 
 
