@@ -1,16 +1,20 @@
 'use client';
 
+import { basicPlaceholders } from '@/constants/data';
 import useDisclosure from '@/hooks/useDisclosure';
 import { cN } from '@/lib/utils';
 import { ChevronDown, ChevronRight, Newspaper, User } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import Show from './elements/Show';
+import { ScrollArea } from './ui/ScrollArea';
 import { Separator } from './ui/Separator';
 import { TooltipProvider } from './ui/Tooltip';
+import { useCategories } from '@/services/categories/queries/useCategories';
 
 export function DashboardNav() {
   const path = usePathname();
+  const { data: categories } = useCategories();
   const isActiveRoute = (route: string) => path.startsWith(route);
   const [isAdminOpen, setIsAdminOpen] = useState(true);
   const { isOpen, toggle } = useDisclosure(isActiveRoute('/dashboard'));
@@ -35,25 +39,21 @@ export function DashboardNav() {
             <span className="text-white">{isOpen ? <ChevronDown /> : <ChevronRight />}</span>
           </button>
           <Show when={isOpen}>
-            <div>
-              {/* Child Links */}
-              <a
-                href="/dashboard/documents"
-                className={cN(`hover:bg- block py-[0.95rem] pl-9 text-[0.875rem] hover:border-l-4 hover:border-l-[#F68833] transition-all`, {
-                  "bg-sidebarBgHover border-l-4 border-l-[#F68833] text-white": path === "/dashboard/documents"
-                })}
-              >
-                Cetak Template
-              </a>
-              <a
-                href="/dashboard/documents/print"
-                className={cN(`block py-[0.95rem] pl-9 text-[0.875rem] hover:border-l-4 hover:border-l-[#F68833] transition-all`, {
-                  "bg-sidebarBgHover border-l-4 border-l-[#F68833] text-white": path === "/dashboard/documents/print"
-                })}
-              >
-                Cetak Isi
-              </a>
-            </div>
+            <Show when={Boolean(categories)}>
+              <ScrollArea className="max-h-[15rem] overflow-y-scroll">
+                {categories?.data?.map((category) => (
+                  <a
+                    key={category?.category_code}
+                    href={`/dashboard/documents/${category?.category_code}`}
+                    className={cN(`hover:bg- block py-[0.95rem] pl-9 capitalize text-[0.875rem] hover:border-l-4 hover:border-l-[#F68833] transition-all`, {
+                      "bg-sidebarBgHover border-l-4 border-l-[#F68833] text-white": path.startsWith(`/dashboard/documents/${category?.category_code}`)
+                    })}
+                  >
+                    {category?.category_name?.replaceAll("_", " ")}
+                  </a>
+                ))}
+              </ScrollArea>
+            </Show>
           </Show>
         </div>
         <Separator color='#15374C' className='bg-slate-500' />
@@ -102,8 +102,24 @@ export function DashboardNav() {
               </a>
             </div>
           </Show>
+          <Separator color='#15374C' className='bg-slate-500' />
         </div>
       </TooltipProvider>
+      <div>
+        <ScrollArea className="h-72 w-48 rounded-md border mx-auto my-2">
+          <div className="p-4">
+            <h4 className="mb-4 text-sm font-medium leading-none">
+              Basic Placeholders
+            </h4>
+            {basicPlaceholders?.map((placeholder) => (
+              <div key={placeholder}>
+                <div className="text-sm">{placeholder}</div>
+                <Separator className="my-2" />
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
     </nav>
   );
 }

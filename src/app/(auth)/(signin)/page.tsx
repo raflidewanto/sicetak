@@ -1,49 +1,42 @@
-import React from 'react';
-import { Metadata } from 'next';
-import Link from 'next/link';
-import { buttonVariants } from '@/components/ui/Button';
-import { cN } from '@/lib/utils';
+import { headers } from 'next/headers';
+import Image from 'next/image';
+import LoginForm from "@/components/forms/LoginForm";
 
-export const metadata: Metadata = {
-  title: 'Authentication',
-  description: 'Authentication forms built using the components.'
+
+const LoginPage = () => {
+  const header = headers();
+  const ip = (header.get('x-forwarded-for') ?? '127.0.0.1').split(',')[0];
+
+  return (
+    <section className="bg-white">
+      <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
+        <aside className="relative block h-16 lg:order-last lg:col-span-5 lg:h-full xl:col-span-6">
+          <div className="w-[870px] h-full">
+            <Image
+              alt="Login Illustration"
+              fill
+              src="https://images.unsplash.com/photo-1605106702734-205df224ecce?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          </div>
+        </aside>
+
+        {/* Form Section */}
+        <main className="flex items-center justify-center px-8 py-8 lg:col-span-7 lg:py-12 xl:col-span-6">
+          <div className="max-w-xl lg:max-w-3xl">
+            <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
+              Welcome Back
+            </h1>
+
+            <p className="mt-4 leading-relaxed text-gray-500">
+              Please log in to access your account.
+            </p>
+            <LoginForm ip={ip} />
+          </div>
+        </main>
+      </div>
+    </section>
+  );
 };
 
-export default function AuthenticationPage() {
-  return (
-    <div className="relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-      <Link
-        href="/examples/authentication"
-        className={cN(buttonVariants({ variant: 'ghost' }), 'absolute right-4 top-4 hidden md:right-8 md:top-8')}
-      >
-        Login
-      </Link>
-      <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex">
-        <div className="absolute inset-0 bg-zinc-900" />
-        <div className="relative z-20 flex items-center text-lg font-medium">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="mr-2 h-6 w-6"
-          >
-            <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
-          </svg>
-          Si Cetak
-        </div>
-      </div>
-      <div className="flex h-full items-center p-4 lg:p-8">
-        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-          <div className="flex flex-col space-y-2 text-center">
-            <h1 className="text-2xl font-semibold tracking-tight">Create an account</h1>
-            <p className="text-sm text-muted-foreground">Enter your email below to create your account</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+export default LoginPage;

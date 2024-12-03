@@ -17,7 +17,7 @@ export default function Sidebar({ className }: SidebarProps) {
   return (
     <aside
       className={cN(
-        `relative hidden h-screen flex-none border-r bg-sidebarBackground text-sidebarForeground transition-[width] duration-500 md:block`,
+        `relative hidden h-screen overflow-y-scroll no-scrollbar flex-none border-r bg-sidebarBackground text-sidebarForeground transition-[width] duration-500 md:block`,
         !isMinimized ? 'w-[14.125rem]' : 'w-[72px]',
         className
       )}

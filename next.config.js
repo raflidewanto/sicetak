@@ -6,6 +6,10 @@ const nextConfig = {
       {
         hostname: 'img.freepik.com',
         protocol: 'https'
+      },
+      {
+        hostname: 'images.unsplash.com',
+        protocol: 'https'
       }
     ]
   },

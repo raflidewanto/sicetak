@@ -28,7 +28,7 @@ import { Switch } from '@/components/ui/Switch';
 import { Textarea } from '@/components/ui/Textarea';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip';
 import { toast } from '@/components/ui/useToast';
-import { customParamPlaceholders, DocumentType, validPlaceholders } from '@/constants/data';
+import { customParamPlaceholders, DocumentType, basicPlaceholders } from '@/constants/data';
 import { useModal } from '@/hooks/useModal';
 import { usePDFJS } from '@/hooks/usePdfjs';
 import { cN } from '@/lib/utils';
@@ -522,11 +522,11 @@ const EditDocument = () => {
                                       </div>
                                       <ScrollArea className="h-72 w-full">
                                         <Show
-                                          when={(validPlaceholders.length ?? 0) > 0}
+                                          when={(basicPlaceholders.length ?? 0) > 0}
                                           fallback={
                                             <p>No data</p>
                                           }>
-                                          {validPlaceholders?.map((placeholder, idx) => (
+                                          {basicPlaceholders?.map((placeholder, idx) => (
                                             <React.Fragment key={`${placeholder}-${idx}`}>
                                               <div className="flex min-h-[3.313rem] items-center justify-between px-4 py-2">
                                                 <p>{placeholder}</p>

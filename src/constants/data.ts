@@ -18,7 +18,7 @@ export const TAB_QUERY = 'tab';
 export const ACTIVE_QUERY = 'active';
 // =====================================================
 
-export const validPlaceholders = [
+export const basicPlaceholders = [
   '{{ $name }}',
   '{{ $nik }}',
   '{{ $address }}',
