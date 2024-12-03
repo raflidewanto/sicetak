@@ -4,6 +4,7 @@
 
 import AddDocumentIcon from '@/assets/icons/ic-add-document.svg';
 import EditIcon from '@/assets/icons/ic-edit.svg';
+import NoDataIcon from '@/assets/icons/ic-no-data.svg';
 import { AdminTableBodySkeleton } from '@/components/admin/DocumentTableSkeleton';
 import Show from '@/components/elements/Show';
 import PageContainer from '@/components/layout/PageContainer';
@@ -29,13 +30,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip';
 import { CATEGORY_QUERY, DOCUMENT_NAME_QUERY, DOCUMENT_TYPE_QUERY, SUBCATEGORY_QUERY } from '@/constants/data';
 import { useDebounceValue } from '@/hooks/useDebounceValue';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useModal } from '@/hooks/useModal';
 import { cN } from '@/lib/utils';
+import { useCategories } from '@/services/categories/queries/useCategories';
 import { usePrintDocument } from '@/services/documents/mutations/usePrintDocument';
 import { useDocuments } from '@/services/documents/queries/useDocuments';
 import { useSubCategories } from '@/services/subcategories/queries/useSubcategories';
 import { getErrorMessage } from '@/utils/error';
-import { DownloadCloud, Edit, Plus, Printer, Search } from 'lucide-react';
+import { DownloadCloud, Plus, Printer, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useQueryState } from 'nuqs';
 import { Suspense } from 'react';
@@ -43,6 +46,7 @@ import { Suspense } from 'react';
 const AdminPage = () => {
   // UI states
   const { openModal, closeModal, modalState } = useModal();
+  const mobile = useMediaQuery('(max-width: 1024px)');
 
   // query state
   const [categoryQuery, setCategoryQuery] = useQueryState(CATEGORY_QUERY);
@@ -63,6 +67,7 @@ const AdminPage = () => {
     subCategoryDebouncedQuery ?? '',
     documentTypeDebouncedQuery ?? ''
   );
+  const { data: categories } = useCategories();
   const { data: subCategories } = useSubCategories();
 
   // mutations
@@ -122,8 +127,11 @@ const AdminPage = () => {
                 <SelectGroup>
                   <SelectLabel>Pilih Kategori</SelectLabel>
                   <SelectItem value={''}>Semua</SelectItem>
-                  <SelectItem value="financing_agreement">Financing Agreement</SelectItem>
-                  <SelectItem value="agreement_transfer">Agreement Transfer</SelectItem>
+                  {categories?.data?.map((category) => (
+                    <SelectItem key={category?.category_code} value={category?.category_name} className='capitalize'>
+                      {category?.category_name?.replaceAll("_", " ")}
+                    </SelectItem>
+                  ))}
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -183,8 +191,8 @@ const AdminPage = () => {
               </Tooltip>
             </TooltipProvider>
             <Show when={Boolean(subCategories?.data)}>
-              {subCategories?.data?.map((subcategory) => (
-                <TooltipProvider key={subcategory?.category_code}>
+              {subCategories?.data?.map((subcategory, idx) => (
+                <TooltipProvider key={`${subcategory?.subcategory_code}-${idx}`}>
                   <Tooltip>
                     <TooltipTrigger className="w-full">
                       <div
@@ -204,20 +212,21 @@ const AdminPage = () => {
                             'line-clamp-1': subcategory?.subcategory_name.length > 17
                           })}
                         >
-                          {(subcategory?.subcategory_name?.toString().length ?? 0) > 18
+                          {(subcategory?.subcategory_name?.toString().length ?? 0) > 18 && mobile
                             ? subcategory?.subcategory_name.split("_").join(" ").substring(0, 17) + '...'
                             : subcategory?.subcategory_name.split("_").join(" ")}
                         </p>
                         <TooltipContent>
                           <p>{subcategory?.subcategory_name.split("_").join(" ")}</p>
                         </TooltipContent>
-                        <Link href={`/admin/dashboard/documents/categories/sub-category/${subcategory?.category_code}`}>
+                        {/* <Link
+                          href={`/admin/dashboard/categories/subcategories/${subcategory?.subcategory_code}/edit`}>
                           <Edit
                             className='font-bold cursor-pointer'
                             size={12}
                             color="#F97316"
                           />
-                        </Link>
+                        </Link> */}
                       </div>
                     </TooltipTrigger>
                   </Tooltip>
@@ -312,8 +321,8 @@ const AdminPage = () => {
                     <TableBody>
                       <TableRow>
                         <TableCell className="px-4 py-2 w-full">
-                          <div className="flex items-center justify-center w-full">
-                            <p className="text-center text-gray-500 w-full">No data</p>
+                          <div className="flex items-center justify-center w-full py-4">
+                            <NoDataIcon />
                           </div>
                         </TableCell>
                       </TableRow>

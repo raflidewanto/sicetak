@@ -42,6 +42,7 @@ import { usePlaceholders } from '@/services/documents/queries/usePlaceholders';
 import { bracketPlaceholder } from '@/types';
 import { getErrorMessage } from '@/utils/error';
 import { extractBracketCoordinates } from '@/utils/pdf';
+import { isWhiteSpaceString } from '@/utils/string';
 import { AxiosError } from 'axios';
 import { EditIcon, X } from 'lucide-react';
 import Link from 'next/link';
@@ -252,6 +253,11 @@ const EditDocument = () => {
       return;
     }
 
+    if (isWhiteSpaceString(placeholderValue)) {
+      openModal("Warning", `Please enter a value`, 'warning');
+      return;
+    }
+
     updatePlaceholderMutation.mutate({
       custom_value: placeholderValue,
       placeholder_name: selectedPlaceholder?.placeholder_name,
@@ -264,6 +270,23 @@ const EditDocument = () => {
         }
         openModal("Error", `Error updating the placeholder: ${data.message}`, 'error');
       },
+      onError: (error) => {
+        if (error instanceof AxiosError) {
+          const status = error.response?.status;
+          if (status === 400) {
+            openModal("Error", `Error updating the placeholder: ${error.response?.data.message}`, 'error');
+            return;
+          }
+          openModal("Error", `Something went wrong`, 'error');
+          return;
+        } else if (error instanceof Error) {
+          openModal("Error", `Error updating the placeholder: ${error.message}`, 'error');
+          return;
+        }
+        const errMessage = getErrorMessage(error);
+        openModal("Error", `Error updating the placeholder: ${errMessage}`, 'error');
+        return;
+      }
     });
   };
 

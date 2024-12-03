@@ -31,8 +31,12 @@ const PrintDocumentPage = () => {
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!agreementNoQuery) {
+      openModal("Warning", "Please enter the agreement number", "warning");
+      return;
+    }
     consumentMutation.mutate(
-      { agreement_no: agreementNoQuery ?? "" },
+      { agreement_no: agreementNoQuery },
       {
         onSuccess: (data) => {
           if (!data?.success) {

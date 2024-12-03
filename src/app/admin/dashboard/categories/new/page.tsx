@@ -20,7 +20,7 @@ const AddCategoryPage = () => {
 
   const { closeModal, modalState, openModal } = useModal();
 
-  function resetForm(){
+  function resetForm() {
     setCategoryName('');
     setCategoryDesc('');
   }
@@ -34,9 +34,10 @@ const AddCategoryPage = () => {
       category_name: categoryName.toLocaleLowerCase().replaceAll(' ', '_'),
     }, {
       onSuccess() {
-        openModal('Success', 'Category created successfully', 'success');
-        resetForm();
-        window.location.href = '/admin/dashboard/documents';
+        openModal('Success', 'Category created successfully', 'success', () => {
+          resetForm();
+          window.location.href = '/admin/dashboard/documents';
+        });
       },
       onError(error) {
         if (error instanceof AxiosError) {

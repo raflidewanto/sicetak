@@ -11,6 +11,8 @@ import { useCategories } from "@/services/categories/queries/useCategories";
 import { Edit } from "lucide-react";
 import Link from "next/link";
 import { useQueryState } from "nuqs";
+import NoDataIcon from '@/assets/icons/ic-no-data.svg';
+import PageContainer from "@/components/layout/PageContainer";
 
 const CategoriesPage = () => {
   const [categoryQuery, setCategoryQuery] = useQueryState(CATEGORY_QUERY);
@@ -19,62 +21,64 @@ const CategoriesPage = () => {
   const { data: categoriesData, isPending, isError } = useCategories(categoryDebouncedQuery ?? "");
 
   return (
-    <div suppressHydrationWarning className="p-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Kategori List</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between mb-4">
-            <Input
-              placeholder="Search"
-              className="w-1/3"
-              value={categoryQuery ?? ""}
-              onChange={(e) => setCategoryQuery(e.target.value)}
-            />
-            <Link href="/admin/dashboard/categories/new">
-              <Button className="bg-orange-500 hover:bg-orange-600 text-white">Tambah Kategori</Button>
-            </Link>
-          </div>
+    <PageContainer scrollable>
+      <div suppressHydrationWarning>
+        <Card>
+          <CardHeader>
+            <CardTitle>Kategori List</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between mb-4">
+              <Input
+                placeholder="Search"
+                className="w-1/3"
+                value={categoryQuery ?? ""}
+                onChange={(e) => setCategoryQuery(e.target.value)}
+              />
+              <Link href="/admin/dashboard/categories/new">
+                <Button className="bg-orange-500 hover:bg-orange-600 text-white">Tambah Kategori</Button>
+              </Link>
+            </div>
 
-          {/* Table */}
-          <Table>
-            <TableHeader className="bg-[#F2F5F6] text-[#676767] font-medium">
-              <TableRow>
-                <TableHead className="w-1/2 p-4">Nama Kategori</TableHead>
-                <TableHead className="text-right p-4">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <Show when={!isPending && isError}>
-              Something went wrong
-            </Show>
-            <Show when={categoriesData?.data?.length === 0 && !isPending}>
-              No data
-            </Show>
-            <Show when={Boolean(categoriesData?.data) && (categoriesData?.data?.length ?? 0) > 0 && !isPending && !isError}>
-              <TableBody>
-                {categoriesData?.data?.map(category => (
-                  <TableRow key={category?.category_code}>
-                    <TableCell className="capitalize">
-                      {category.category_name?.replaceAll("_", " ")}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end space-x-4">
-                        <Link href={`/admin/dashboard/categories/${category?.category_code}/edit`}>
-                          <Button variant="ghost" size="sm">
-                            <Edit className="h-4 w-4 text-orange-500" />
-                          </Button>
-                        </Link>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Show>
-          </Table>
-        </CardContent>
-      </Card>
-    </div>
+            {/* Table */}
+            <Table>
+              <TableHeader className="bg-[#F2F5F6] text-[#676767] font-medium">
+                <TableRow>
+                  <TableHead className="w-1/2 p-4">Nama Kategori</TableHead>
+                  <TableHead className="text-right p-4">Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <Show when={!isPending && isError}>
+                Something went wrong
+              </Show>
+              <Show when={categoriesData?.data?.length === 0 && !isPending}>
+                <NoDataIcon />
+              </Show>
+              <Show when={Boolean(categoriesData?.data) && (categoriesData?.data?.length ?? 0) > 0 && !isPending && !isError}>
+                <TableBody>
+                  {categoriesData?.data?.map(category => (
+                    <TableRow key={category?.category_code}>
+                      <TableCell className="capitalize">
+                        {category.category_name?.replaceAll("_", " ")}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end space-x-4">
+                          <Link href={`/admin/dashboard/categories/${category?.category_code}/edit`}>
+                            <Button variant="ghost" size="sm">
+                              <Edit className="h-4 w-4 text-orange-500" />
+                            </Button>
+                          </Link>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Show>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
+    </PageContainer>
   );
 };
 
