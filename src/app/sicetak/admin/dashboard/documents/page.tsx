@@ -161,7 +161,7 @@ const AdminPage = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="relative right-3 w-full" align="start">
                 <DropdownMenuItem asChild>
-                  <Link href="/admin/dashboard/documents/upload">
+                  <Link href="/sicetak/admin/dashboard/documents/upload">
                     <p className='flex items-center gap-x-2 text-sm font-medium text-gray-700'>
                       <AddDocumentIcon />
                       Tambah Dokumen
@@ -220,7 +220,7 @@ const AdminPage = () => {
                           <p>{subcategory?.subcategory_name.split("_").join(" ")}</p>
                         </TooltipContent>
                         {/* <Link
-                          href={`/admin/dashboard/categories/subcategories/${subcategory?.subcategory_code}/edit`}>
+                          href={`/sicetak/admin/dashboard/categories/subcategories/${subcategory?.subcategory_code}/edit`}>
                           <Edit
                             className='font-bold cursor-pointer'
                             size={12}
@@ -254,7 +254,20 @@ const AdminPage = () => {
                     <TableBody className="bg-white">
                       {documents?.data?.map((doc) => (
                         <TableRow key={doc.document_code} className="h-[3.313rem] border-b">
-                          <TableCell className="px-4 py-2">{doc.name}</TableCell>
+                          <TableCell className="px-4 py-2">
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <p className='text-black cursor-help'>
+                                    {doc.name}
+                                  </p>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  {doc?.description}
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </TableCell>
                           <TableCell className="px-4 py-2 text-center">
                             <div className="flex items-center justify-evenly gap-x-2">
                               <TooltipProvider>
@@ -307,7 +320,7 @@ const AdminPage = () => {
                           </TableCell>
                           <TableCell className="px-4 py-2 text-center">
                             <Link
-                              href={`/admin/dashboard/documents/${doc.document_code}/edit`}
+                              href={`/sicetak/admin/dashboard/documents/${doc.document_code}/edit`}
                               className="flex cursor-pointer items-center justify-center gap-2"
                             >
                               <EditIcon />

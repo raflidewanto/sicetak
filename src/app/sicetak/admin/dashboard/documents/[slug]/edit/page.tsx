@@ -206,7 +206,7 @@ const EditDocument = () => {
     }, {
       onSuccess: (data) => {
         if (data.success) {
-          window.location.href = '/dashboard/documents';
+          window.location.href = '/sicetak/dashboard/documents';
           return;
         }
         toast({
@@ -442,7 +442,7 @@ const EditDocument = () => {
 
             {/* Buttons */}
             <div className="flex justify-end space-x-4 px-5">
-              <Link href="/admin/dashboard/documents">
+              <Link href="/sicetak/admin/dashboard/documents">
                 <Button variant="ghost" className="border border-gray-300 bg-white">
                   Kembali
                 </Button>

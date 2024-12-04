@@ -1,8 +1,14 @@
-import { NavItem } from '@/types';
-
+import { APP_CODE_SICETAK } from './data';
 // =====================================================
 // number constants
 export const FIVE_MINUTES_IN_MS = 5 * 60 * 1000;
+// =====================================================
+
+// =====================================================
+// local storage
+export const LS_USER_ID = 'smsf-i-id';
+export const LS_IN_TOOLS_MENU = 'smsf-mn';
+export const LS_TOKEN = 'smsf-tk-i';
 // =====================================================
 
 // =====================================================
@@ -36,7 +42,23 @@ export const basicPlaceholders = [
   '{{ $condition }}'
 ];
 
-export const customParamPlaceholders = ['{{ $content1 }}', '{{ $content2 }}', '{{ $content3 }}', '{{ $content4 }}'];
+export const customParamPlaceholders = [
+  '{{ $content1 }}',
+  '{{ $content2 }}',
+  '{{ $content3 }}',
+  '{{ $content4 }}',
+  "{{ $content5 }}",
+  "{{ $content6 }}",
+  "{{ $content7 }}",
+  "{{ $content8 }}",
+  "{{ $content9 }}",
+  "{{ $content10 }}",
+  "{{ $content11 }}",
+  "{{ $content12 }}",
+  "{{ $content13 }}",
+  "{{ $content14 }}",
+  "{{ $content15 }}",
+];
 
 export const productTypes = [
   {
@@ -79,3 +101,58 @@ export type ProductTypeValue =
   | 'flash_cash_r2';
 
 export type DocumentType = 'corporate' | 'personal';
+
+export const dummyMenu = [
+  {
+      "menu_id": 99,
+      "menu_code": "m-sicetak",
+      "menu_name": "Si Cetak",
+      "menu_description": "Si Cetak",
+      "menu_priority": 1,
+      "url": "/sicetak",
+      "app_code": "sicetak",
+      "sub_menu": [
+          {
+              "menu_id": 128,
+              "menu_code": "m-sicetak-dashboard",
+              "menu_name": "Dokumen",
+              "menu_description": "SiCetak Dokumen Dashboard\n",
+              "menu_priority": 1,
+              "url": "/dashboard/documents",
+              "app_code": "sicetak",
+              "sub_menu": null
+          },
+          {
+              "menu_id": 237,
+              "menu_code": "m-sicetak-dashboard",
+              "menu_name": "Admin",
+              "menu_description": "Dashboard Admin\n",
+              "menu_priority": 3,
+              "url": "/admin/dashboard/documents",
+              "app_code": "sicetak",
+              "sub_menu": [
+                  {
+                      "menu_id": 238,
+                      "menu_code": "m-sicetak-dashboard-documents",
+                      "menu_name": "Dokumen",
+                      "menu_description": "Dashboard Dokumen Admin\n",
+                      "menu_priority": 1,
+                      "url": "/admin/dashboard/documents",
+                      "app_code": "sicetak",
+                      "sub_menu": null
+                  },
+                  {
+                      "menu_id": 228,
+                      "menu_code": "m-sicetak-dashboard-categories",
+                      "menu_name": "Kategori",
+                      "menu_description": "Dashboard Kategori Dokumen Admin\n",
+                      "menu_priority": 2,
+                      "url": "/admin/dashboard/categories",
+                      "app_code": "sicetak",
+                      "sub_menu": null
+                  },
+              ]
+          }
+      ]
+  }
+];

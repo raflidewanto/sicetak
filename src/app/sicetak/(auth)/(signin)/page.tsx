@@ -1,41 +1,69 @@
-import { headers } from 'next/headers';
-import Image from 'next/image';
-import LoginForm from "@/components/forms/LoginForm";
+"use client";
+
+import { LS_TOKEN, LS_USER_ID } from "@/constants/data";
+import { useAuthorize } from "@/services/integrations/idm/mutations/useAuthorize";
+import { generateRequestBodyAuthorize } from "@/utils/auth";
+import { decryptLS, encryptLS } from "@/utils/crypto";
+import { AxiosError } from "axios";
+import moment from "moment";
+import { useEffect, useRef } from "react";
 
 
 const LoginPage = () => {
-  const header = headers();
-  const ip = (header.get('x-forwarded-for') ?? '127.0.0.1').split(',')[0];
+  const token = localStorage.getItem(LS_TOKEN);
+  const user = localStorage.getItem(LS_USER_ID);
+  const decryptedToken = decryptLS(token ?? "");
+  const decryptedUser = decryptLS(user ?? "");
+  const authorizeMutation = useAuthorize();
+  const dataFetchedRef = useRef(false);
+  
+
+  useEffect(() => {
+    if (dataFetchedRef.current) {
+      return;
+    }
+    dataFetchedRef.current = true;
+    const payload = generateRequestBodyAuthorize(
+      decryptedToken,
+      decryptedUser,
+      2,
+      moment().format("YYYY-MM-DD HH:mm:ss"),
+      process.env.NEXT_PUBLIC_PRIVATE_KEY ?? ""
+    );
+    authorizeMutation.mutate({
+      ...JSON.parse(payload),
+      token: decryptedToken
+    }, {
+      onSuccess: (data) => {
+        if (!data.success) {
+          console.log(data.message);
+          return;
+        }
+        console.log(data);
+        if (data.data?.token && data?.data?.authorize) {
+          localStorage.setItem(LS_TOKEN, encryptLS(data.data?.token));
+        } else {
+          // redirect to intools login page
+          return;
+        }
+      },
+      onError: (error) => {
+        if (error instanceof AxiosError) {
+          console.log(error.response?.data.message);
+          return;
+        }
+        if (error instanceof Error) {
+          console.log(error.message);
+          return;
+        }
+        console.log(error);
+      }
+    });
+  }, []);
+
 
   return (
-    <section className="bg-white">
-      <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
-        <aside className="relative block h-16 lg:order-last lg:col-span-5 lg:h-full xl:col-span-6">
-          <div className="w-[870px] h-full">
-            <Image
-              alt="Login Illustration"
-              fill
-              src="https://images.unsplash.com/photo-1605106702734-205df224ecce?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80"
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-          </div>
-        </aside>
-
-        {/* Form Section */}
-        <main className="flex items-center justify-center px-8 py-8 lg:col-span-7 lg:py-12 xl:col-span-6">
-          <div className="max-w-xl lg:max-w-3xl">
-            <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
-              Welcome Back
-            </h1>
-
-            <p className="mt-4 leading-relaxed text-gray-500">
-              Please log in to access your account.
-            </p>
-            <LoginForm ip={ip} />
-          </div>
-        </main>
-      </div>
-    </section>
+    <div></div>
   );
 };
 

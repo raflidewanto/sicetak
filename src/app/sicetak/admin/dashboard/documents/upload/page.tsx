@@ -150,7 +150,7 @@ const AddNewDocumentPage = () => {
     uploadMutation.mutate(formData, {
       onSuccess: (data) => {
         if (data.success) {
-          window.location.href = '/dashboard/documents';
+          window.location.href = '/sicetak/dashboard/documents';
           return;
         }
         openModal("Error", `Error updating the placeholder: ${data.message}`, 'error');

@@ -178,7 +178,7 @@ const EditCategoryPage = () => {
                   value={search ?? ""}
                   onChange={(e) => setSearch(e.target.value)}
                 />
-                <Link href={`/admin/dashboard/categories/subcategories/new?category-code=${slug}`}>
+                <Link href={`/sicetak/admin/dashboard/categories/subcategories/new?category-code=${slug}`}>
                   <Button>
                     Tambah Sub Kategori
                   </Button>

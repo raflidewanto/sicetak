@@ -23,7 +23,7 @@ export default function Sidebar({ className }: SidebarProps) {
       )}
     >
       <div className="hidden px-5 pt-6 lg:block">
-        <Link href="/dashboard">
+        <Link href="/sicetak/dashboard/documents">
           <Show when={!isMinimized} fallback={<PrinterIcon />}>
             <div className="flex items-center justify-start space-x-2">
               <span>

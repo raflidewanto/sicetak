@@ -14,7 +14,7 @@ import { useQueryState } from "nuqs";
 import NoDataIcon from '@/assets/icons/ic-no-data.svg';
 import PageContainer from "@/components/layout/PageContainer";
 
-const CategoriesPage = () => {
+const ParameterPage = () => {
   const [categoryQuery, setCategoryQuery] = useQueryState(CATEGORY_QUERY);
   const [categoryDebouncedQuery] = useDebounceValue(categoryQuery, 1000);
 
@@ -25,7 +25,7 @@ const CategoriesPage = () => {
       <div suppressHydrationWarning>
         <Card>
           <CardHeader>
-            <CardTitle>Kategori List</CardTitle>
+            <CardTitle>Parameter</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between mb-4">
@@ -82,4 +82,4 @@ const CategoriesPage = () => {
   );
 };
 
-export default CategoriesPage;
+export default ParameterPage;

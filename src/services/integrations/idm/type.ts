@@ -1,3 +1,16 @@
+export type ValidateTokenRequestBody = {
+  username: string,
+  user_type: number, // 2
+  datetime: string,
+  signature: string
+};
+
+export type AuthorizeResponse = {
+  authorize: boolean,
+  token: string,
+  need_reset_password: boolean
+}
+
 export type LoginPayload = {
   username: string;
   password: string;

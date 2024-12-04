@@ -36,7 +36,7 @@ const AddCategoryPage = () => {
       onSuccess() {
         openModal('Success', 'Category created successfully', 'success', () => {
           resetForm();
-          window.location.href = '/admin/dashboard/documents';
+          window.location.href = '/sicetak/admin/dashboard/documents';
         });
       },
       onError(error) {
@@ -85,7 +85,7 @@ const AddCategoryPage = () => {
                 />
               </div>
               <div className="flex justify-end space-x-4">
-                <Link href="/admin/dashboard/documents">
+                <Link href="/sicetak/admin/dashboard/documents">
                   <Button type="button" variant="ghost" className="border border-gray-300 bg-white">
                     Kembali
                   </Button>

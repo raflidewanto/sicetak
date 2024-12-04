@@ -44,7 +44,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
             <Button size={'sm'} className="w-full md:w-auto">
               Tambah Kategori
             </Button>
-            <Link href="/admin/dashboard/documents/upload">
+            <Link href="/sicetak/admin/dashboard/documents/upload">
               <Button size={'sm'} className="w-full md:w-auto">
                 Tambah Dokumen
               </Button>

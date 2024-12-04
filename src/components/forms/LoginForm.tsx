@@ -1,16 +1,19 @@
 "use client";
 
+import { LS_IN_TOOLS_MENU } from '@/constants/data';
+import { useModal } from '@/hooks/useModal';
+import { useReadLocalStorage } from '@/hooks/useReadLocalStorage';
+import { useLogin } from '@/services/integrations/idm/mutations/useLogin';
+import { generateRequestHeadersAndPayload } from '@/utils/auth';
+import { decryptLS } from '@/utils/crypto';
+import { getErrorMessage } from '@/utils/error';
+import { getBrowser, getPlatform } from '@/utils/userAgent';
+import { AxiosError } from 'axios';
 import React, { useState } from 'react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Label } from '../ui/Label';
-import { generateRequestHeadersAndPayload } from '@/utils/auth';
-import { getBrowser, getPlatform } from '@/utils/userAgent';
-import { useLogin } from '@/services/integrations/idm/mutations/useLogin';
 import { Modal } from '../ui/Modal';
-import { useModal } from '@/hooks/useModal';
-import { AxiosError } from 'axios';
-import { getErrorMessage } from '@/utils/error';
 
 type LoginFormProps = {
   ip: string;
@@ -19,6 +22,7 @@ type LoginFormProps = {
 const LoginForm = (props: LoginFormProps) => {
   const { ip } = props;
   const loginMutation = useLogin();
+
 
   // form states
   const [username, setUsername] = useState('');
@@ -50,7 +54,7 @@ const LoginForm = (props: LoginFormProps) => {
           openModal("Error", data?.message ?? "Something went wrong", 'error');
           return;
         }
-        window.location.href = '/dashboard/documents';
+        window.location.href = '/sicetak/dashboard/documents';
       },
       onError: (error) => {
         if (error instanceof AxiosError) {

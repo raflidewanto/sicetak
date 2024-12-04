@@ -17,7 +17,7 @@ export function DashboardNav() {
   const { data: categories } = useCategories();
   const isActiveRoute = (route: string) => path.startsWith(route);
   const [isAdminOpen, setIsAdminOpen] = useState(true);
-  const { isOpen, toggle } = useDisclosure(isActiveRoute('/dashboard'));
+  const { isOpen, toggle } = useDisclosure(isActiveRoute('/sicetak/dashboard'));
 
   return (
     <nav className="grid items-start gap-2">
@@ -26,7 +26,7 @@ export function DashboardNav() {
         <div>
           <button
             className={cN(`flex h-[3rem] items-center gap-2 overflow-hidden py-2 text-sm font-medium transition-all hover:border-l-4 hover:border-l-[#F68833] hover:bg-sidebarBgHover justify-between w-full p-2`, {
-              "border-l-4 border-l-[#F68833] bg-sidebarBgHover text-white": isActiveRoute("/dashboard"),
+              "border-l-4 border-l-[#F68833] bg-sidebarBgHover text-white": isActiveRoute("/sicetak/dashboard"),
             })}
             onClick={() => toggle()}
           >
@@ -44,9 +44,9 @@ export function DashboardNav() {
                 {categories?.data?.map((category) => (
                   <a
                     key={category?.category_code}
-                    href={`/dashboard/documents/${category?.category_code}`}
+                    href={`/sicetak/dashboard/documents/${category?.category_code}`}
                     className={cN(`hover:bg- block py-[0.95rem] pl-9 capitalize text-[0.875rem] hover:border-l-4 hover:border-l-[#F68833] transition-all`, {
-                      "bg-sidebarBgHover border-l-4 border-l-[#F68833] text-white": path.startsWith(`/dashboard/documents/${category?.category_code}`)
+                      "bg-sidebarBgHover border-l-4 border-l-[#F68833] text-white": path.startsWith(`/sicetak/dashboard/documents/${category?.category_code}`)
                     })}
                   >
                     {category?.category_name?.replaceAll("_", " ")}
@@ -61,7 +61,7 @@ export function DashboardNav() {
         <div>
           <button
             className={cN(`flex h-[3rem] items-center gap-2 overflow-hidden py-2 text-sm font-medium transition-all hover:border-l-4 hover:border-l-[#F68833] hover:bg-sidebarBgHover justify-between w-full p-2`, {
-              "border-l-4 border-l-[#F68833] bg-sidebarBgHover text-white": isActiveRoute("/admin"),
+              "border-l-4 border-l-[#F68833] bg-sidebarBgHover text-white": isActiveRoute("/sicetak/admin"),
             })}
             onClick={() => setIsAdminOpen(!isAdminOpen)}
           >
@@ -77,49 +77,47 @@ export function DashboardNav() {
             <div>
               {/* Child Links */}
               <a
-                href="/admin/dashboard/documents"
+                href="/sicetak/admin/dashboard/documents"
                 className={cN(`block py-[0.95rem] pl-9 text-[0.875rem] hover:border-l-4 hover:border-l-[#F68833] transition-all`, {
-                  "bg-sidebarBgHover border-l-4 border-l-[#F68833] text-white": isActiveRoute("/admin/dashboard/documents")
+                  "bg-sidebarBgHover border-l-4 border-l-[#F68833] text-white": isActiveRoute("/sicetak/admin/dashboard/documents")
                 })}
               >
                 Dokumen
               </a>
               {/* <a
-                href="/admin/dashboard/parameters"
+                href="/sicetak/admin/dashboard/parameters"
                 className={cN(`block py-[0.95rem] pl-9 text-[0.875rem] hover:border-l-4 hover:border-l-[#F68833] transition-all`, {
-                  "bg-sidebarBgHover border-l-4 border-l-[#F68833] text-white": isActiveRoute("/admin/dashboard/parameters")
+                  "bg-sidebarBgHover border-l-4 border-l-[#F68833] text-white": isActiveRoute("/sicetak/admin/dashboard/parameters")
                 })}
               >
                 Parameter
               </a> */}
               <a
-                href="/admin/dashboard/categories"
+                href="/sicetak/admin/dashboard/categories"
                 className={cN(`block py-[0.95rem] pl-9 text-[0.875rem] hover:border-l-4 hover:border-l-[#F68833] transition-all`, {
-                  "bg-sidebarBgHover border-l-4 border-l-[#F68833] text-white": isActiveRoute("/admin/dashboard/categories")
+                  "bg-sidebarBgHover border-l-4 border-l-[#F68833] text-white": isActiveRoute("/sicetak/admin/dashboard/categories")
                 })}
               >
                 Kategori
               </a>
             </div>
           </Show>
-          <Separator color='#15374C' className='bg-slate-500' />
+          <Separator color='#15374C' className='bg-slate-500 my-2' />
         </div>
       </TooltipProvider>
-      <div>
-        <ScrollArea className="h-72 w-48 rounded-md border mx-auto my-2">
-          <div className="p-4">
-            <h4 className="mb-4 text-sm font-medium leading-none">
-              Basic Placeholders
-            </h4>
-            {basicPlaceholders?.map((placeholder) => (
-              <div key={placeholder}>
-                <div className="text-sm">{placeholder}</div>
-                <Separator className="my-2" />
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
-      </div>
+      <ScrollArea className="h-72 w-48 rounded-md border mx-auto my-2">
+        <div className="p-4">
+          <h4 className="mb-4 text-sm font-medium leading-none">
+            Basic Placeholders
+          </h4>
+          {basicPlaceholders?.map((placeholder) => (
+            <div key={placeholder}>
+              <div className="text-sm">{placeholder}</div>
+              <Separator className="my-2" />
+            </div>
+          ))}
+        </div>
+      </ScrollArea>
     </nav>
   );
 }

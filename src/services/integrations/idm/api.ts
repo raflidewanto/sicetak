@@ -2,7 +2,7 @@ import { Response } from '@/services/axiosInstance';
 import apiResolver from '@/utils/api';
 import Axios from 'axios';
 import moment from 'moment';
-import { LoginPayload, LoginResponse } from './type';
+import { AuthorizeResponse, LoginPayload, LoginResponse, ValidateTokenRequestBody } from './type';
 
 const baseURL = 
   process.env.NODE_ENV === 'development' ? 
@@ -41,6 +41,21 @@ export function login(payload: LoginPayload): Promise<Response<LoginResponse>> {
       "DT-SMSF-DeviceID": `${process.env.NEXT_PUBLIC_DEVICE_ID}`,
       "DT-SMSF-Datetime": moment().format("YYYY-MM-DD HH:mm:ss"),
     },
+  }));
+}
+
+export function authorize(payload: ValidateTokenRequestBody & { token: string }) {
+  return apiResolver<Response<AuthorizeResponse>>(() => axios.post('/token/authorize', {
+    username: payload?.username,
+    user_type: payload?.user_type,
+    datetime: payload?.datetime,
+    signature: payload?.signature
+  }, {
+    headers: {
+      "DT-SMSF-Datetime": payload?.datetime,
+      "DT-SMSF-Signature": payload?.signature,
+      "Authorization": `token = ${payload?.token}`
+    }
   }));
 }
 

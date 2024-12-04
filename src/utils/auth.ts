@@ -2,6 +2,8 @@ import moment from 'moment';
 import CryptoJS from 'crypto-js';
 import { LoginPayload } from '@/services/integrations/idm/type';
 
+export const urlValidateToken = process.env.NEXT_PUBLIC_IDM_BASE_URL_STAGING + '/idm/token/authorize';
+
 interface RequestPayload {
     username: string;
     user_type: number; // 2
@@ -67,3 +69,20 @@ export function generateRequestHeadersAndPayload(
         body: updatedPayload,
     };
 }
+
+export const generateRequestBodyAuthorize = (token: string, username: string, user_type: number, datetime: string, privateKey: string) => {
+    let signature = CryptoJS.HmacSHA256(
+        token + // LS_TOKEN
+        username +
+        user_type +
+        datetime,
+        privateKey).toString();
+
+    const ValidateTokenRequestBody = {
+        username: username,
+        user_type: user_type,
+        datetime: datetime,
+        signature: signature
+    };
+    return JSON.stringify(ValidateTokenRequestBody);
+};

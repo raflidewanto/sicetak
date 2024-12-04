@@ -99,7 +99,7 @@ const CategoryDocumentPage = () => {
                 onChange={(e) => setDocumentQuery(e.target.value)}
               />
             </div>
-            <Link href="/dashboard/documents/print">
+            <Link href="/sicetak/dashboard/documents/print">
               <Button>
                 Cetak isi
               </Button>

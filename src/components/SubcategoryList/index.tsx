@@ -56,7 +56,9 @@ const SubCategoriesList = (props: SubCategoriesListProps) => {
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end space-x-4">
-                    <Link href={`/admin/dashboard/categories/subcategories/${subcategory?.subcategory_code}/edit?category-code=${categoryCode}`}>
+                    <Link
+                      href={`/sicetak/admin/dashboard/categories/subcategories/${subcategory?.subcategory_code}/edit?category-code=${categoryCode}`}
+                    >
                       <Button variant="ghost" size="sm">
                         <Edit className="h-4 w-4 text-orange-500" />
                       </Button>
