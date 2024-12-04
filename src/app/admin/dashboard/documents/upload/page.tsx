@@ -21,10 +21,8 @@ import { Switch } from '@/components/ui/Switch';
 import { Textarea } from '@/components/ui/Textarea';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip';
 import { toast } from '@/components/ui/useToast';
-import { DocumentType } from '@/constants/data';
 import { useModal } from '@/hooks/useModal';
 import { usePDFJS } from '@/hooks/usePdfjs';
-import { cN } from '@/lib/utils';
 import { useCategories } from '@/services/categories/queries/useCategories';
 import { useSubCategoriesByCategory } from '@/services/categories/queries/useSubCategoriesByCategory';
 import { useUploadDoc } from '@/services/documents/mutations/useUploadDocument';
@@ -45,7 +43,6 @@ const AddNewDocumentPage = () => {
   const [fileCategory, setFileCategory] = useState<string>('');
   const [fileSubCategory, setFileSubCategory] = useState<string>('');
   const [bracketCoordinates, setBracketCoordinates] = useState<bracketPlaceholder[]>([]);
-  const [docType, setDocType] = useState<DocumentType>('personal');
   const [release, setRelease] = useState<boolean>(false);
   const [active, setActive] = useState<boolean>(false);
   const { openModal, closeModal, modalState } = useModal();
@@ -120,7 +117,6 @@ const AddNewDocumentPage = () => {
 
     if (!fileSubCategory) errors.fileSubCategory = 'Subkategori file diperlukan';
     if (!fileCategory) errors.fileCategory = 'Kategori file diperlukan';
-    if (!docType) errors.docType = 'Pilih jenis dokumen';
     if (!fileDescription) errors.fileDescription = 'Deskripsi file diperlukan';
     if (!fileName) errors.fileName = 'Nama file diperlukan';
     if (!file) errors.file = 'Pilih file';
@@ -146,7 +142,7 @@ const AddNewDocumentPage = () => {
     formData.append('description', fileDescription);
     formData.append('category_code', fileCategory);
     formData.append('subcategory_code', fileSubCategory);
-    formData.append('document_type', docType);
+    formData.append('document_type', "");
     formData.append('placeholders', JSON.stringify(bracketCoordinates));
     formData.append('active', active.valueOf().toString());
     formData.append('release', release.valueOf().toString());
@@ -266,30 +262,14 @@ const AddNewDocumentPage = () => {
 
             {/* upload document */}
             <div className="w-full space-y-4 p-4">
-              {/* Tabs */}
-              <div className="flex items-center justify-center space-x-4 sm:justify-start">
-                <button
-                  type="button"
-                  onClick={() => setDocType('personal')}
-                  className={cN(
-                    'px-4 py-2 text-sm font-medium ring-transparent focus-visible:outline-none',
-                    docType === 'personal' ? 'border-b-2 border-orange-500 font-bold text-gray-800' : 'text-gray-600'
-                  )}
-                >
-                  Perseorangan
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDocType('corporate')}
-                  className={cN(
-                    'px-4 py-2 text-sm font-medium ring-transparent focus-visible:outline-none',
-                    docType === 'corporate' ? 'border-b-2 border-orange-500 font-bold text-gray-800' : 'text-gray-600'
-                  )}
-                >
-                  Perusahaan
-                </button>
-              </div>
-              <UploadSection />
+              <Label htmlFor="corporate-file" className="block text-sm font-medium text-gray-700">
+                Dokumen Perusahaan
+              </Label>
+              <UploadSection key="corporate" />
+              <Label htmlFor="individual-file" className="block text-sm font-medium text-gray-700">
+                Dokumen Perseorangan
+              </Label>
+              <UploadSection key="individual" />
             </div>
 
             {/* switches for release and active */}

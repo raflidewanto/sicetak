@@ -106,9 +106,9 @@ const CategoryDocumentPage = () => {
             </Link>
           </div>
         </section>
-        <main className="flex flex-grow flex-col sm:flex-row">
+        <main className="flex flex-grow flex-col lg:flex-row">
           {/* sub categories container */}
-          <section className="max-h-dvh w-full border-r-2 border-gray-300 bg-white md:w-[20%]">
+          <section className="max-h-dvh w-full border-r-2 border-gray-300 bg-white lg:w-[20%]">
             {/* sub category Card */}
             <TooltipProvider>
               <Tooltip>
@@ -126,7 +126,7 @@ const CategoryDocumentPage = () => {
             </TooltipProvider>
             <Show when={Boolean(subCategories?.data)}>
               {subCategories?.data?.map((subcategory) => (
-                <TooltipProvider key={subcategory?.category_code}>
+                <TooltipProvider key={subcategory?.subcategory_code}>
                   <Tooltip>
                     <TooltipTrigger className="w-full">
                       <div

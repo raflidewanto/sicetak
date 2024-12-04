@@ -100,8 +100,8 @@ export const extractBracketCoordinates = async (
             x: bracketX,
             y: bracketY,
             page: pageNumber,
-            pageWidth: pageWidth,
-            pageHeight: pageHeight,
+            page_width: pageWidth,
+            page_height: pageHeight,
           });
         }
       }

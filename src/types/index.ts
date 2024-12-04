@@ -36,7 +36,7 @@ export type bracketPlaceholder = {
   x: number;
   y: number;
   page: number;
-  pag_width: number;
+  page_width: number;
   page_height: number;
 };
 
