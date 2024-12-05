@@ -3,7 +3,7 @@
 import { basicPlaceholders, dummyMenu, Menu } from '@/constants/data';
 import { cN } from '@/lib/utils';
 import { useCategories } from '@/services/categories/queries/useCategories';
-import { ChevronDown, ChevronRight, User } from 'lucide-react';
+import { ChevronDown, ChevronRight, Newspaper, User } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Show from './elements/Show';
@@ -48,11 +48,18 @@ export function DashboardNav() {
 
     if (newMenu) {
       setSiCetakMenu(newMenu);
+
+      const initiallyOpenMenu = newMenu.find((menu) =>
+        menu.sub_menu?.some((sub) => isActiveRoute(sub?.url || ''))
+      );
+      if (initiallyOpenMenu) {
+        setOpenMenuCode(initiallyOpenMenu.menu_code);
+      }
     }
   }, [categories]);
 
   const toggleMenu = (menuCode: string) => {
-    setOpenMenuCode((prev) => (prev === menuCode ? null : menuCode)); // Toggle menu open state
+    setOpenMenuCode((prev) => (prev === menuCode ? null : menuCode));
   };
 
   return (
@@ -74,7 +81,12 @@ export function DashboardNav() {
             >
               <div className="flex items-center space-x-2">
                 <span className="text-white">
-                  <User />
+                  <Show
+                    fallback={<User />}
+                    when={menu?.menu_code === 'm-sicetak-dashboard-documents'}
+                  >
+                    <Newspaper />
+                  </Show>
                 </span>
                 <span className="text-white">{menu?.menu_name}</span>
               </div>

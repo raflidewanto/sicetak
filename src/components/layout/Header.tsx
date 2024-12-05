@@ -1,11 +1,10 @@
 "use client";
 
+import Box from "@/assets/icons/ic-box.svg";
 import { cN } from '@/lib/utils';
+import { Separator } from '../ui/Separator';
 import { MobileSidebar } from './MobileSidebar';
 import { UserNav } from './UserNav';
-import { Separator } from '../ui/Separator';
-import Box from "@/assets/icons/ic-box.svg";
-import NotificationIcon from '@/assets/icons/ic-notification.svg';
 
 export default function Header() {
   return (
@@ -15,7 +14,6 @@ export default function Header() {
           <MobileSidebar />
         </div>
         <div className="flex items-center gap-2">
-          <NotificationIcon />
           <Box />
           <Separator orientation="vertical" className="h-[1.813rem] bg-[#98A2B3]" />
           <UserNav />
