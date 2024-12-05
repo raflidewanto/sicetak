@@ -3,6 +3,9 @@ import apiResolver from '@/utils/api';
 import Axios from 'axios';
 import moment from 'moment';
 import { AuthorizeResponse, LoginPayload, LoginResponse, ValidateTokenRequestBody } from './type';
+import { generateRequestBodyAuthorize } from '@/utils/auth';
+import { LS_TOKEN, LS_USER_ID } from '@/constants/data';
+import { decryptLS } from '@/utils/crypto';
 
 const baseURL = 
   process.env.NODE_ENV === 'development' ? 
@@ -44,18 +47,57 @@ export function login(payload: LoginPayload): Promise<Response<LoginResponse>> {
   }));
 }
 
-export function authorize(payload: ValidateTokenRequestBody & { token: string }) {
-  return apiResolver<Response<AuthorizeResponse>>(() => axios.post('/token/authorize', {
-    username: payload?.username,
-    user_type: payload?.user_type,
-    datetime: payload?.datetime,
-    signature: payload?.signature
-  }, {
+export function authorize() {
+  const token = localStorage.getItem(LS_TOKEN);
+  const user = localStorage.getItem(LS_USER_ID);
+  const decryptedToken = decryptLS(token ?? "");
+  const decryptedUser = decryptLS(user ?? "");
+
+  const payload = generateRequestBodyAuthorize(
+    decryptedToken,
+    decryptedUser,
+    2,
+    moment().format("YYYY-MM-DD HH:mm:ss"),
+    process.env.NEXT_PUBLIC_PRIVATE_KEY ?? ""
+  );
+  const requestPayload = JSON.parse(payload);
+  
+
+  return apiResolver<Response<AuthorizeResponse>>(() => axios.post('/token/authorize', requestPayload, {
     headers: {
-      "DT-SMSF-Datetime": payload?.datetime,
-      "DT-SMSF-Signature": payload?.signature,
-      "Authorization": `token = ${payload?.token}`
+      "DT-SMSF-Datetime": requestPayload?.datetime,
+      "DT-SMSF-Signature": requestPayload?.signature,
+      "Authorization": `token = ${decryptedToken}`
     }
   }));
 }
 
+export const validateTokenFetch = async () => {
+  let urlValidateToken = process.env.NEXT_PUBLIC_IDM_BASE_URL_STAGING + '/idm/token/authorize';
+  const token = localStorage.getItem(LS_TOKEN);
+  const user = localStorage.getItem(LS_USER_ID);
+  const decryptedToken = decryptLS(token ?? "");
+  const decryptedUser = decryptLS(user ?? "");
+
+  const payload = generateRequestBodyAuthorize(
+    decryptedToken,
+    decryptedUser,
+    2,
+    moment().format("YYYY-MM-DD HH:mm:ss"),
+    process.env.NEXT_PUBLIC_PRIVATE_KEY ?? ""
+  );
+  const requestPayload = JSON.parse(payload);
+  const requestOptions = {
+      method: 'POST',
+      headers: {
+        "Authorization": `token = ${decryptedToken}`
+      },
+      body: JSON.stringify(requestPayload),
+  };
+  const response = await fetch(urlValidateToken, requestOptions);
+  let data;
+  if (response.ok) {
+      data = await response.json();
+  }
+  return { response, data };
+};

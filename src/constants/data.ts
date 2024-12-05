@@ -1,4 +1,3 @@
-import { APP_CODE_SICETAK } from './data';
 // =====================================================
 // number constants
 export const FIVE_MINUTES_IN_MS = 5 * 60 * 1000;
@@ -102,7 +101,18 @@ export type ProductTypeValue =
 
 export type DocumentType = 'corporate' | 'personal';
 
-export const dummyMenu = [
+export type Menu = {
+  menu_id: number;
+  menu_code: string;
+  menu_name: string;
+  menu_description: string;
+  menu_priority: number;
+  url: string;
+  app_code: string;
+  sub_menu: Menu[] | null;
+}
+
+export const dummyMenu: Array<Menu> = [
   {
       "menu_id": 99,
       "menu_code": "m-sicetak",
@@ -114,40 +124,40 @@ export const dummyMenu = [
       "sub_menu": [
           {
               "menu_id": 128,
-              "menu_code": "m-sicetak-dashboard",
+              "menu_code": "m-sicetak-dashboard-documents",
               "menu_name": "Dokumen",
               "menu_description": "SiCetak Dokumen Dashboard\n",
               "menu_priority": 1,
               "url": "/dashboard/documents",
               "app_code": "sicetak",
-              "sub_menu": null
+              "sub_menu": null // append from categories
           },
           {
               "menu_id": 237,
-              "menu_code": "m-sicetak-dashboard",
+              "menu_code": "m-sicetak-dashboard-admin",
               "menu_name": "Admin",
               "menu_description": "Dashboard Admin\n",
-              "menu_priority": 3,
+              "menu_priority": 2,
               "url": "/admin/dashboard/documents",
               "app_code": "sicetak",
               "sub_menu": [
                   {
                       "menu_id": 238,
-                      "menu_code": "m-sicetak-dashboard-documents",
+                      "menu_code": "m-sicetak-dashboard-documents-admin",
                       "menu_name": "Dokumen",
                       "menu_description": "Dashboard Dokumen Admin\n",
                       "menu_priority": 1,
-                      "url": "/admin/dashboard/documents",
+                      "url": "/sicetak/admin/dashboard/documents",
                       "app_code": "sicetak",
                       "sub_menu": null
                   },
                   {
                       "menu_id": 228,
-                      "menu_code": "m-sicetak-dashboard-categories",
+                      "menu_code": "m-sicetak-dashboard-categories-admin",
                       "menu_name": "Kategori",
                       "menu_description": "Dashboard Kategori Dokumen Admin\n",
                       "menu_priority": 2,
-                      "url": "/admin/dashboard/categories",
+                      "url": "/sicetak/admin/dashboard/categories",
                       "app_code": "sicetak",
                       "sub_menu": null
                   },

@@ -36,16 +36,19 @@ import { cN } from '@/lib/utils';
 import { useCategories } from '@/services/categories/queries/useCategories';
 import { usePrintDocument } from '@/services/documents/mutations/usePrintDocument';
 import { useDocuments } from '@/services/documents/queries/useDocuments';
+import { useAuthorize } from '@/services/integrations/idm/mutations/useAuthorize';
 import { useSubCategories } from '@/services/subcategories/queries/useSubcategories';
 import { getErrorMessage } from '@/utils/error';
 import { DownloadCloud, Plus, Printer, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useQueryState } from 'nuqs';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 
 const AdminPage = () => {
   // UI states
   const { openModal, closeModal, modalState } = useModal();
+  const dataFetchedRef = useRef(false);
+  const { mutate: authorizeMutation } = useAuthorize();
   const mobile = useMediaQuery('(max-width: 1024px)');
 
   // query state
@@ -95,6 +98,14 @@ const AdminPage = () => {
       return;
     }
   }
+
+  useEffect(() => {
+    if (dataFetchedRef.current) {
+      return;
+    }
+    dataFetchedRef.current = true;
+    authorizeMutation();
+  }, []);
 
   return (
     <PageContainer scrollable>

@@ -20,7 +20,6 @@ import {
 import { Switch } from '@/components/ui/Switch';
 import { Textarea } from '@/components/ui/Textarea';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip';
-import { toast } from '@/components/ui/useToast';
 import { useModal } from '@/hooks/useModal';
 import { usePDFJS } from '@/hooks/usePdfjs';
 import { useCategories } from '@/services/categories/queries/useCategories';
@@ -128,11 +127,10 @@ const AddNewDocumentPage = () => {
     event.preventDefault();
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
-      Object.values(errors).forEach((message) =>
-        toast({
-          title: message,
-          variant: 'destructive'
-        })
+      Object.values(errors).forEach((message) => {
+        openModal("Error", message, 'error');
+        return;
+      }
       );
       return;
     }
