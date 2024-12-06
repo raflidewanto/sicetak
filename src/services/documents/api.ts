@@ -1,5 +1,6 @@
 import apiResolver, { newAbortSignal } from '@/utils/api';
 import { createAxiosInstance, Response } from '../axiosInstance';
+import { DocumentsResponse } from './types';
 
 const axios = createAxiosInstance('documents');
 
@@ -137,4 +138,8 @@ export function toggleRelease(id: string): Promise<Response> {
 
 export function getDocumentBySubcategory(id: string): Promise<Response<Document[]>> {
   return apiResolver<Response<Document[]>>(() => axios.get(`/subcategory/${id}`));
+}
+
+export function getMasterData() {
+  return apiResolver<DocumentsResponse>(() => axios.get(`/documents`)); 
 }

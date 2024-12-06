@@ -13,7 +13,7 @@ import { Separator } from './ui/Separator';
 export function DashboardNav() {
   const path = usePathname();
   const { data: categories } = useCategories();
-  const [openMenuCode, setOpenMenuCode] = useState<string | null>(null); // Track which menu is open
+  const [openMenuCode, setOpenMenuCode] = useState<string | null>(null);
   const [sicetakMenu, setSiCetakMenu] = useState<Menu[]>([]);
 
   const isActiveRoute = (route: string) => path.startsWith(route);
@@ -38,6 +38,7 @@ export function DashboardNav() {
       }
     }
 
+    // TODO: get menu from localStorage for sicetak 
     const menu = dummyMenu.find((menu) => menu.menu_code === 'm-sicetak');
     const newMenu = menu?.sub_menu?.map((m): Menu => {
       if (m?.menu_code === 'm-sicetak-dashboard-documents') {
@@ -99,7 +100,7 @@ export function DashboardNav() {
                     key={sub?.menu_id}
                     href={sub?.url}
                     className={cN(
-                      `block py-[0.95rem] pl-9 text-[0.875rem] hover:border-l-4 hover:border-l-[#F68833] transition-all`,
+                      `block py-[0.95rem] pl-9 text-[0.875rem] hover:border-l-4 hover:border-l-[#F68833] hover:bg-sidebarBgHover transition-all`,
                       {
                         'bg-sidebarBgHover border-l-4 border-l-[#F68833] text-white': isActiveRoute(sub?.url),
                       }
@@ -117,12 +118,12 @@ export function DashboardNav() {
           </div>
         );
       })}
-      <ScrollArea className="h-72 w-48 rounded-md border mx-auto my-2">
+      <ScrollArea className="h-72 w-48 rounded-md border mx-auto my-2 bg-white text-zinc-950">
         <div className="p-4">
           <h4 className="mb-4 text-sm font-medium leading-none">Basic Placeholders</h4>
           {basicPlaceholders?.map((placeholder) => (
             <div key={placeholder}>
-              <div className="text-sm">{placeholder}</div>
+              <div className="text-sm">{placeholder}</div> 
               <Separator className="my-2" />
             </div>
           ))}

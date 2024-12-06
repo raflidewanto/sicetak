@@ -4,22 +4,31 @@ import { useEventListener } from './useEventListener';
 const IS_SERVER = typeof window === 'undefined';
 
 type Options<T, InitializeWithValue extends boolean | undefined> = {
-  deserializer?: (value: string) => T;
-  initializeWithValue: InitializeWithValue;
-};
+  deserializer?: (value: string) => T
+  initializeWithValue: InitializeWithValue
+}
 
 // SSR version
-export function useReadLocalStorage<T>(key: string, options: Options<T, false>): T | null | undefined;
+export function useReadLocalStorage<T>(
+  key: string,
+  options: Options<T, false>,
+): T | null | undefined
 // CSR version
-export function useReadLocalStorage<T>(key: string, options?: Partial<Options<T, true>>): T | null;
-export function useReadLocalStorage<T>(key: string, options: Partial<Options<T, boolean>> = {}): T | null | undefined {
+export function useReadLocalStorage<T>(
+  key: string,
+  options?: Partial<Options<T, true>>,
+): T | null
+export function useReadLocalStorage<T>(
+  key: string,
+  options: Partial<Options<T, boolean>> = {},
+): T | null | undefined {
   let { initializeWithValue = true } = options;
   if (IS_SERVER) {
     initializeWithValue = false;
   }
 
   const deserializer = useCallback<(value: string) => T | null>(
-    (value) => {
+    value => {
       if (options.deserializer) {
         return options.deserializer(value);
       }
@@ -38,7 +47,7 @@ export function useReadLocalStorage<T>(key: string, options: Partial<Options<T, 
 
       return parsed as T;
     },
-    [options]
+    [options],
   );
 
   // Get from local storage then
@@ -78,7 +87,7 @@ export function useReadLocalStorage<T>(key: string, options: Partial<Options<T, 
       }
       setStoredValue(readValue());
     },
-    [key, readValue]
+    [key, readValue],
   );
 
   // this only works for other documents, not the current one

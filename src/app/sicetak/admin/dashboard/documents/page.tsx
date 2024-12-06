@@ -48,7 +48,7 @@ const AdminPage = () => {
   // UI states
   const { openModal, closeModal, modalState } = useModal();
   const dataFetchedRef = useRef(false);
-  const { mutate: authorizeMutation } = useAuthorize();
+  const { mutateAsync: authorizeMutation } = useAuthorize();
   const mobile = useMediaQuery('(max-width: 1024px)');
 
   // query state
@@ -99,12 +99,22 @@ const AdminPage = () => {
     }
   }
 
-  useEffect(() => {
-    if (dataFetchedRef.current) {
-      return;
+  async function firstLoadPage() {
+    try {
+      const { data, success } = await authorizeMutation();
+      if (success && data?.authorize) {
+        return;
+      }
+      window.location.href = process.env.NEXT_PUBLIC_IN_TOOLS_SIGN_IN_URL ?? "/";
+    } catch (error) {
+      window.location.href = process.env.NEXT_PUBLIC_IN_TOOLS_SIGN_IN_URL ?? "/";
     }
+  }
+
+  useEffect(() => {
+    if (dataFetchedRef.current) return;
     dataFetchedRef.current = true;
-    authorizeMutation();
+    firstLoadPage();
   }, []);
 
   return (
@@ -359,11 +369,11 @@ const AdminPage = () => {
         </main>
       </div>
       <Modal
-        title="Error"
+        title={modalState.title}
         description={modalState?.description ?? 'Something went wrong'}
         isOpen={modalState?.isOpen}
         onClose={closeModal}
-        type='error'
+        type={modalState.type}
       />
     </PageContainer>
   );

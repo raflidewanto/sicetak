@@ -1,11 +1,8 @@
 "use client";
 
-import { LS_IN_TOOLS_MENU } from '@/constants/data';
 import { useModal } from '@/hooks/useModal';
-import { useReadLocalStorage } from '@/hooks/useReadLocalStorage';
 import { useLogin } from '@/services/integrations/idm/mutations/useLogin';
 import { generateRequestHeadersAndPayload } from '@/utils/auth';
-import { decryptLS } from '@/utils/crypto';
 import { getErrorMessage } from '@/utils/error';
 import { getBrowser, getPlatform } from '@/utils/userAgent';
 import { AxiosError } from 'axios';

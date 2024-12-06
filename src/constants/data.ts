@@ -1,4 +1,7 @@
 // =====================================================
+
+import { DocumentsResponse } from "@/services/documents/types";
+
 // number constants
 export const FIVE_MINUTES_IN_MS = 5 * 60 * 1000;
 // =====================================================
@@ -166,3 +169,312 @@ export const dummyMenu: Array<Menu> = [
       ]
   }
 ];
+
+export const dummyMasterData: DocumentsResponse = {
+  "success": true,
+  "message": "get data success",
+  "data": [
+      {
+          "code": "md-sicetak-category-009",
+          "name": "Syariah",
+          "status": 1,
+          "documents": [],
+          "sub_categories": []
+      },
+      {
+          "code": "md-sicetak-category-008",
+          "name": "Syariah",
+          "status": 1,
+          "documents": [],
+          "sub_categories": []
+      },
+      {
+          "code": "md-sicetak-category-001",
+          "name": "Financial Agreement",
+          "status": 1,
+          "documents": [],
+          "sub_categories": [
+              {
+                  "code": "md-sicetak-category-003",
+                  "name": "Fasilitas Dana",
+                  "status": 1,
+                  "documents": [
+                      {
+                          "code": "DOC2412040001",
+                          "name": "Surat Kuasa Fidusia",
+                          "description": "",
+                          "is_active": true,
+                          "document_type": [
+                              {
+                                  "type": "md-sicetak-type-001",
+                                  "name": "perorangan",
+                                  "documents_file": [
+                                      {
+                                          "document_code": "DOCF2412040001",
+                                          "document_name": "Surat Kuasa Fidusia",
+                                          "is_release": false
+                                      }
+                                  ]
+                              },
+                              {
+                                  "type": "md-sicetak-type-002",
+                                  "name": "perusahaan",
+                                  "documents_file": [
+                                      {
+                                          "document_code": "DOCF2412040003",
+                                          "document_name": "Surat Kuasa Fidusia",
+                                          "is_release": false
+                                      }
+                                  ]
+                              }
+                          ]
+                      },
+                      {
+                          "code": "DOC2412040002",
+                          "name": "Surat Kuasa Lalai",
+                          "description": "",
+                          "is_active": true,
+                          "document_type": [
+                              {
+                                  "type": "md-sicetak-type-001",
+                                  "name": "perorangan",
+                                  "documents_file": [
+                                      {
+                                          "document_code": "DOCF2412040002",
+                                          "document_name": "Surat Kuasa Lalai",
+                                          "is_release": false
+                                      }
+                                  ]
+                              },
+                              {
+                                  "type": "md-sicetak-type-002",
+                                  "name": "perusahaan",
+                                  "documents_file": [
+                                      {
+                                          "document_code": "DOCF2412040004",
+                                          "document_name": "Surat Kuasa Lalai",
+                                          "is_release": false
+                                      }
+                                  ]
+                              }
+                          ]
+                      }
+                  ],
+                  "sub_categories": []
+              },
+              {
+                  "code": "md-sicetak-category-004",
+                  "name": "Fasilitas Modal Usaha",
+                  "status": 1,
+                  "documents": [
+                      {
+                          "code": "DOC2412040003",
+                          "name": "Surat Kuasa Fidusia",
+                          "description": "",
+                          "is_active": true,
+                          "document_type": [
+                              {
+                                  "type": "md-sicetak-type-001",
+                                  "name": "perorangan",
+                                  "documents_file": [
+                                      {
+                                          "document_code": "DOCF2412040005",
+                                          "document_name": "Surat Kuasa Fidusia",
+                                          "is_release": false
+                                      }
+                                  ]
+                              },
+                              {
+                                  "type": "md-sicetak-type-002",
+                                  "name": "perusahaan",
+                                  "documents_file": [
+                                      {
+                                          "document_code": "DOCF2412040007",
+                                          "document_name": "Surat Kuasa Fidusia",
+                                          "is_release": false
+                                      }
+                                  ]
+                              }
+                          ]
+                      },
+                      {
+                          "code": "DOC2412040004",
+                          "name": "Surat Kuasa Lalai",
+                          "description": "",
+                          "is_active": true,
+                          "document_type": [
+                              {
+                                  "type": "md-sicetak-type-001",
+                                  "name": "perorangan",
+                                  "documents_file": [
+                                      {
+                                          "document_code": "DOCF2412040006",
+                                          "document_name": "Surat Kuasa Lalai",
+                                          "is_release": false
+                                      }
+                                  ]
+                              },
+                              {
+                                  "type": "md-sicetak-type-002",
+                                  "name": "perusahaan",
+                                  "documents_file": [
+                                      {
+                                          "document_code": "DOCF2412040008",
+                                          "document_name": "Surat Kuasa Lalai",
+                                          "is_release": false
+                                      }
+                                  ]
+                              }
+                          ]
+                      }
+                  ],
+                  "sub_categories": []
+              }
+          ]
+      },
+      {
+          "code": "md-sicetak-category-002",
+          "name": "Agreement Transfer",
+          "status": 1,
+          "documents": [],
+          "sub_categories": [
+              {
+                  "code": "md-sicetak-category-005",
+                  "name": "Fasilitas Dana",
+                  "status": 1,
+                  "documents": [
+                      {
+                          "code": "DOC2412040005",
+                          "name": "Surat Kuasa Fidusia",
+                          "description": "",
+                          "is_active": true,
+                          "document_type": [
+                              {
+                                  "type": "md-sicetak-type-001",
+                                  "name": "perorangan",
+                                  "documents_file": [
+                                      {
+                                          "document_code": "DOCF2412040009",
+                                          "document_name": "Surat Kuasa Fidusia",
+                                          "is_release": false
+                                      }
+                                  ]
+                              },
+                              {
+                                  "type": "md-sicetak-type-002",
+                                  "name": "perusahaan",
+                                  "documents_file": [
+                                      {
+                                          "document_code": "DOCF2412040011",
+                                          "document_name": "Surat Kuasa Fidusia",
+                                          "is_release": false
+                                      }
+                                  ]
+                              }
+                          ]
+                      },
+                      {
+                          "code": "DOC2412040006",
+                          "name": "Surat Kuasa Lalai",
+                          "description": "",
+                          "is_active": true,
+                          "document_type": [
+                              {
+                                  "type": "md-sicetak-type-001",
+                                  "name": "perorangan",
+                                  "documents_file": [
+                                      {
+                                          "document_code": "DOCF2412040010",
+                                          "document_name": "Surat Kuasa Lalai",
+                                          "is_release": false
+                                      }
+                                  ]
+                              },
+                              {
+                                  "type": "md-sicetak-type-002",
+                                  "name": "perusahaan",
+                                  "documents_file": [
+                                      {
+                                          "document_code": "DOCF2412040012",
+                                          "document_name": "Surat Kuasa Lalai",
+                                          "is_release": false
+                                      }
+                                  ]
+                              }
+                          ]
+                      }
+                  ],
+                  "sub_categories": []
+              },
+              {
+                  "code": "md-sicetak-category-006",
+                  "name": "Fasilitas Modal Usaha",
+                  "status": 1,
+                  "documents": [
+                      {
+                          "code": "DOC2412040007",
+                          "name": "Surat Kuasa Fidusia",
+                          "description": "",
+                          "is_active": true,
+                          "document_type": [
+                              {
+                                  "type": "md-sicetak-type-001",
+                                  "name": "perorangan",
+                                  "documents_file": [
+                                      {
+                                          "document_code": "DOCF2412040013",
+                                          "document_name": "Surat Kuasa Fidusia",
+                                          "is_release": false
+                                      }
+                                  ]
+                              },
+                              {
+                                  "type": "md-sicetak-type-002",
+                                  "name": "perusahaan",
+                                  "documents_file": [
+                                      {
+                                          "document_code": "DOCF2412040015",
+                                          "document_name": "Surat Kuasa Fidusia",
+                                          "is_release": false
+                                      }
+                                  ]
+                              }
+                          ]
+                      },
+                      {
+                          "code": "DOC2412040008",
+                          "name": "Surat Kuasa Lalai",
+                          "description": "",
+                          "is_active": true,
+                          "document_type": [
+                              {
+                                  "type": "md-sicetak-type-001",
+                                  "name": "perorangan",
+                                  "documents_file": [
+                                      {
+                                          "document_code": "DOCF2412040014",
+                                          "document_name": "Surat Kuasa Lalai",
+                                          "is_release": false
+                                      }
+                                  ]
+                              },
+                              {
+                                  "type": "md-sicetak-type-002",
+                                  "name": "perusahaan",
+                                  "documents_file": [
+                                      {
+                                          "document_code": "DOCF2412040016",
+                                          "document_name": "Surat Kuasa Lalai",
+                                          "is_release": false
+                                      }
+                                  ]
+                              }
+                          ]
+                      }
+                  ],
+                  "sub_categories": []
+              }
+          ]
+      }
+  ]
+};

@@ -39,6 +39,7 @@ import { usePlaceholderUpdate } from '@/services/documents/mutations/usePlacehol
 import { useReuploadDoc } from '@/services/documents/mutations/useReupload';
 import { useDocumentById } from '@/services/documents/queries/useDocuments';
 import { usePlaceholders } from '@/services/documents/queries/usePlaceholders';
+import { useAuthorize } from '@/services/integrations/idm/mutations/useAuthorize';
 import { bracketPlaceholder } from '@/types';
 import { getErrorMessage } from '@/utils/error';
 import { extractBracketCoordinates } from '@/utils/pdf';
@@ -47,12 +48,14 @@ import { AxiosError } from 'axios';
 import { EditIcon, X } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import React, { memo, useEffect, useMemo, useState } from 'react';
+import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 
 const EditDocument = () => {
   // route
   const router = useRouter();
   const { slug: documentId } = useParams<{ slug: string }>();
+
+  const dataFetchedRef = useRef(false);
 
   // queries
   const { data: placeholders } = usePlaceholders(documentId);
@@ -79,9 +82,22 @@ const EditDocument = () => {
   // mutations
   const reuploadMutation = useReuploadDoc();
   const updatePlaceholderMutation = usePlaceholderUpdate();
+  const { mutateAsync: authorizeMutation } = useAuthorize();
 
   // UI
   const { openModal, closeModal, modalState } = useModal();
+
+  async function firstLoadPage() {
+    try {
+      const { data, success } = await authorizeMutation();
+      if (success && data?.authorize) {
+        return;
+      }
+      window.location.href = process.env.NEXT_PUBLIC_IN_TOOLS_SIGN_IN_URL ?? "/";
+    } catch (error) {
+      window.location.href = process.env.NEXT_PUBLIC_IN_TOOLS_SIGN_IN_URL ?? "/";
+    }
+  }
 
   const customParams = useMemo(() => {
     return placeholders?.data?.sort((a, b) => a.placeholder_name.localeCompare(b.placeholder_name)).filter(p => customParamPlaceholders.includes(p.placeholder_name));
@@ -95,6 +111,12 @@ const EditDocument = () => {
     setActive(document?.data?.active ?? false);
     setRelease(document?.data?.release ?? false);
   }, [document]);
+
+  useEffect(() => {
+    if (dataFetchedRef.current) return;
+    dataFetchedRef.current = true;
+    firstLoadPage();
+  });
 
   const onLoadPDFJS = async (pdfjs: any) => {
     if (!file) return;
@@ -135,11 +157,11 @@ const EditDocument = () => {
           </div>
           <p className="mt-1 text-xs">PDF files only (max size: 10 MB)</p>
         </div>
-        <Show when={Boolean(file)}>
+        <Show when={Boolean(file) || Boolean(document?.data?.raw_file)}>
           <div className="flex flex-row items-center justify-between gap-x-3 rounded-lg border border-[#2665E5] bg-white p-[0.625rem]">
             <section className="flex flex-row items-center gap-x-2">
               <UploadedFileIcon />
-              <p className="text-sm text-[#2665E5]">{file?.name}</p>
+              <p className="text-sm text-[#2665E5]">{file?.name ?? document?.data?.name}</p>
             </section>
             <section>
               <TooltipProvider>
@@ -179,71 +201,76 @@ const EditDocument = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const errors = validateForm();
-    if (Object.keys(errors).length > 0) {
-      Object.values(errors).forEach((message) =>
-        toast({
-          title: message,
-          variant: 'destructive'
-        })
-      );
-      return;
-    }
-    const formData = new FormData();
-    formData.append('file', file as Blob);
-    formData.append('name', fileName);
-    formData.append('description', fileDescription);
-    formData.append('category_code', fileCategory);
-    formData.append('subcategory_code', fileSubCategory);
-    formData.append('document_type', docType);
-    formData.append('placeholders', JSON.stringify(bracketCoordinates));
-    formData.append('active', active.valueOf().toString());
-    formData.append('release', release.valueOf().toString());
+    const { data, success } = await authorizeMutation();
+    if (success && data?.authorize) {
+      const errors = validateForm();
+      if (Object.keys(errors).length > 0) {
+        Object.values(errors).forEach((message) =>
+          toast({
+            title: message,
+            variant: 'destructive'
+          })
+        );
+        return;
+      }
+      const formData = new FormData();
+      formData.append('file', file as Blob);
+      formData.append('name', fileName);
+      formData.append('description', fileDescription);
+      formData.append('category_code', fileCategory);
+      formData.append('subcategory_code', fileSubCategory);
+      formData.append('document_type', docType);
+      formData.append('placeholders', JSON.stringify(bracketCoordinates));
+      formData.append('active', active.valueOf().toString());
+      formData.append('release', release.valueOf().toString());
 
-    reuploadMutation.mutate({
-      formData,
-      id: documentId
-    }, {
-      onSuccess: (data) => {
-        if (data.success) {
-          window.location.href = '/sicetak/dashboard/documents';
-          return;
-        }
-        toast({
-          title: `Error uploading the file: ${data.message}`,
-          variant: 'destructive'
-        });
-      },
-      onError: (error) => {
-        if (error instanceof AxiosError) {
-          const status = error.response?.status;
-          if (status === 400) {
+      reuploadMutation.mutate({
+        formData,
+        id: documentId
+      }, {
+        onSuccess: (data) => {
+          if (data.success) {
+            window.location.href = '/sicetak/dashboard/documents';
+            return;
+          }
+          toast({
+            title: `Error uploading the file: ${data.message}`,
+            variant: 'destructive'
+          });
+        },
+        onError: (error) => {
+          if (error instanceof AxiosError) {
+            const status = error.response?.status;
+            if (status === 400) {
+              toast({
+                title: `Error uploading the file: ${error.response?.data.message}`,
+                variant: 'destructive'
+              });
+              return;
+            }
             toast({
-              title: `Error uploading the file: ${error.response?.data.message}`,
+              title: `Something went wrong`,
+              variant: 'destructive'
+            });
+            return;
+          } else if (error instanceof Error) {
+            toast({
+              title: `Error uploading the file: ${error.message}`,
               variant: 'destructive'
             });
             return;
           }
+          const errMessage = getErrorMessage(error);
           toast({
-            title: `Something went wrong`,
-            variant: 'destructive'
-          });
-          return;
-        } else if (error instanceof Error) {
-          toast({
-            title: `Error uploading the file: ${error.message}`,
+            title: errMessage ? `Error uploading the file: ${errMessage}` : `Something went wrong`,
             variant: 'destructive'
           });
           return;
         }
-        const errMessage = getErrorMessage(error);
-        toast({
-          title: errMessage ? `Error uploading the file: ${errMessage}` : `Something went wrong`,
-          variant: 'destructive'
-        });
-        return;
-      }
-    });
+      });
+      return;
+    }
+    window.location.href = process.env.NEXT_PUBLIC_IN_TOOLS_SIGN_IN_URL ?? "/";
   };
 
   const handleUpdatePlaceholder = (e: React.FormEvent) => {

@@ -9,15 +9,15 @@ export function useAuthorize() {
     mutationFn: authorize,
     onSuccess: (data) => {
       if (!data.success) {
-        console.log(data.message);
-        // localStorage.removeItem(LS_TOKEN);
+        console.error(data.message);
+        localStorage.removeItem(LS_TOKEN);
         return;
       }
       if (data.data?.token && data?.data?.authorize) {
-        console.log("User Authorized");
         localStorage.setItem(LS_TOKEN, encryptLS(data.data?.token));
+        
       } else {
-        // localStorage.removeItem(LS_TOKEN);
+        localStorage.removeItem(LS_TOKEN);
         console.error("Error authorizing user");
         return;
       }
@@ -27,19 +27,19 @@ export function useAuthorize() {
         console.error(error);
         if (error.response?.status === 403) {
           console.error("Unauthorized");
-          // localStorage.removeItem(LS_TOKEN);
-          // window.location.href = process.env.NEXT_PUBLIC_IN_TOOLS_SIGN_IN_URL ?? "/";
+          localStorage.removeItem(LS_TOKEN);
+          window.location.href = process.env.NEXT_PUBLIC_IN_TOOLS_SIGN_IN_URL ?? "/";
         }
-        // localStorage.removeItem(LS_TOKEN);
+        localStorage.removeItem(LS_TOKEN);
         return;
       }
       if (error instanceof Error) {
         console.log(error.message);
-        // localStorage.removeItem(LS_TOKEN);
+        localStorage.removeItem(LS_TOKEN);
         return;
       }
       console.log(error);
-      // localStorage.removeItem(LS_TOKEN);
-    }
+      localStorage.removeItem(LS_TOKEN);
+    },
   });
 }

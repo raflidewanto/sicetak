@@ -1,11 +1,11 @@
+import { LS_TOKEN, LS_USER_ID } from '@/constants/data';
 import { Response } from '@/services/axiosInstance';
 import apiResolver from '@/utils/api';
+import { generateRequestBodyAuthorize } from '@/utils/auth';
+import { decryptLS } from '@/utils/crypto';
 import Axios from 'axios';
 import moment from 'moment';
-import { AuthorizeResponse, LoginPayload, LoginResponse, ValidateTokenRequestBody } from './type';
-import { generateRequestBodyAuthorize } from '@/utils/auth';
-import { LS_TOKEN, LS_USER_ID } from '@/constants/data';
-import { decryptLS } from '@/utils/crypto';
+import { AuthorizeResponse, LoginPayload, LoginResponse } from './type';
 
 const baseURL = 
   process.env.NODE_ENV === 'development' ? 

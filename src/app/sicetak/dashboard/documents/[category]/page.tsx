@@ -10,35 +10,19 @@ import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip';
-import { DOCUMENT_NAME_QUERY, SUBCATEGORY_QUERY } from '@/constants/data';
+import { DOCUMENT_NAME_QUERY, dummyMasterData, SUBCATEGORY_QUERY } from '@/constants/data';
 import { useDebounceValue } from '@/hooks/useDebounceValue';
 import { useModal } from '@/hooks/useModal';
 import { cN } from '@/lib/utils';
 import { useSubCategoriesByCategory } from '@/services/categories/queries/useSubCategoriesByCategory';
 import { useDocuments } from '@/services/documents/queries/useDocuments';
+import { Category, Document } from '@/services/documents/types';
 import { getErrorMessage } from '@/utils/error';
 import { DownloadCloud, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useQueryState } from 'nuqs';
 import { Suspense } from 'react';
-
-// const groupedDocuments = [
-//   {
-//     master_doc_code: "DOC123",
-//     documents: [
-//       { id: 1, document_name: "Corporation Doc", file: "base64_corporate" },
-//       { id: 2, document_name: "Individual Doc", file: "base64_individual" }
-//     ]
-//   },
-//   {
-//     master_doc_code: "DOC456",
-//     documents: [
-//       { id: 3, document_name: "Corporation Doc", file: "base64_corporate" },
-//       { id: 4, document_name: "Individual Doc", file: "base64_individual" }
-//     ]
-//   }
-// ];
 
 const CategoryDocumentPage = () => {
   // route
@@ -81,6 +65,29 @@ const CategoryDocumentPage = () => {
     }
   }
 
+  const collectDocuments = (category: Category): Document[] => {
+    let documents: Document[] = [...category.documents];
+    for (const subCategory of category.sub_categories) {
+      documents = documents.concat(collectDocuments(subCategory));
+    }
+    return documents;
+  };
+
+  const extractDocuments = (categories: Category[], categoryName: string): Document[] => {
+    for (const category of categories) {
+      if (category.name === categoryName) {
+        return collectDocuments(category);
+      }
+      if (category.sub_categories.length > 0) {
+        const result = extractDocuments(category.sub_categories, categoryName);
+        if (result.length > 0) return result;
+      }
+    }
+    return [];
+  };
+
+  const masterDataDummy = extractDocuments(dummyMasterData?.data, "Financial Agreement");
+
   return (
     <PageContainer scrollable>
       <div className="flex min-h-[35rem] w-full flex-grow flex-col items-stretch rounded-md border border-gray-300 text-xs">
@@ -99,7 +106,7 @@ const CategoryDocumentPage = () => {
                 onChange={(e) => setDocumentQuery(e.target.value)}
               />
             </div>
-            <Link href="/sicetak/dashboard/documents/print">
+            <Link className='items-end' href="/sicetak/dashboard/documents/print">
               <Button>
                 Cetak isi
               </Button>
@@ -160,7 +167,6 @@ const CategoryDocumentPage = () => {
               ))}
             </Show>
           </section>
-          {/* table */}
           <section className="min-h-max flex-1 overflow-x-scroll px-4">
             <div className="flex w-full flex-col gap-4 px-2 py-2">
               <div className="w-full overflow-auto rounded-b-md border-b">
@@ -172,63 +178,69 @@ const CategoryDocumentPage = () => {
                       <TableHead className="px-4 py-2 text-center">Perusahaan</TableHead>
                     </TableRow>
                   </TableHeader>
-                  <Show when={isDocumentsLoading}>
-                    <DocumentsTableSkeleton />
-                  </Show>
-                  <Show
-                    when={!isDocumentsLoading && (documents?.data?.length ?? 0) > 0}>
-                    <TableBody className="bg-white">
-                      {documents?.data?.map((doc) => (
-                        <TableRow key={doc.document_code} className="h-[3.313rem] border-b">
+                  <TableBody className="bg-white">
+                    {masterDataDummy?.map((doc) => {
+                      const individual = doc.document_type.find((type) => type.name === "perorangan");
+                      const corporate = doc.document_type.find((type) => type.name === "perusahaan");
+
+                      return (
+                        <TableRow key={doc.code} className="h-[3.313rem] border-b">
+                          {/* Document Name */}
                           <TableCell className="px-4 py-2">{doc.name}</TableCell>
-                          {/* individual actions */}
+                          {/* Individual Action */}
                           <TableCell className="px-4 py-2 text-center">
-                            <div className="flex items-center justify-evenly -gap-x-4">
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <DownloadCloud
-                                      onClick={() => handleDownloadTemplate(doc?.file)}
-                                      className="cursor-pointer text-[#3B3B3B]"
-                                    />
-                                  </TooltipTrigger>
-                                  <TooltipContent>Download Template</TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            </div>
+                            {individual?.documents_file?.[0]?.document_code ? (
+                              <div className="flex items-center justify-center gap-4">
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <DownloadCloud
+                                        onClick={() =>
+                                          handleDownloadTemplate(individual.documents_file[0].document_code)
+                                        }
+                                        className="cursor-pointer text-[#3B3B3B]"
+                                      />
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      Download Template Perorangan
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              </div>
+                            ) : (
+                              <p className="text-gray-400">Unavailable</p>
+                            )}
                           </TableCell>
-                          {/* corporate actions */}
+                          {/* Corporate Action */}
                           <TableCell className="px-4 py-2 text-center">
-                            <div className="flex items-center justify-evenly -gap-x-4">
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <DownloadCloud
-                                      onClick={() => handleDownloadTemplate(doc?.file)}
-                                      className="cursor-pointer text-[#3B3B3B]"
-                                    />
-                                  </TooltipTrigger>
-                                  <TooltipContent>Download Template</TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            </div>
+                            {corporate?.documents_file?.[0]?.document_code ? (
+                              <div className="flex items-center justify-center gap-4">
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <DownloadCloud
+                                        onClick={() =>
+                                          handleDownloadTemplate(corporate.documents_file[0].document_code)
+                                        }
+                                        className="cursor-pointer text-[#3B3B3B]"
+                                      />
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      Download Template Perusahaan
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              </div>
+                            ) : (
+                              <p className="text-gray-400">Unavailable</p>
+                            )}
                           </TableCell>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Show>
-                  <Show when={Boolean(!documents?.data) && !isDocumentsLoading} >
-                    <TableBody>
-                      <TableRow>
-                        <TableCell className="px-4 py-2 w-full">
-                          <div className="flex items-center justify-center w-full">
-                            <p className="text-center text-gray-500 w-full">No data</p>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Show>
+                      );
+                    })}
+                  </TableBody>
                 </Table>
+
               </div>
             </div>
           </section>
