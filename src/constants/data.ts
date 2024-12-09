@@ -117,7 +117,7 @@ export type Menu = {
 
 export const dummyMenu: Array<Menu> = [
   {
-      "menu_id": 99,
+      "menu_id": 1,
       "menu_code": "m-sicetak",
       "menu_name": "Si Cetak",
       "menu_description": "Si Cetak",
@@ -130,17 +130,17 @@ export const dummyMenu: Array<Menu> = [
               "menu_code": "m-sicetak-dashboard-documents",
               "menu_name": "Dokumen",
               "menu_description": "SiCetak Dokumen Dashboard\n",
-              "menu_priority": 1,
+              "menu_priority": 2,
               "url": "/dashboard/documents",
               "app_code": "sicetak",
-              "sub_menu": null // append from categories
+              "sub_menu": null
           },
           {
               "menu_id": 237,
               "menu_code": "m-sicetak-dashboard-admin",
               "menu_name": "Admin",
-              "menu_description": "Dashboard Admin\n",
-              "menu_priority": 2,
+              "menu_description": "Admin Dashboard\n",
+              "menu_priority": 1,
               "url": "/admin/dashboard/documents",
               "app_code": "sicetak",
               "sub_menu": [
@@ -161,6 +161,16 @@ export const dummyMenu: Array<Menu> = [
                       "menu_description": "Dashboard Kategori Dokumen Admin\n",
                       "menu_priority": 2,
                       "url": "/sicetak/admin/dashboard/categories",
+                      "app_code": "sicetak",
+                      "sub_menu": null
+                  },
+                  {
+                      "menu_id": 218,
+                      "menu_code": "m-sicetak-dashboard-parameters-admin",
+                      "menu_name": "Parameter",
+                      "menu_description": "Dashboard Parameter Dokumen Admin\n",
+                      "menu_priority": 3,
+                      "url": "/sicetak/admin/dashboard/parameter",
                       "app_code": "sicetak",
                       "sub_menu": null
                   },

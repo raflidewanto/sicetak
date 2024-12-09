@@ -1,129 +1,97 @@
 'use client';
 
-import { basicPlaceholders, dummyMenu, Menu } from '@/constants/data';
+import { basicPlaceholders, LS_IN_TOOLS_MENU, Menu } from '@/constants/data';
 import { cN } from '@/lib/utils';
-import { useCategories } from '@/services/categories/queries/useCategories';
+import { decryptLS } from '@/utils/crypto';
 import { ChevronDown, ChevronRight, Newspaper, User } from 'lucide-react';
-import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import Show from './elements/Show';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { ScrollArea } from './ui/ScrollArea';
 import { Separator } from './ui/Separator';
 
 export function DashboardNav() {
   const path = usePathname();
-  const { data: categories } = useCategories();
+  const router = useRouter();
   const [openMenuCode, setOpenMenuCode] = useState<string | null>(null);
-  const [sicetakMenu, setSiCetakMenu] = useState<Menu[]>([]);
+
+  const menus: Array<Menu> = JSON.parse(
+    decryptLS(localStorage.getItem(LS_IN_TOOLS_MENU) as string)
+  );
+  const sicetakMenu = menus.find((m) => m.app_code === 'sicetak');
 
   const isActiveRoute = (route: string) => path.startsWith(route);
 
-  useEffect(() => {
-    let categoriesMenu: Menu[] = [];
-    const categoriesLength = categories?.data?.length ?? 0;
-
-    if (categoriesLength > 0) {
-      for (let i = 0; i < categoriesLength; i++) {
-        const category = categories?.data?.[i];
-        categoriesMenu.push({
-          menu_id: i,
-          menu_code: `m-sicetak-dashboard-documents-${category?.category_code}`,
-          menu_name: category?.category_name ?? '',
-          menu_description: category?.category_description ?? '',
-          menu_priority: i,
-          url: `/sicetak/dashboard/documents/${category?.category_code}`,
-          app_code: 'sicetak',
-          sub_menu: null,
-        });
-      }
+  const handleMenuClick = (menu: Menu) => {
+    if (menu.sub_menu && menu.sub_menu.length > 0) {
+      // Toggle the menu if it has submenus
+      setOpenMenuCode((prev) => (prev === menu.menu_code ? null : menu.menu_code));
+    } else if (menu.url) {
+      // Navigate if it doesn't have submenus
+      router.push('/sicetak' + menu.url);
     }
-
-    // TODO: get menu from localStorage for sicetak 
-    const menu = dummyMenu.find((menu) => menu.menu_code === 'm-sicetak');
-    const newMenu = menu?.sub_menu?.map((m): Menu => {
-      if (m?.menu_code === 'm-sicetak-dashboard-documents') {
-        return { ...m, sub_menu: categoriesMenu };
-      }
-      return m;
-    });
-
-    if (newMenu) {
-      setSiCetakMenu(newMenu);
-
-      const initiallyOpenMenu = newMenu.find((menu) =>
-        menu.sub_menu?.some((sub) => isActiveRoute(sub?.url || ''))
-      );
-      if (initiallyOpenMenu) {
-        setOpenMenuCode(initiallyOpenMenu.menu_code);
-      }
-    }
-  }, [categories]);
-
-  const toggleMenu = (menuCode: string) => {
-    setOpenMenuCode((prev) => (prev === menuCode ? null : menuCode));
   };
 
   return (
     <nav className="grid items-start gap-2">
-      {sicetakMenu?.map((menu) => {
-        const isOpen = openMenuCode === menu.menu_code;
-        const isActive = isActiveRoute(menu.url || '');
+      <div>
+        {sicetakMenu?.sub_menu?.map((menu) => {
+          const isOpen = openMenuCode === menu.menu_code;
+          const isActive =
+            isActiveRoute('/sicetak' + menu.url || '') ||
+            menu.sub_menu?.some((sub) => isActiveRoute('/sicetak' + sub.url || ''));
 
-        return (
-          <div key={menu?.menu_code}>
-            <button
-              className={cN(
-                `flex h-[3rem] items-center gap-2 overflow-hidden py-2 text-sm font-medium transition-all hover:border-l-4 hover:border-l-[#F68833] hover:bg-sidebarBgHover justify-between w-full p-2`,
-                {
-                  'border-l-4 border-l-[#F68833] bg-sidebarBgHover text-white': isActive,
-                }
+          return (
+            <div key={menu.menu_code}>
+              <button
+                className={cN(
+                  `flex h-[3rem] items-center gap-2 overflow-hidden py-2 text-sm font-medium transition-all hover:border-l-4 hover:border-l-[#F68833] hover:bg-sidebarBgHover justify-between w-full p-2`,
+                  {
+                    'border-l-4 border-l-[#F68833] bg-sidebarBgHover text-white': isActive,
+                  }
+                )}
+                onClick={() => handleMenuClick(menu)}
+              >
+                <div className="flex items-center space-x-2">
+                  <span className="text-white">
+                    {menu.menu_code === 'm-sicetak-dashboard-documents' ? <Newspaper /> : <User />}
+                  </span>
+                  <span className="text-white">{menu.menu_name}</span>
+                </div>
+                {menu.sub_menu && (
+                  <span className="text-white">{isOpen ? <ChevronDown /> : <ChevronRight />}</span>
+                )}
+              </button>
+              {isOpen && menu.sub_menu && (
+                <div>
+                  {menu.sub_menu.map((sub) => (
+                    <a
+                      key={sub.menu_id}
+                      href={'/sicetak' + sub.url}
+                      className={cN(
+                        `block py-[0.95rem] pl-9 text-[0.875rem] capitalize hover:border-l-4 hover:border-l-[#F68833] hover:bg-sidebarBgHover transition-all`,
+                        {
+                          'bg-sidebarBgHover border-l-4 border-l-[#F68833] text-white': isActiveRoute(
+                            '/sicetak' + sub.url
+                          ),
+                        }
+                      )}
+                    >
+                      {sub.menu_name}
+                    </a>
+                  ))}
+                </div>
               )}
-              onClick={() => toggleMenu(menu.menu_code || '')}
-            >
-              <div className="flex items-center space-x-2">
-                <span className="text-white">
-                  <Show
-                    fallback={<User />}
-                    when={menu?.menu_code === 'm-sicetak-dashboard-documents'}
-                  >
-                    <Newspaper />
-                  </Show>
-                </span>
-                <span className="text-white">{menu?.menu_name}</span>
-              </div>
-              <span className="text-white">{isOpen ? <ChevronDown /> : <ChevronRight />}</span>
-            </button>
-            <Show when={isOpen}>
-              <div>
-                {menu?.sub_menu?.map((sub) => (
-                  <a
-                    key={sub?.menu_id}
-                    href={sub?.url}
-                    className={cN(
-                      `block py-[0.95rem] pl-9 text-[0.875rem] hover:border-l-4 hover:border-l-[#F68833] hover:bg-sidebarBgHover transition-all`,
-                      {
-                        'bg-sidebarBgHover border-l-4 border-l-[#F68833] text-white': isActiveRoute(sub?.url),
-                      }
-                    )}
-                  >
-                    {sub?.menu_name?.replaceAll('_', ' ')}
-                    <Show when={!!sub?.sub_menu?.length}>
-                      <ChevronRight />
-                    </Show>
-                  </a>
-                ))}
-              </div>
-            </Show>
-            <Separator color="#15374C" className="bg-slate-500 my-2" />
-          </div>
-        );
-      })}
+              <Separator color="#15374C" className="bg-slate-500 my-2" />
+            </div>
+          );
+        })}
+      </div>
       <ScrollArea className="h-72 w-48 rounded-md border mx-auto my-2 bg-white text-zinc-950">
         <div className="p-4">
           <h4 className="mb-4 text-sm font-medium leading-none">Basic Placeholders</h4>
           {basicPlaceholders?.map((placeholder) => (
             <div key={placeholder}>
-              <div className="text-sm">{placeholder}</div> 
+              <div className="text-sm">{placeholder}</div>
               <Separator className="my-2" />
             </div>
           ))}

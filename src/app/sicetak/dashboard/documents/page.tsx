@@ -4,21 +4,10 @@
 
 import PageContainer from '@/components/layout/PageContainer';
 import { LS_USER_ID } from '@/constants/data';
-import { useAuthorize } from '@/services/integrations/idm/mutations/useAuthorize';
 import { decryptLS } from '@/utils/crypto';
-import { useEffect, useRef } from 'react';
 
 const DocumentsPage = () => {
-  const { mutate: authorizeMutation } = useAuthorize();
-  const dataFetchedRef = useRef(false);
   const user =  localStorage.getItem(LS_USER_ID);
-
-  useEffect(() => {
-    if (dataFetchedRef.current) return;
-    dataFetchedRef.current = true;
-    authorizeMutation();
-  }, []);
-
 
   return (
     <PageContainer scrollable>

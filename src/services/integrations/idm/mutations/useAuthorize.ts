@@ -28,7 +28,6 @@ export function useAuthorize() {
         if (error.response?.status === 403) {
           console.error("Unauthorized");
           localStorage.removeItem(LS_TOKEN);
-          window.location.href = process.env.NEXT_PUBLIC_IN_TOOLS_SIGN_IN_URL ?? "/";
         }
         localStorage.removeItem(LS_TOKEN);
         return;

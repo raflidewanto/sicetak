@@ -104,9 +104,12 @@ const AdminPage = () => {
       const { data, success } = await authorizeMutation();
       if (success && data?.authorize) {
         return;
+      } else {
+        console.error(data?.authorize);
+        window.location.href = process.env.NEXT_PUBLIC_IN_TOOLS_SIGN_IN_URL ?? "/";
       }
-      window.location.href = process.env.NEXT_PUBLIC_IN_TOOLS_SIGN_IN_URL ?? "/";
     } catch (error) {
+      console.error(error);
       window.location.href = process.env.NEXT_PUBLIC_IN_TOOLS_SIGN_IN_URL ?? "/";
     }
   }

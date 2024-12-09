@@ -1,6 +1,8 @@
 import apiResolver from '@/utils/api';
 import { createAxiosInstance, Response } from '../axiosInstance';
 import { SubCategoryResponseDTO } from '../subcategories/api';
+import { LS_TOKEN, LS_USER_ID } from '@/constants/data';
+import { decryptLS } from '@/utils/crypto';
 
 const axios = createAxiosInstance('categories');
 
@@ -36,24 +38,40 @@ export function getSubCategoriesByCategory(categoryId: string, search?: string, 
   }));
 }
 
-type AddCategoryRequestDTO = {
-  category_name: string;
-  category_description: string;
-  category_active: boolean;
+type AddCategoryRequestDTO = { 
+  name: string;
+  desc: string;
+  master_detail_code?: string; // for sub category
+  datetime: string;
+  signature: string;  // crypto.EncodeSHA256HMAC private key, dto.Token, dto.category_name, dto.Date
 }
 
 export function createCategory(payload: AddCategoryRequestDTO) {
-  return apiResolver<Response<CategoryResponseDTO>>(() => axios.post('/add', payload));
+  const token = decryptLS(localStorage.getItem(LS_TOKEN) as string);
+  const userID = decryptLS(localStorage.getItem(LS_USER_ID) as string);
+  return apiResolver<Response<CategoryResponseDTO>>(() => axios.post('/add', payload, {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "token = " + token,
+      "DT-SMSF-Token": token,
+      "DT-SMSF-UserID": userID,
+      "DT-SMSF-UserType": 2,
+    }
+  }));
 }
 
 type UpdateCategoryRequestDTO = {
-  category_code: string;
-  category_name: string;
-  category_description: string;
+    code: string;
+    name: string;
+    desc: string;
+    status: "1" | "0";
+    master_detail_code?: string; // to change its parent category
+    datetime: string;
+    signature: string; // message = token, Code, Name, Date 
 }
 
 export function updateCategory(payload: UpdateCategoryRequestDTO) {
-  return apiResolver<Response>(() => axios.post(`/update/${payload.category_code}`, payload, {
+  return apiResolver<Response>(() => axios.post(`/update`, payload, {
     headers: {
       "Content-Type": "application/json",
     }

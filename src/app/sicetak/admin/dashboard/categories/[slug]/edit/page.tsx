@@ -8,15 +8,18 @@ import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/Select";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { Switch } from "@/components/ui/Switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { Textarea } from "@/components/ui/Textarea";
-import { ACTIVE_QUERY, SUBCATEGORY_QUERY } from "@/constants/data";
+import { ACTIVE_QUERY, LS_TOKEN, SUBCATEGORY_QUERY } from "@/constants/data";
 import { useDebounceValue } from "@/hooks/useDebounceValue";
 import { useModal } from "@/hooks/useModal";
 import { useUpdateCategory } from "@/services/categories/mutations/useUpdateCategory";
 import { useCategoryByCode } from "@/services/categories/queries/useCategories";
+import { decryptLS } from "@/utils/crypto";
 import { getErrorMessage } from "@/utils/error";
 import { AxiosError } from "axios";
+import moment from "moment";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
@@ -26,6 +29,7 @@ const EditCategoryPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const { data: category, isLoading: loadingCategory } = useCategoryByCode(slug);
   const router = useRouter();
+  const decryptedToken = decryptLS(localStorage.getItem(LS_TOKEN) as string);
 
   // query params
   const [search, setSearch] = useQueryState(SUBCATEGORY_QUERY);
@@ -34,8 +38,10 @@ const EditCategoryPage = () => {
   const [debouncedSearch] = useDebounceValue(search, 1000);
   const [debouncedActive] = useDebounceValue(active, 1000);
 
+  // form states
   const [categoryName, setCategoryName] = useState(category?.data?.category_name ?? "");
   const [categoryDescription, setCategoryDescription] = useState(category?.data?.category_description ?? "");
+  const [categoryStatus, setCategoryStatus] = useState<"1" | "0">(category?.data?.category_active ? "1" : "0");
 
   const updateCategoryMutation = useUpdateCategory();
 
@@ -53,10 +59,16 @@ const EditCategoryPage = () => {
       openModal("Warning", "Please fill all fields", "warning");
       return;
     }
+    const date = moment().format('YYYY-MM-DD HH:mm:ss');
+    const stringToSign = `${decryptedToken}${categoryName}${date}`;
+    const cryptoKey = process.env.NEXT_PUBLIC_CRYPTO_KEY as string;
     updateCategoryMutation.mutate({
-      category_code: slug,
-      category_name: categoryName,
-      category_description: categoryDescription
+      code: slug,
+      name: categoryName,
+      desc: categoryDescription,
+      status: categoryStatus,
+      datetime: moment().format('YYYY-MM-DD HH:mm:ss'),
+      signature: CryptoJS.HmacSHA256(stringToSign, cryptoKey).toString(),
     }, {
       onSuccess: (data) => {
         if (!data.success) {
@@ -147,6 +159,20 @@ const EditCategoryPage = () => {
                         className="mt-1"
                       />
                     </Show>
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="status"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Status
+                    </label>
+                    <Switch
+                      onCheckedChange={(v) => setCategoryStatus(v === true ? "1" : "0")}
+                      checked={categoryStatus === "1"}
+                      className="mt-1"
+                      name="status"
+                    />
                   </div>
                 </div>
                 {/* Buttons */}

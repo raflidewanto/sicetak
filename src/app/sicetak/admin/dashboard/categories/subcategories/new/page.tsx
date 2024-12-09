@@ -7,43 +7,51 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
-import { Switch } from '@/components/ui/Switch';
-import { CATEGORY_CODE_QUERY } from '@/constants/data';
+import { CATEGORY_CODE_QUERY, LS_TOKEN } from '@/constants/data';
 import { useModal } from '@/hooks/useModal';
+import { useCreateCategory } from '@/services/categories/mutations/useCreateCategory';
 import { useCategories } from '@/services/categories/queries/useCategories';
-import { useCreateSubcategory } from '@/services/subcategories/mutations/useCreateSubcategories';
+import { decryptLS } from '@/utils/crypto';
 import { getErrorMessage } from '@/utils/error';
 import { AxiosError } from 'axios';
+import CryptoJS from 'crypto-js';
+import moment from 'moment';
 import { useRouter } from 'next/navigation';
 import { useQueryState } from 'nuqs';
 import { useState } from 'react';
 
 const AddSubCategoryPage = () => {
   const [categoryCodeQuery] = useQueryState(CATEGORY_CODE_QUERY);
+  const decryptedToken = decryptLS(localStorage.getItem(LS_TOKEN) as string);
 
   const {
     data: categories,
     isPending: categoriesPending,
     isError: categoriesError
   } = useCategories();
-  const createSubcategoryMutation = useCreateSubcategory();
+  const createSubcategoryMutation = useCreateCategory();
   const router = useRouter();
 
   // form  states
   const [subcategoryName, setSubcategoryName] = useState("");
   const [subcategoryDescription, setSubcategoryDescription] = useState("");
   const [categoryCode, setCategoryCode] = useState(categoryCodeQuery ?? "");
-  const [subcategoryActive, setSubcategoryActive] = useState(false);
 
   const { closeModal, openModal, modalState } = useModal();
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const date = moment().format('YYYY-MM-DD HH:mm:ss');
+    const formattedCategoryName = subcategoryName.toLocaleLowerCase().replaceAll(' ', '_');
+    const stringToSign = `${decryptedToken}${formattedCategoryName}${date}`;
+    const cryptoKey = process.env.NEXT_PUBLIC_CRYPTO_KEY as string;
+    
     createSubcategoryMutation.mutate({
-      subcategory_name: subcategoryName,
-      category_code: categoryCode,
-      subcategory_active: subcategoryActive,
-      subcategory_desc: subcategoryDescription
+      name: subcategoryName,
+      master_detail_code: categoryCode,
+      desc: subcategoryDescription,
+      datetime: moment().format('YYYY-MM-DD HH:mm:ss'),
+      signature: CryptoJS.HmacSHA256(stringToSign, cryptoKey).toString(),
     }, {
       onSuccess: (data) => {
         if (!data.success) {
@@ -126,18 +134,6 @@ const AddSubCategoryPage = () => {
                   className="mt-1"
                   value={subcategoryDescription}
                   onChange={e => setSubcategoryDescription(e.target.value)}
-                />
-              </div>
-              <div className='space-y-2'>
-                <label htmlFor="status" className="block text-sm font-medium text-gray-700">
-                  Status
-                </label>
-                <Switch
-                  id="status"
-                  onCheckedChange={v => setSubcategoryActive(v)}
-                  placeholder="Status"
-                  value={subcategoryActive.valueOf().toString()}
-                  className="mt-1"
                 />
               </div>
               <div className="flex justify-end space-x-4">

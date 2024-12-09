@@ -6,10 +6,14 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Textarea } from '@/components/ui/Textarea';
+import { LS_TOKEN } from '@/constants/data';
 import { useModal } from '@/hooks/useModal';
 import { cN } from '@/lib/utils';
 import { useCreateCategory } from '@/services/categories/mutations/useCreateCategory';
+import { decryptLS } from '@/utils/crypto';
 import { AxiosError } from 'axios';
+import CryptoJS from "crypto-js";
+import moment from 'moment';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -17,6 +21,9 @@ const AddCategoryPage = () => {
   const createCategoryMutation = useCreateCategory();
   const [categoryName, setCategoryName] = useState('');
   const [categoryDesc, setCategoryDesc] = useState('');
+  const token = localStorage.getItem(LS_TOKEN);
+  const decryptedToken = decryptLS(token as string);
+  
 
   const { closeModal, modalState, openModal } = useModal();
 
@@ -27,13 +34,23 @@ const AddCategoryPage = () => {
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const date = moment().format('YYYY-MM-DD HH:mm:ss');
+    const formattedCategoryName = categoryName.toLocaleLowerCase().replaceAll(' ', '_');
+    const stringToSign = `${decryptedToken}${formattedCategoryName}${date}`;
+    
+    const cryptoKey = process.env.NEXT_PUBLIC_CRYPTO_KEY as string;
 
     createCategoryMutation.mutate({
-      category_active: false,
-      category_description: categoryDesc,
-      category_name: categoryName.toLocaleLowerCase().replaceAll(' ', '_'),
+      name: categoryName.toLocaleLowerCase().replaceAll(' ', '_'),
+      desc: categoryDesc,
+      datetime: date,
+      signature: CryptoJS.HmacSHA256(stringToSign, cryptoKey).toString(),
     }, {
-      onSuccess() {
+      onSuccess(data) {
+        if (!data.success) {
+          openModal('Error', data.message, 'error');
+          return;
+        }
         openModal('Success', 'Category created successfully', 'success', () => {
           resetForm();
           window.location.href = '/sicetak/admin/dashboard/documents';
