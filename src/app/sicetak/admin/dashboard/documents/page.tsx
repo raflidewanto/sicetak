@@ -152,8 +152,8 @@ const AdminPage = () => {
                   <SelectLabel>Pilih Kategori</SelectLabel>
                   <SelectItem value={''}>Semua</SelectItem>
                   {categories?.data?.map((category) => (
-                    <SelectItem key={category?.category_code} value={category?.category_name} className='capitalize'>
-                      {category?.category_name?.replaceAll("_", " ")}
+                    <SelectItem key={category?.code} value={category?.name} className='capitalize'>
+                      {category?.name?.replaceAll("_", " ")}
                     </SelectItem>
                   ))}
                 </SelectGroup>

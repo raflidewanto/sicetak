@@ -34,19 +34,6 @@ export const createAxiosInstance = (endpoint?: string) => {
 
 const axios = createAxiosInstance("/idm");
 
-export function login(payload: LoginPayload): Promise<Response<LoginResponse>> {
-  return apiResolver(() => axios.post("/smsf/login", payload, {
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `token = ${process.env.NEXT_PUBLIC_AUTH_TOKEN_HEADER}`,
-      "DT-SMSF-API-Key": `${process.env.NEXT_PUBLIC_API_KEY}`,
-      "DT-SMSF-Source": `${process.env.NEXT_PUBLIC_SOURCE}`,
-      "DT-SMSF-DeviceID": `${process.env.NEXT_PUBLIC_DEVICE_ID}`,
-      "DT-SMSF-Datetime": moment().format("YYYY-MM-DD HH:mm:ss"),
-    },
-  }));
-}
-
 export function authorize() {
   const token = localStorage.getItem(LS_TOKEN);
   const user = localStorage.getItem(LS_USER_ID);

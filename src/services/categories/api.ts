@@ -3,30 +3,30 @@ import { createAxiosInstance, Response } from '../axiosInstance';
 import { SubCategoryResponseDTO } from '../subcategories/api';
 import { LS_TOKEN, LS_USER_ID } from '@/constants/data';
 import { decryptLS } from '@/utils/crypto';
+import { CategoryDTOResponse } from './types';
 
 const axios = createAxiosInstance('categories');
 
-type CategoryResponseDTO = {
-    category_code: string;
-    category_name: string;
-    category_description: string;
-    category_active: boolean;
-    created_by: number;
-    created_at: number;
-    updated_by: number;
-    updated_at: number;
-  }
-
-export function getAllCategories(categoryName?: string) {
-  return apiResolver<Response<CategoryResponseDTO[]>>(() => axios.get('', {
+export function getAllCategories() {
+  return apiResolver<Response<CategoryDTOResponse[]>>(() => axios.get('', {
+    headers: {
+        "DT-SMSF-Token": localStorage.getItem(LS_TOKEN) as string,
+        "DT-SMSF-UserID": localStorage.getItem(LS_USER_ID) as string,
+        "DT-SMSF-UserType": 2,
+    },
     params: {
-      category_name: categoryName
+      "search": "",
+      "fields": "",
+      "sort_type": "",
+      "sort_by": "",
+      "page": 1,
+      "show_pagination": false,
     }
   }));
 }
 
 export function getCategoryByCode(id: string){
-  return apiResolver<Response<CategoryResponseDTO>>(() => axios.get(`/${id}`));
+  return apiResolver<Response<CategoryDTOResponse>>(() => axios.get(`/${id}`));
 }
 
 export function getSubCategoriesByCategory(categoryId: string, search?: string, active?: string) {
@@ -49,7 +49,7 @@ type AddCategoryRequestDTO = {
 export function createCategory(payload: AddCategoryRequestDTO) {
   const token = decryptLS(localStorage.getItem(LS_TOKEN) as string);
   const userID = decryptLS(localStorage.getItem(LS_USER_ID) as string);
-  return apiResolver<Response<CategoryResponseDTO>>(() => axios.post('/add', payload, {
+  return apiResolver<Response<CategoryDTOResponse>>(() => axios.post('/add', payload, {
     headers: {
       "Content-Type": "application/json",
       "Authorization": "token = " + token,
