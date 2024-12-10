@@ -1,6 +1,9 @@
 import apiResolver, { newAbortSignal } from '@/utils/api';
 import { createAxiosInstance, Response } from '../axiosInstance';
 import { DocumentsResponse } from './types';
+import { LS_TOKEN, LS_USER_ID } from '@/constants/data';
+import { decryptLS } from '@/utils/crypto';
+import { DocumentDTO } from '../categories/types';
 
 const axios = createAxiosInstance('documents');
 
@@ -41,25 +44,27 @@ export async function uploadDocument(formData: FormData): Promise<Response> {
 }
 
 export function getDocuments({
-  documentName,
-  documentCategory,
-  documentSubCategory,
-  documentType
+  categoryCode,
 }: {
-  documentName?: string;
-  documentCategory?: string;
-  documentSubCategory?: string;
-  documentType?: string;
-}): Promise<Response<Document[]>> {
-  return apiResolver<Response<Document[]>>(() =>
+  categoryCode?: string;
+}) {
+  return apiResolver<Response<DocumentDTO[]>>(() =>
     axios.get(``, {
       signal: AbortSignal.timeout(FIFTEEN_SECONDS),
-      params: {
-        'document_name': documentName,
-        'category_name': documentCategory,
-        'subcategory_name': documentSubCategory,
-        'document_type': documentType
-      }
+      headers: {
+        "DT-SMSF-Token": decryptLS(localStorage.getItem(LS_TOKEN) as string),
+        "DT-SMSF-UserID": decryptLS(localStorage.getItem(LS_USER_ID) as string),
+        "DT-SMSF-UserType": 2,
+    },
+    params: {
+      "search": "",
+      'category_code': categoryCode,
+      "fields": "",
+      "sort_type": "",
+      "sort_by": "",
+      "page": 1,
+      "show_pagination": false,
+    }
     })
   );
 }
