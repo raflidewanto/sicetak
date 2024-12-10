@@ -3,11 +3,12 @@ import { getDocumentById, getDocumentBySubcategory, getDocuments, getMasterData 
 import { FIVE_MINUTES_IN_MS } from '@/constants/data';
 
 export function useDocuments(
-  categoryCode?: string
+  categoryCode?: string,
+  search?: string
 ) {
   return useQuery({
-    queryKey: ['documents', categoryCode],
-    queryFn: () => getDocuments({ categoryCode }),
+    queryKey: ['documents', categoryCode, search],
+    queryFn: () => getDocuments({ categoryCode, search }),
     staleTime: FIVE_MINUTES_IN_MS,
     enabled: Boolean(categoryCode)
   });

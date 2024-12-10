@@ -45,10 +45,12 @@ export async function uploadDocument(formData: FormData): Promise<Response> {
 
 export function getDocuments({
   categoryCode,
+  search,
 }: {
   categoryCode?: string;
+  search?: string;
 }) {
-  return apiResolver<Response<DocumentDTO[]>>(() =>
+  return apiResolver<Response<DocumentDTO[]>>(() => 
     axios.get(``, {
       signal: AbortSignal.timeout(FIFTEEN_SECONDS),
       headers: {
@@ -57,7 +59,7 @@ export function getDocuments({
         "DT-SMSF-UserType": 2,
     },
     params: {
-      "search": "",
+      "search": search,
       'category_code': categoryCode,
       "fields": "",
       "sort_type": "",

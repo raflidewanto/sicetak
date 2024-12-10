@@ -31,3 +31,14 @@ export type DocumentsFile = {
   document_name: string
   is_release: boolean
 }
+
+
+export type CreateMasterDocumentPayload = {
+  name: string
+  desc: string
+  category_code: string
+  release: boolean
+  active: boolean
+  datetime: string
+  signature: string // dto.Token, dto.Name, dto.CategoryCode, dto.Date + key
+}

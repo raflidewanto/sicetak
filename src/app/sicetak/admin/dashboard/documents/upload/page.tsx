@@ -1,57 +1,180 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Card, CardContent } from '@/components/ui/Card';
+import UploadedFileIcon from '@/assets/icons/ic-uploaded-file.svg';
+import Show from '@/components/elements/Show';
+import PageContainer from '@/components/layout/PageContainer';
 import { Button } from '@/components/ui/Button';
+import { Card, CardContent } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/Textarea';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { Label } from '@/components/ui/Label';
 import { Modal } from '@/components/ui/Modal';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/Select';
 import { Switch } from '@/components/ui/Switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { Textarea } from '@/components/ui/Textarea';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip';
 import { useModal } from '@/hooks/useModal';
+import { usePDFJS } from '@/hooks/usePdfjs';
 import { useCategories } from '@/services/categories/queries/useCategories';
 import { useSubCategoriesByCategory } from '@/services/categories/queries/useSubCategoriesByCategory';
-import UploadSection from '@/components/forms/UploadSection';
-import PageContainer from '@/components/layout/PageContainer';
-import { parseAsInteger, useQueryState } from 'nuqs';
+import { useUploadDoc } from '@/services/documents/mutations/useUploadDocument';
+import { bracketPlaceholder } from '@/types';
+import { getErrorMessage } from '@/utils/error';
+import { extractBracketCoordinates } from '@/utils/pdf';
+import { AxiosError } from 'axios';
+import { X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { memo, useState } from 'react';
 
-const AddNewDocumentStepper = () => {
-  const router = useRouter();
-  const { openModal, closeModal, modalState } = useModal();
-
+const AddNewDocumentPage = () => {
   const { data: categories } = useCategories();
-  const [fileCategory, setFileCategory] = useState('');
+  const router = useRouter();
+  // master data
+  const [fileName, setFileName] = useState<string>('');
+  const [fileDescription, setFileDescription] = useState<string>('');
+  const [fileCategory, setFileCategory] = useState<string>('');
+  const [fileSubCategory, setFileSubCategory] = useState<string>('');
+  const [release, setRelease] = useState<boolean>(false);
+  const [active, setActive] = useState<boolean>(false);
+
+  const [file, setFile] = useState<File | null>(null);
+  const [bracketCoordinates, setBracketCoordinates] = useState<bracketPlaceholder[]>([]);
+
+  const { openModal, closeModal, modalState } = useModal();
   const { data: subCategories } = useSubCategoriesByCategory(fileCategory);
+  const uploadMutation = useUploadDoc();
 
-  const [step, setStep] = useQueryState('step', parseAsInteger.withDefault(1));
-  const [fileName, setFileName] = useState('');
-  const [fileDescription, setFileDescription] = useState('');
-  const [fileSubCategory, setFileSubCategory] = useState('');
-  const [active, setActive] = useState(false);
-  const [release, setRelease] = useState(false);
+  const onLoadPDFJS = async (pdfjs: any) => {
+    if (!file) return;
 
-  const nextStep = () => setStep((prev) => prev + 1);
-  const prevStep = () => setStep((prev) => prev - 1);
-
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    openModal('Success', 'Document added successfully!', 'success');
-    // You can handle form submission here
+    // callback function to handle the extracted coordinates
+    const handleCoordinates = (coordinates: bracketPlaceholder[]) => {
+      setBracketCoordinates(coordinates);
+    };
+    await extractBracketCoordinates(pdfjs, file, handleCoordinates);
   };
 
-  const validateStep1 = () => {
-    if (!fileName || !fileCategory || !fileDescription) {
-      openModal('Validation Error', 'All fields in step 1 are required.', 'error');
-      return false;
+  usePDFJS(onLoadPDFJS, [file]);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setFile(event.target.files[0]);
     }
-    return true;
   };
 
-  const handleNextStep = () => {
-    // if (step === 1 && !validateStep1()) return;
-    nextStep();
+  const UploadSection = memo(() => {
+    return (
+      <>
+        <div
+          className="flex flex-col items-center justify-center gap-y-2 rounded-md border-2 border-dashed border-gray-300 p-6
+       text-gray-500"
+        >
+          <div className="flex flex-row items-center justify-center gap-x-3">
+            <label className="cursor-pointer rounded-md bg-gray-200 px-4 py-2 text-sm text-gray-700">
+              Choose File
+              <input type="file" accept=".pdf" className="hidden" onChange={(e) => handleFileChange(e)} />
+            </label>
+            <p className="text-[0.75rem]">Upload File Here</p>
+          </div>
+          <p className="mt-1 text-xs">PDF files only (max size: 10 MB)</p>
+        </div>
+        <Show when={Boolean(file)}>
+          <div className="flex flex-row items-center justify-between gap-x-3 rounded-lg border border-[#2665E5] bg-white p-[0.625rem]">
+            <section className="flex flex-row items-center gap-x-2">
+              <UploadedFileIcon />
+              <p className="text-sm text-[#2665E5]">{file?.name}</p>
+            </section>
+            <section>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <X
+                      size={20}
+                      onClick={() => setFile(null)}
+                      className="cursor-pointer text-[#2665E5] transition-all hover:text-red-500"
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent className="rounded-md bg-black bg-opacity-85 p-2 text-white">
+                    <p>Remove document</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </section>
+          </div>
+        </Show>
+      </>
+    );
+  });
+  UploadSection.displayName = 'UploadSection';
+
+  const validateForm = () => {
+    const errors: { [key: string]: string } = {};
+
+    if (!fileSubCategory) errors.fileSubCategory = 'Subkategori file diperlukan';
+    if (!fileCategory) errors.fileCategory = 'Kategori file diperlukan';
+    if (!fileDescription) errors.fileDescription = 'Deskripsi file diperlukan';
+    if (!fileName) errors.fileName = 'Nama file diperlukan';
+    if (!file) errors.file = 'Pilih file';
+
+    return errors;
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      Object.values(errors).forEach((message) => {
+        openModal("Error", message, 'error');
+        return;
+      }
+      );
+      return;
+    }
+    const formData = new FormData();
+    formData.append('file', file as Blob);
+    formData.append('name', fileName);
+    formData.append('description', fileDescription);
+    formData.append('category_code', fileCategory);
+    formData.append('subcategory_code', fileSubCategory);
+    formData.append('document_type', "");
+    formData.append('placeholders', JSON.stringify(bracketCoordinates));
+    formData.append('active', active.valueOf().toString());
+    formData.append('release', release.valueOf().toString());
+
+    uploadMutation.mutate(formData, {
+      onSuccess: (data) => {
+        if (data.success) {
+          window.location.href = '/sicetak/dashboard/documents';
+          return;
+        }
+        openModal("Error", `Error updating the placeholder: ${data.message}`, 'error');
+      },
+      onError: (error) => {
+        if (error instanceof AxiosError) {
+          const status = error.response?.status;
+          if (status === 400) {
+            openModal("Upload error", `Error uploading file: ${error.response?.data.message}`, 'error');
+            return;
+          }
+          openModal("Upload error", `Something went wrong`, 'error');
+          return;
+        } else if (error instanceof Error) {
+          openModal("Upload error", `Error uploading file: ${error.message}`, 'error');
+          return;
+        }
+        const errMessage = getErrorMessage(error);
+        openModal("Upload error", `Error uploading file: ${errMessage ? errMessage : 'Something went wrong'}`, 'error');
+        return;
+      }
+    });
   };
 
   return (
@@ -60,139 +183,159 @@ const AddNewDocumentStepper = () => {
         <CardContent className="p-5">
           <form onSubmit={handleSubmit}>
             <h1 className="text-lg font-bold capitalize">Tambah Dokumen</h1>
+            <section className="space-y-4 py-4">
+              <div>
+                <label htmlFor="file-name" className="block text-sm font-medium text-gray-700">
+                  Nama File
+                </label>
+                <Input
+                  id="file-name"
+                  placeholder="Value"
+                  className="mt-1"
+                  onChange={(e) => setFileName(e.target.value)}
+                />
+              </div>
 
-            {/* Step 1 */}
-            {step === 1 && (
-              <section className="space-y-4 py-4">
-                <div>
-                  <label htmlFor="file-name" className="block text-sm font-medium text-gray-700">
-                    Nama File
-                  </label>
-                  <Input
-                    id="file-name"
-                    placeholder="Enter file name"
-                    value={fileName}
-                    onChange={(e) => setFileName(e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2">
-                  <section>
-                    <Label>Kategori</Label>
-                    <Select value={fileCategory} onValueChange={(v) => setFileCategory(v)}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Pilih Kategori" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Kategori</SelectLabel>
-                          {categories?.data?.map((category) => (
-                            <SelectItem key={category.code} value={category.code}>
+              {/* category & subcategory */}
+              <div className="grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2">
+                <section className="w-full space-y-2">
+                  <Label className="block text-sm font-medium text-gray-700">Kategori</Label>
+                  <Select
+                    value={fileCategory}
+                    onValueChange={(v) => setFileCategory(v)}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Pilih Kategori" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Kategori</SelectLabel>
+                        <Show when={Boolean(categories)} fallback={(
+                          <p>Something went wrong</p>
+                        )}>
+                          {categories?.data?.map(category => (
+                            <SelectItem
+                              value={category.code}
+                              key={category.code}
+                              className="capitalize">
                               {category.name.split('_').join(' ')}
                             </SelectItem>
                           ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </section>
+                        </Show>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </section>
+                {/* sub category */}
+                <section className="w-full space-y-2">
+                  <Label className="block text-sm font-medium text-gray-700">Sub Kategori</Label>
+                  <Select
+                    value={fileSubCategory}
+                    onValueChange={(v) => setFileSubCategory(v)}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Pilih Sub Kategori" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Sub Kategori</SelectLabel>
+                        {subCategories?.data?.map(subCategory => (
+                          <SelectItem value={subCategory.subcategory_code} key={subCategory.subcategory_code}>
+                            {subCategory.subcategory_name.split('_').join(' ')}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </section>
+              </div>
 
-                  <section>
-                    <Label>Sub Kategori</Label>
-                    <Select
-                      value={fileSubCategory}
-                      onValueChange={(v) => setFileSubCategory(v)}
-                      disabled={!fileCategory}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Pilih Sub Kategori" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Sub Kategori</SelectLabel>
-                          {subCategories?.data?.map((subCategory) => (
-                            <SelectItem
-                              key={subCategory.subcategory_code}
-                              value={subCategory.subcategory_code}
-                            >
-                              {subCategory.subcategory_name.split('_').join(' ')}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </section>
-                </div>
+              <div>
+                <label htmlFor="file-description" className="block text-sm font-medium text-gray-700">
+                  Deskripsi
+                </label>
+                <Textarea
+                  id="file-description"
+                  placeholder="Value"
+                  className="mt-1 h-32"
+                  onChange={(e) => setFileDescription(e.target.value)}
+                />
+              </div>
+            </section>
 
-                <div>
-                  <label htmlFor="file-description" className="block text-sm font-medium text-gray-700">
-                    Deskripsi
-                  </label>
-                  <Textarea
-                    id="file-description"
-                    placeholder="Enter file description"
-                    value={fileDescription}
-                    onChange={(e) => setFileDescription(e.target.value)}
-                    className="mt-1 h-32"
-                  />
-                </div>
-              </section>
-            )}
+            {/* upload document */}
+            <div className="w-full space-y-4 p-4">
+              <Tabs defaultValue="individual" className='space-y-6'>
+                <TabsList className="grid w-full grid-cols-2 max-w-fit">
+                  <TabsTrigger value="individual">Perorangan</TabsTrigger>
+                  <TabsTrigger value="corporate">Perusahaan</TabsTrigger>
+                </TabsList>
 
-            {/* Step 2 */}
-            {step === 2 && (
-              <section className="space-y-4 py-4">
-                <h2 className="text-lg font-semibold">Step 2: Upload Files</h2>
-                <UploadSection key="corporate" />
-                <UploadSection key="individual" />
-              </section>
-            )}
+                <TabsContent value="corporate">
+                  <UploadSection key="corporate" />
+                </TabsContent>
 
-            {/* Step 3 */}
-            {step === 3 && (
-              <section className="space-y-4 py-4">
-                <h2 className="text-lg font-semibold">Step 3: Document Settings</h2>
+                <TabsContent value="individual">
+                  <UploadSection key="individual" />
+                </TabsContent>
+
+              </Tabs>
+            </div>
+
+            {/* switches for release and active */}
+            <section className="flex flex-col items-start justify-center gap-y-8 px-4 py-6 sm:flex-row sm:items-center sm:justify-start sm:gap-x-8">
+              <div className="space-y-2">
+                <p className="text-[0.875rem] font-medium capitalize">Status</p>
                 <div className="flex items-center space-x-2">
                   <Switch id="active" onCheckedChange={() => setActive(!active)} />
-                  <Label htmlFor="active">{active ? 'Active' : 'Inactive'}</Label>
+                  <Label htmlFor="active">
+                    <Show
+                      when={active}
+                      fallback={<span className="mx-1 inline-block h-2 w-2 rounded-full bg-red-400"></span>}
+                    >
+                      <span className="mx-1 inline-block h-2 w-2 rounded-full bg-green-400"></span>
+                    </Show>
+                    Active
+                  </Label>
                 </div>
+              </div>
+              <div className="space-y-2">
+                <p className="text-[0.875rem] font-medium capitalize">Rilis Dokumen</p>
                 <div className="flex items-center space-x-2">
                   <Switch id="release" onCheckedChange={() => setRelease(!release)} />
-                  <Label htmlFor="release">{release ? 'Released' : 'Unreleased'}</Label>
+                  <Label htmlFor="release">
+                    <Show
+                      when={release}
+                      fallback={<span className="mx-1 inline-block h-2 w-2 rounded-full bg-red-400"></span>}
+                    >
+                      <span className="mx-1 inline-block h-2 w-2 rounded-full bg-green-400"></span>
+                    </Show>
+                    Release
+                  </Label>
                 </div>
-              </section>
-            )}
+              </div>
+            </section>
 
-            {/* Navigation Buttons */}
-            <div className="flex justify-end space-x-4">
-              {step > 1 && (
-                <Button variant="ghost" type='button' onClick={prevStep}>
-                  Kembali
-                </Button>
-              )}
-              {step < 3 && (
-                <Button type="button" onClick={handleNextStep}>
-                  Selanjutnya
-                </Button>
-              )}
-              {step === 3 && (
-                <Button type="submit" className="bg-orange-500 text-white">
-                  Simpan
-                </Button>
-              )}
+            {/* Buttons */}
+            <div className="flex justify-end space-x-4 px-5">
+              <Button variant="ghost" className="border border-gray-300 bg-white" onClick={() => router.back()}>
+                Kembali
+              </Button>
+              <Button type="submit" className="bg-orange-500 text-white">
+                Simpan
+              </Button>
             </div>
           </form>
         </CardContent>
-        <Modal
-          title={modalState.title}
-          description={modalState.description}
-          isOpen={modalState.isOpen}
-          onClose={closeModal}
-          type={modalState.type}
-        />
       </Card>
+      <Modal
+        title={modalState.title}
+        description={modalState.description}
+        isOpen={modalState.isOpen}
+        onClose={closeModal}
+        type={modalState.type}
+      />
     </PageContainer>
   );
 };
 
-export default AddNewDocumentStepper;
+export default AddNewDocumentPage;

@@ -2,24 +2,24 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 'use client';
 
-import DocumentTable from '@/components/DocumentsTable';
 import Show from '@/components/elements/Show';
+import NoDataIcon from '@/assets/icons/ic-no-data.svg';
 import PageContainer from '@/components/layout/PageContainer';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip';
-import { DOCUMENT_NAME_QUERY, dummyMasterData } from '@/constants/data';
+import { DOCUMENT_NAME_QUERY } from '@/constants/data';
 import { useDebounceValue } from '@/hooks/useDebounceValue';
 import { useModal } from '@/hooks/useModal';
 import { cN } from '@/lib/utils';
 import { useCategories } from '@/services/categories/queries/useCategories';
 import { CategoryDTOResponse } from '@/services/categories/types';
 import { useDocuments } from '@/services/documents/queries/useDocuments';
-import { Category, Document } from '@/services/documents/types';
 import { getErrorMessage } from '@/utils/error';
-import { CloudIcon, DownloadCloud, Search } from 'lucide-react';
+import { DownloadCloud, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useQueryState } from 'nuqs';
 import { Suspense, useEffect, useState } from 'react';
@@ -35,13 +35,13 @@ const DocumentPage = () => {
   const [documentDebouncedQuery] = useDebounceValue(documentQuery, 1500);
 
   // queries
-  const { data: categories } = useCategories();
+  const { data: categories, isLoading: categoriesLoading } = useCategories();
   const [selectedCategory, setSelectedCategory] = useState(categories?.data?.[0]?.code);
   const [subcategories, setSubcategories] = useState<CategoryDTOResponse[] | []>([]);
 
-  const [subCategoryCode, setSubCategoryCode] = useState("");
+  const [subCategoryCode, setSubCategoryCode] = useState(subcategories?.[0]?.code ?? "");
 
-  const { data: documents } = useDocuments(subCategoryCode);
+  const { data: documents, isLoading: documentsLoading } = useDocuments(subCategoryCode, documentDebouncedQuery ?? "");
 
   useEffect(() => {
     if (categories && (categories?.data?.length ?? 0) > 0) {
@@ -49,6 +49,7 @@ const DocumentPage = () => {
         const initialCategory = categories?.data[0];
         setSelectedCategory(initialCategory.code);
         setSubcategories(initialCategory.sub_categories || []);
+        setSubCategoryCode(initialCategory.sub_categories[0]?.code ?? "");
       }
     }
   }, [categories]);
@@ -56,6 +57,7 @@ const DocumentPage = () => {
   useEffect(() => {
     const category = categories?.data?.find((c) => c.code === selectedCategory);
     setSubcategories(category?.sub_categories || []);
+    setSubCategoryCode(category?.sub_categories[0]?.code ?? "");
   }, [selectedCategory, categories]);
 
   function handleDownloadTemplate(file: string) {
@@ -77,33 +79,8 @@ const DocumentPage = () => {
     }
   }
 
-  const collectDocuments = (category: Category): Document[] => {
-    let documents: Document[] = [...category.documents];
-    for (const subCategory of category.sub_categories) {
-      documents = documents.concat(collectDocuments(subCategory));
-    }
-    return documents;
-  };
-
-  const extractDocuments = (categories: Category[], categoryName: string): Document[] => {
-    for (const category of categories) {
-      // TODO change to category code
-      if (category.name === categoryName) {
-        return collectDocuments(category);
-      }
-      if (category.sub_categories.length > 0) {
-        const result = extractDocuments(category.sub_categories, categoryName);
-        if (result.length > 0) return result;
-      }
-    }
-    return [];
-  };
-
-  const masterDataDummy = extractDocuments(dummyMasterData?.data, "Financial Agreement");
-
   return (
     <PageContainer scrollable>
-      {JSON.stringify(documents)}
       <div className="flex min-h-[35rem] w-full flex-grow flex-col items-stretch rounded-md border border-gray-300 text-xs">
         {/* header */}
         <section className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-tl-md rounded-tr-md border-b border-gray-300 bg-[#173E55] px-4 py-2">
@@ -128,8 +105,12 @@ const DocumentPage = () => {
         <main className="flex flex-grow flex-col lg:flex-row">
           {/* categories */}
           <section className="max-h-dvh w-full border-r-2 border-gray-300 bg-white lg:w-[20%]">
+            <h1 className='text-lg font-bold capitalize mt-1 p-2 border-b border-gray-300'>Kategori</h1>
+            <Show when={categoriesLoading}>
+              Loading...
+            </Show>
             <Show when={Boolean(categories?.data)}>
-              {categories?.data?.map((category) => (
+              {categories?.data?.sort((a, b) => a.name.localeCompare(b.name)).map((category) => (
                 <TooltipProvider key={category?.code}>
                   <Tooltip>
                     <TooltipTrigger className="w-full">
@@ -167,39 +148,42 @@ const DocumentPage = () => {
           {/* sub categories container */}
           <Show when={Boolean(subcategories)}>
             <section className="max-h-dvh w-full border-r-2 border-gray-300 bg-white lg:w-[20%]">
-              {subcategories?.map((subcategory) => (
-                <TooltipProvider key={subcategory?.code}>
-                  <Tooltip>
-                    <TooltipTrigger className="w-full">
-                      <div
-                        onClick={() =>
-                          setSubCategoryCode(subcategory?.code)
-                        }
-                        className={cN(
-                          `flex min-h-[3rem] w-full items-center justify-between border-b border-gray-300 bg-white px-4 py-2 transition-all hover:border-l-4 hover:border-l-[#173E55] hover:bg-background`,
-                          {
-                            'border-l-4 border-l-[#173E55] bg-background':
-                              subCategoryCode === subcategory?.code
+              <h1 className='text-lg font-bold capitalize my-1 p-2 border-b border-gray-300'>Sub Kategori</h1>
+              <Show when={subcategories?.length > 0} fallback={<p className='p-3 text-lg font-medium'>Not Found</p>}>
+                {subcategories?.map((subcategory) => (
+                  <TooltipProvider key={subcategory?.code}>
+                    <Tooltip>
+                      <TooltipTrigger className="w-full">
+                        <div
+                          onClick={() =>
+                            setSubCategoryCode(subcategory?.code)
                           }
-                        )}
-                      >
-                        <p
-                          className={cN(`text-sm font-semibold capitalize`, {
-                            'line-clamp-1': subcategory?.name.length > 17
-                          })}
+                          className={cN(
+                            `flex min-h-[3rem] w-full items-center justify-between border-b border-gray-300 bg-white px-4 py-2 transition-all hover:border-l-4 hover:border-l-[#173E55] hover:bg-background`,
+                            {
+                              'border-l-4 border-l-[#173E55] bg-background':
+                                subCategoryCode === subcategory?.code
+                            }
+                          )}
                         >
-                          {(subcategory?.name?.toString().length ?? 0) > 18
-                            ? subcategory?.name.split("_").join(" ").substring(0, 17) + '...'
-                            : subcategory?.name.split("_").join(" ")}
-                        </p>
-                        <TooltipContent>
-                          <p>{subcategory?.name.split("_").join(" ")}</p>
-                        </TooltipContent>
-                      </div>
-                    </TooltipTrigger>
-                  </Tooltip>
-                </TooltipProvider>
-              ))}
+                          <p
+                            className={cN(`text-sm font-semibold capitalize`, {
+                              'line-clamp-1': subcategory?.name.length > 17
+                            })}
+                          >
+                            {(subcategory?.name?.toString().length ?? 0) > 18
+                              ? subcategory?.name.split("_").join(" ").substring(0, 17) + '...'
+                              : subcategory?.name.split("_").join(" ")}
+                          </p>
+                          <TooltipContent>
+                            <p>{subcategory?.name.split("_").join(" ")}</p>
+                          </TooltipContent>
+                        </div>
+                      </TooltipTrigger>
+                    </Tooltip>
+                  </TooltipProvider>
+                ))}
+              </Show>
             </section>
           </Show>
           <section className="min-h-max flex-1 overflow-x-scroll px-4">
@@ -214,49 +198,59 @@ const DocumentPage = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {documents?.data?.map((document) => (
-                      <TableRow key={document.code as React.Key} className="hover:bg-gray-50">
-                        <TableCell className="p-3 border-b border-gray-300">{document.name}</TableCell>
-                        <TableCell className="p-3 border-b border-gray-300">
-                          {document.document_type
-                            .find((type) => type.name === "perusahaan")
-                            ?.documents_file.map((file) => (
-                              <TooltipProvider key={file?.document_code}>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <DownloadCloud
-                                      onClick={() => handleDownloadTemplate(file.document_code)}
-                                      className="cursor-pointer text-gray-700 hover:text-blue-600"
-                                    />
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    Download Template Perusahaan
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            ))}
-                        </TableCell>
-                        <TableCell className="p-3 border-b border-gray-300">
-                          {document.document_type
-                            .find((type) => type.name === "perorangan")
-                            ?.documents_file.map((file) => (
-                              <TooltipProvider key={file?.document_code}>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <DownloadCloud
-                                      onClick={() => handleDownloadTemplate(file.document_code)}
-                                      className="cursor-pointer text-gray-700 hover:text-blue-600"
-                                    />
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    Download Template Perorangan
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            ))}
+                    <Show when={documentsLoading}>
+                      <TableRow>
+                        <TableCell colSpan={3}>
+                          <Skeleton className='w-full h-12' />
                         </TableCell>
                       </TableRow>
-                    ))}
+                    </Show>
+                    <Show when={!documentsLoading && !!documents?.data && subCategoryCode !== ""}>
+                      {documents?.data?.map((document) => (
+                        <TableRow key={document.code as React.Key} className="hover:bg-gray-50">
+                          <TableCell className="p-3 border-b border-gray-300 min-w-[20rem]">{document.name}</TableCell>
+                          <TableCell className="p-3 border-b border-gray-300 text-center">
+                            {document.document_type
+                              .find((type) => type.name === "perorangan")
+                              ?.documents_file.map((file) => (
+                                <TooltipProvider key={file?.document_code}>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <DownloadCloud
+                                        onClick={() => handleDownloadTemplate(file.document_code)}
+                                        className="cursor-pointer text-gray-700 hover:text-blue-600"
+                                      />
+                                    </TooltipTrigger>
+                                    <TooltipContent>Download Template Perorangan</TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              ))}
+                          </TableCell>
+                          <TableCell className="p-3 border-b border-gray-300 text-center">
+                            {document.document_type
+                              .find((type) => type.name === "perusahaan")
+                              ?.documents_file.map((file) => (
+                                <TooltipProvider key={file?.document_code}>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <DownloadCloud
+                                        onClick={() => handleDownloadTemplate(file.document_code)}
+                                        className="cursor-pointer text-gray-700 hover:text-blue-600"
+                                      />
+                                    </TooltipTrigger>
+                                    <TooltipContent>Download Template Perusahaan</TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              ))}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </Show>
+                    <Show when={!documents?.data}>
+                      <div className='grid place-content-center p-4'>
+                        <NoDataIcon />
+                      </div>
+                    </Show>
                   </TableBody>
                 </Table>
               </div>
