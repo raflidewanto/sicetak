@@ -15,15 +15,14 @@ import { AxiosError } from 'axios';
 import CryptoJS from "crypto-js";
 import moment from 'moment';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const AddCategoryPage = () => {
   const createCategoryMutation = useCreateCategory();
   const [categoryName, setCategoryName] = useState('');
   const [categoryDesc, setCategoryDesc] = useState('');
-  const token = localStorage.getItem(LS_TOKEN);
-  const decryptedToken = decryptLS(token as string);
-  
+  const [token, setToken] = useState("");
+
 
   const { closeModal, modalState, openModal } = useModal();
 
@@ -32,12 +31,20 @@ const AddCategoryPage = () => {
     setCategoryDesc('');
   }
 
+  useEffect(() => {
+    setToken(decryptLS(localStorage.getItem(LS_TOKEN) as string));
+  }, []);
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!token) {
+      openModal("Error", "Invalid token", "error");
+      return;
+    }
     const date = moment().format('YYYY-MM-DD HH:mm:ss');
     const formattedCategoryName = categoryName.toLocaleLowerCase().replaceAll(' ', '_');
-    const stringToSign = `${decryptedToken}${formattedCategoryName}${date}`;
-    
+    const stringToSign = `${token}${formattedCategoryName}${date}`;
+
     const cryptoKey = process.env.NEXT_PUBLIC_CRYPTO_KEY as string;
 
     createCategoryMutation.mutate({

@@ -5,7 +5,7 @@ import { cN } from '@/lib/utils';
 import { decryptLS } from '@/utils/crypto';
 import { ChevronDown, ChevronRight, Newspaper, User } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollArea } from './ui/ScrollArea';
 import { Separator } from './ui/Separator';
 
@@ -13,22 +13,34 @@ export function DashboardNav() {
   const path = usePathname();
   const router = useRouter();
   const [openMenuCode, setOpenMenuCode] = useState<string | null>(null);
+  const [menus, setMenus] = useState<Array<Menu>>([]);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
-  const menus: Array<Menu> = JSON.parse(
-    decryptLS(localStorage.getItem(LS_IN_TOOLS_MENU) as string)
-  );
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedMenus = localStorage.getItem(LS_IN_TOOLS_MENU);
+      const storedRoles = localStorage.getItem(LS_USER_ROLES);
+      
+      if (storedMenus) {
+        const decryptedMenus = JSON.parse(decryptLS(storedMenus)) as Menu[];
+        setMenus(decryptedMenus);
+      }
+
+      if (storedRoles) {
+        const decryptedRoles = JSON.parse(decryptLS(storedRoles)) as Roles;
+        setIsAdmin(decryptedRoles.some((role) => role.role_code === 'admin-sicetak'));
+      }
+    }
+  }, []);
+
   const sicetakMenu = menus.find((m) => m.app_code === 'sicetak');
-  const roles = JSON.parse(decryptLS(localStorage.getItem(LS_USER_ROLES) as string)) as Roles;
-  const isAdmin = roles.some((role) => role.role_code === 'admin-sicetak');
 
   const isActiveRoute = (route: string) => path.startsWith(route);
 
   const handleMenuClick = (menu: Menu) => {
     if (menu.sub_menu && menu.sub_menu.length > 0) {
-      // Toggle the menu if it has submenus
       setOpenMenuCode((prev) => (prev === menu.menu_code ? null : menu.menu_code));
     } else if (menu.url) {
-      // Navigate if it doesn't have submenus
       router.push('/sicetak' + menu.url);
     }
   };
@@ -37,7 +49,7 @@ export function DashboardNav() {
     <nav className="grid items-start gap-2">
       <div>
         {sicetakMenu?.sub_menu
-          ?.filter((menu) => isAdmin || menu.menu_code === 'm-sicetak-dashboard-documents') // Admin sees all menus; non-admin sees one menu
+          ?.filter((menu) => isAdmin || menu.menu_code === 'm-sicetak-dashboard-documents')
           .map((menu) => {
             const isOpen = openMenuCode === menu.menu_code;
             const isActive =

@@ -27,10 +27,6 @@ import { useQueryState } from 'nuqs';
 import { Suspense, useEffect, useState } from 'react';
 
 const AdminPage = () => {
-  // local storage
-  const roles = JSON.parse(decryptLS(localStorage.getItem(LS_USER_ROLES) as string)) as Roles;
-  const isAdmin = roles.some((role) => role.role_code === 'admin-sicetak');
-
   // UI states
   const { openModal, closeModal, modalState } = useModal();
 
@@ -67,11 +63,16 @@ const AdminPage = () => {
   }, [selectedCategory, categories]);
 
   useEffect(() => {
-    if (isAdmin) {
-      return;
+    if (typeof window !== "undefined") {
+      const rolesStr = window.localStorage.getItem(LS_USER_ROLES);
+      const roles = rolesStr ? JSON.parse(decryptLS(rolesStr)) as Roles : [];
+      const isAdmin = roles.some((role) => role.role_code === 'admin-sicetak');
+      if (isAdmin) {
+        return;
+      }
+      window.location.href = '/sicetak/dashboard/documents';
     }
-    window.location.href = '/sicetak/dashboard/documents';
-  }, [isAdmin]);
+  }, []);
 
   function handleDownloadTemplate(file: string) {
     try {
@@ -314,11 +315,11 @@ const AdminPage = () => {
         onClose={closeModal}
         type={modalState.type}
       />
-    </PageContainer >
+    </PageContainer>
   );
 };
 
-export default function AdminPageSuspense() {
+export default function AdminPageSuspensed() {
   return (
     <Suspense>
       <AdminPage />

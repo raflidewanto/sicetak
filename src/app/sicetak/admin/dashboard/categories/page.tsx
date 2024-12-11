@@ -13,6 +13,7 @@ import Link from "next/link";
 import { useQueryState } from "nuqs";
 import NoDataIcon from '@/assets/icons/ic-no-data.svg';
 import PageContainer from "@/components/layout/PageContainer";
+import { Suspense } from "react";
 
 const CategoriesPage = () => {
   const [categoryQuery, setCategoryQuery] = useQueryState(CATEGORY_QUERY);
@@ -57,13 +58,13 @@ const CategoriesPage = () => {
               <Show when={Boolean(categoriesData?.data) && (categoriesData?.data?.length ?? 0) > 0 && !isPending && !isError}>
                 <TableBody>
                   {categoriesData?.data?.map(category => (
-                    <TableRow key={category?.category_code}>
+                    <TableRow key={category?.code}>
                       <TableCell className="capitalize">
-                        {category.category_name?.replaceAll("_", " ")}
+                        {category.name?.replaceAll("_", " ")}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end space-x-4">
-                          <Link href={`/sicetak/admin/dashboard/categories/${category?.category_code}/edit`}>
+                          <Link href={`/sicetak/admin/dashboard/categories/${category?.code}/edit`}>
                             <Button variant="ghost" size="sm">
                               <Edit className="h-4 w-4 text-orange-500" />
                             </Button>
@@ -82,4 +83,10 @@ const CategoriesPage = () => {
   );
 };
 
-export default CategoriesPage;
+export default function CategoriesPageSuspensed() {
+  return (
+    <Suspense>
+      <CategoriesPage />
+    </Suspense>
+  );
+}

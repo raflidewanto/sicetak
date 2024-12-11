@@ -5,7 +5,7 @@ import { generateRequestBodyAuthorize } from '@/utils/auth';
 import { decryptLS } from '@/utils/crypto';
 import Axios from 'axios';
 import moment from 'moment';
-import { AuthorizeResponse, LoginPayload, LoginResponse } from './type';
+import { AuthorizeResponse } from './type';
 
 const baseURL = 
   process.env.NODE_ENV === 'development' ? 

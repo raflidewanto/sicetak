@@ -29,7 +29,7 @@ const EditCategoryPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const { data: category, isLoading: loadingCategory } = useCategoryByCode(slug);
   const router = useRouter();
-  const decryptedToken = decryptLS(localStorage.getItem(LS_TOKEN) as string);
+  const [token, setToken] = useState("");
 
   // query params
   const [search, setSearch] = useQueryState(SUBCATEGORY_QUERY);
@@ -39,9 +39,9 @@ const EditCategoryPage = () => {
   const [debouncedActive] = useDebounceValue(active, 1000);
 
   // form states
-  const [categoryName, setCategoryName] = useState(category?.data?.category_name ?? "");
-  const [categoryDescription, setCategoryDescription] = useState(category?.data?.category_description ?? "");
-  const [categoryStatus, setCategoryStatus] = useState<"1" | "0">(category?.data?.category_active ? "1" : "0");
+  const [categoryName, setCategoryName] = useState(category?.data?.name ?? "");
+  const [categoryDescription, setCategoryDescription] = useState(category?.data?.status ?? "");
+  const [categoryStatus, setCategoryStatus] = useState<"1" | "0">(category?.data?.status ? "1" : "0");
 
   const updateCategoryMutation = useUpdateCategory();
 
@@ -49,18 +49,26 @@ const EditCategoryPage = () => {
   const { closeModal, openModal, modalState } = useModal();
 
   useEffect(() => {
-    setCategoryName(category?.data?.category_name ?? "");
-    setCategoryDescription(category?.data?.category_description ?? "");
+    setCategoryName(category?.data?.name ?? "");
+    setCategoryDescription(category?.data?.status ?? "");
   }, [category]);
+
+  useEffect(() => {
+    setToken(decryptLS(localStorage.getItem(LS_TOKEN) as string));
+  }, []);
 
   function handleUpdateCategory(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!token) {
+      openModal("Error", "Invalid token", "error");
+      return;
+    }
     if (!categoryName || !categoryDescription) {
       openModal("Warning", "Please fill all fields", "warning");
       return;
     }
     const date = moment().format('YYYY-MM-DD HH:mm:ss');
-    const stringToSign = `${decryptedToken}${categoryName}${date}`;
+    const stringToSign = `${decryptLS(token)}${categoryName}${date}`;
     const cryptoKey = process.env.NEXT_PUBLIC_CRYPTO_KEY as string;
     updateCategoryMutation.mutate({
       code: slug,
@@ -177,7 +185,7 @@ const EditCategoryPage = () => {
                 </div>
                 {/* Buttons */}
                 <div className="mt-6 flex justify-end space-x-4">
-                  <Button onClick={() => router.back()} variant="ghost">Kembali</Button>
+                  <Button onClick={() => router.back()} type="button" variant="ghost">Kembali</Button>
                   <Button className="bg-orange-500 hover:bg-orange-600 text-white">Simpan</Button>
                 </div>
               </form>

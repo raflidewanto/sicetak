@@ -51,8 +51,8 @@ const EditSubCategoryPage = () => {
   }, [subcategory]);
 
   useEffect(() => {
-    if (defaultCategory?.data?.category_code) {
-      setSelectedCategory(defaultCategory.data.category_code);
+    if (defaultCategory?.data?.code) {
+      setSelectedCategory(defaultCategory.data.code);
     }
   }, [defaultCategory]);
 
@@ -143,10 +143,10 @@ const EditSubCategoryPage = () => {
                             {categories?.data?.map(category => (
                               <SelectItem
                                 className='capitalize'
-                                key={category?.category_code}
-                                value={category?.category_code}
+                                key={category?.code}
+                                value={category?.code}
                               >
-                                {category?.category_name?.replaceAll("_", " ")}
+                                {category?.name?.replaceAll("_", " ")}
                               </SelectItem>
                             ))}
                           </Show>

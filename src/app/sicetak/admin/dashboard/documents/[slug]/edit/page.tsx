@@ -69,7 +69,7 @@ const EditDocument = () => {
   const [fileCategory, setFileCategory] = useState<string>(document?.data?.category_name ?? '');
   const [fileSubCategory, setFileSubCategory] = useState<string>(document?.data?.subcategory_name ?? '');
   const [bracketCoordinates, setBracketCoordinates] = useState<bracketPlaceholder[]>([]);
-  const [docType, setDocType] = useState<DocumentType>('personal');
+  const [docType, setDocType] = useState<DocumentType>('individual');
   const [release, setRelease] = useState<boolean>(document?.data?.release ?? false);
   const [active, setActive] = useState<boolean>(document?.data?.active ?? false);
 
@@ -352,8 +352,8 @@ const EditDocument = () => {
                       <SelectGroup>
                         <SelectLabel>Kategori</SelectLabel>
                         {categories?.data?.map((category) => (
-                          <SelectItem value={category.category_code} key={category.category_code} className="capitalize">
-                            {category.category_name.split('_').join(' ')}
+                          <SelectItem value={category.code} key={category.code} className="capitalize">
+                            {category.name.split('_').join(' ')}
                           </SelectItem>
                         ))}
                       </SelectGroup>
@@ -404,10 +404,10 @@ const EditDocument = () => {
               <div className="flex items-center justify-center space-x-4 sm:justify-start">
                 <button
                   type="button"
-                  onClick={() => setDocType('personal')}
+                  onClick={() => setDocType('individual')}
                   className={cN(
                     'px-4 py-2 text-sm font-medium ring-transparent focus-visible:outline-none',
-                    docType === 'personal' ? 'border-b-2 border-orange-500 font-bold text-gray-800' : 'text-gray-600'
+                    docType === 'individual' ? 'border-b-2 border-orange-500 font-bold text-gray-800' : 'text-gray-600'
                   )}
                 >
                   Perseorangan

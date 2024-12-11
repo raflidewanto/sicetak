@@ -7,7 +7,7 @@ import { CategoryDTOResponse } from './types';
 
 const axios = createAxiosInstance('categories');
 
-export function getAllCategories() {
+export function getAllCategories(categoryName?: string) {
   return apiResolver<Response<CategoryDTOResponse[]>>(() => axios.get('', {
     headers: {
         "DT-SMSF-Token": localStorage.getItem(LS_TOKEN) as string,
@@ -15,7 +15,7 @@ export function getAllCategories() {
         "DT-SMSF-UserType": 2,
     },
     params: {
-      "search": "",
+      "search": categoryName,
       "fields": "",
       "sort_type": "",
       "sort_by": "",

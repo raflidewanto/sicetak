@@ -18,11 +18,11 @@ import CryptoJS from 'crypto-js';
 import moment from 'moment';
 import { useRouter } from 'next/navigation';
 import { useQueryState } from 'nuqs';
-import { useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 
 const AddSubCategoryPage = () => {
   const [categoryCodeQuery] = useQueryState(CATEGORY_CODE_QUERY);
-  const decryptedToken = decryptLS(localStorage.getItem(LS_TOKEN) as string);
+  const [token, setToken] = useState("");
 
   const {
     data: categories,
@@ -39,13 +39,23 @@ const AddSubCategoryPage = () => {
 
   const { closeModal, openModal, modalState } = useModal();
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setToken(decryptLS(localStorage.getItem(LS_TOKEN) as string));
+    }
+  }, []);
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!token) {
+      openModal("Error", "Invalid token", "error");
+      return;
+    }
     const date = moment().format('YYYY-MM-DD HH:mm:ss');
     const formattedCategoryName = subcategoryName.toLocaleLowerCase().replaceAll(' ', '_');
-    const stringToSign = `${decryptedToken}${formattedCategoryName}${date}`;
+    const stringToSign = `${decryptLS(token)}${formattedCategoryName}${date}`;
     const cryptoKey = process.env.NEXT_PUBLIC_CRYPTO_KEY as string;
-    
+
     createSubcategoryMutation.mutate({
       name: subcategoryName,
       master_detail_code: categoryCode,
@@ -104,8 +114,8 @@ const AddSubCategoryPage = () => {
                     </Show>
                     <Show when={(categories?.data?.length ?? 0) > 0 && !categoriesPending}>
                       {categories?.data?.map((category) => (
-                        <SelectItem key={category.category_code} value={category.category_code} className="capitalize">
-                          {category.category_name.replaceAll("_", " ")}
+                        <SelectItem key={category.code} value={category.code} className="capitalize">
+                          {category.name.replaceAll("_", " ")}
                         </SelectItem>
                       ))}
                     </Show>
@@ -160,4 +170,10 @@ const AddSubCategoryPage = () => {
   );
 };
 
-export default AddSubCategoryPage;
+export default function AddSubCategoryPageSuspensed() {
+  return (
+    <Suspense>
+      <AddSubCategoryPage />
+    </Suspense>
+  );
+}
