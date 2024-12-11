@@ -2,9 +2,10 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 'use client';
 
-import Show from '@/components/elements/Show';
 import NoDataIcon from '@/assets/icons/ic-no-data.svg';
+import Show from '@/components/elements/Show';
 import PageContainer from '@/components/layout/PageContainer';
+import ToolTip from '@/components/ToolTip';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
@@ -207,41 +208,40 @@ const DocumentPage = () => {
                     </Show>
                     <Show when={!documentsLoading && !!documents?.data && subCategoryCode !== ""}>
                       {documents?.data?.map((document) => (
-                        <TableRow key={document.code as React.Key} className="hover:bg-gray-50">
-                          <TableCell className="p-3 border-b border-gray-300 min-w-[20rem]">{document.name}</TableCell>
-                          <TableCell className="p-3 border-b border-gray-300 text-center">
-                            {document.document_type
-                              .find((type) => type.name === "perorangan")
-                              ?.documents_file.map((file) => (
-                                <TooltipProvider key={file?.document_code}>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <DownloadCloud
-                                        onClick={() => handleDownloadTemplate(file.document_code)}
-                                        className="cursor-pointer text-gray-700 hover:text-blue-600"
-                                      />
-                                    </TooltipTrigger>
-                                    <TooltipContent>Download Template Perorangan</TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                              ))}
+                        <TableRow key={document.code} className="hover:bg-gray-50">
+                          {/* Document Name */}
+                          <TableCell className="p-3 border-b border-gray-300 min-w-[20rem]">
+                            {document.name ?? 'N/A'}
                           </TableCell>
+
+                          {/* Perorangan Actions */}
                           <TableCell className="p-3 border-b border-gray-300 text-center">
-                            {document.document_type
-                              .find((type) => type.name === "perusahaan")
-                              ?.documents_file.map((file) => (
-                                <TooltipProvider key={file?.document_code}>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <DownloadCloud
-                                        onClick={() => handleDownloadTemplate(file.document_code)}
-                                        className="cursor-pointer text-gray-700 hover:text-blue-600"
-                                      />
-                                    </TooltipTrigger>
-                                    <TooltipContent>Download Template Perusahaan</TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
+                            <div className="flex items-center justify-evenly gap-x-2">
+                              {document.type_document?.perorangan.map((file) => (
+                                <ToolTip key={file.document_code} title="Download Template Perorangan">
+                                  <DownloadCloud
+                                    size={24}
+                                    onClick={() => handleDownloadTemplate(file.document_code)}
+                                    className="cursor-pointer text-gray-700 hover:text-blue-600"
+                                  />
+                                </ToolTip>
                               ))}
+                            </div>
+                          </TableCell>
+
+                          {/* Perusahaan Actions */}
+                          <TableCell className="p-3 border-b border-gray-300 text-center">
+                            <div className="flex items-center justify-evenly gap-x-2">
+                              {document.type_document?.perusahaan.map((file) => (
+                                <ToolTip key={file.document_code} title="Download Template Perusahaan">
+                                  <DownloadCloud
+                                    size={24}
+                                    onClick={() => handleDownloadTemplate(file.document_code)}
+                                    className="cursor-pointer text-gray-700 hover:text-blue-600"
+                                  />
+                                </ToolTip>
+                              ))}
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}

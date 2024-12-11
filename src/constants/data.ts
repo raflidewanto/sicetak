@@ -11,6 +11,7 @@ export const FIVE_MINUTES_IN_MS = 5 * 60 * 1000;
 export const LS_USER_ID = 'smsf-i-id';
 export const LS_IN_TOOLS_MENU = 'smsf-mn';
 export const LS_TOKEN = 'smsf-tk-i';
+export const LS_USER_ROLES = 'smsf-rl';
 // =====================================================
 
 // =====================================================
@@ -62,47 +63,7 @@ export const customParamPlaceholders = [
   "{{ $content15 }}",
 ];
 
-export const productTypes = [
-  {
-    label: 'Semua',
-    value: ''
-  },
-  {
-    label: 'Fasilitas Dana',
-    value: 'fund_facilities'
-  },
-  {
-    label: 'Fasilitas Modal Usaha',
-    value: 'business_capital_facilities'
-  },
-  {
-    label: 'Installment Financing',
-    value: 'installment_financing'
-  },
-  {
-    label: 'SLB',
-    value: 'slb'
-  },
-  {
-    label: 'Mitra Loyal Carfin',
-    value: 'carfin_loyal_partnership'
-  },
-  {
-    label: 'Flash Cash R2',
-    value: 'flash_cash_r2'
-  }
-] as const;
-
-export type ProductTypeValue =
-  | ''
-  | 'fund_facilities'
-  | 'business_capital_facilities'
-  | 'installment_financing'
-  | 'slb'
-  | 'carfin_loyal_partnership'
-  | 'flash_cash_r2';
-
-export type DocumentType = 'corporate' | 'personal';
+export type DocumentType = 'corporate' | 'individual';
 
 export type Menu = {
   menu_id: number;
@@ -114,6 +75,14 @@ export type Menu = {
   app_code: string;
   sub_menu: Menu[] | null;
 }
+
+export type Role = {
+    role_id: number;
+    role_code: string;
+    role_name: string;
+}
+
+export type Roles = Role[];
 
 export const dummyMenu: Array<Menu> = [
   {

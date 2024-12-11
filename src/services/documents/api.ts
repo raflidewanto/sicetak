@@ -1,9 +1,9 @@
-import apiResolver, { newAbortSignal } from '@/utils/api';
-import { createAxiosInstance, Response } from '../axiosInstance';
-import { DocumentsResponse } from './types';
 import { LS_TOKEN, LS_USER_ID } from '@/constants/data';
+import apiResolver, { newAbortSignal } from '@/utils/api';
 import { decryptLS } from '@/utils/crypto';
+import { createAxiosInstance, Response } from '../axiosInstance';
 import { DocumentDTO } from '../categories/types';
+import { DocumentsResponse } from './types';
 
 const axios = createAxiosInstance('documents');
 

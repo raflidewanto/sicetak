@@ -1,6 +1,6 @@
 'use client';
 
-import { basicPlaceholders, LS_IN_TOOLS_MENU, Menu } from '@/constants/data';
+import { basicPlaceholders, LS_IN_TOOLS_MENU, LS_USER_ROLES, Menu, Roles } from '@/constants/data';
 import { cN } from '@/lib/utils';
 import { decryptLS } from '@/utils/crypto';
 import { ChevronDown, ChevronRight, Newspaper, User } from 'lucide-react';
@@ -18,6 +18,8 @@ export function DashboardNav() {
     decryptLS(localStorage.getItem(LS_IN_TOOLS_MENU) as string)
   );
   const sicetakMenu = menus.find((m) => m.app_code === 'sicetak');
+  const roles = JSON.parse(decryptLS(localStorage.getItem(LS_USER_ROLES) as string)) as Roles;
+  const isAdmin = roles.some((role) => role.role_code === 'admin-sicetak');
 
   const isActiveRoute = (route: string) => path.startsWith(route);
 
@@ -34,57 +36,59 @@ export function DashboardNav() {
   return (
     <nav className="grid items-start gap-2">
       <div>
-        {sicetakMenu?.sub_menu?.map((menu) => {
-          const isOpen = openMenuCode === menu.menu_code;
-          const isActive =
-            isActiveRoute('/sicetak' + menu.url || '') ||
-            menu.sub_menu?.some((sub) => isActiveRoute('/sicetak' + sub.url || ''));
+        {sicetakMenu?.sub_menu
+          ?.filter((menu) => isAdmin || menu.menu_code === 'm-sicetak-dashboard-documents') // Admin sees all menus; non-admin sees one menu
+          .map((menu) => {
+            const isOpen = openMenuCode === menu.menu_code;
+            const isActive =
+              isActiveRoute('/sicetak' + menu.url || '') ||
+              menu.sub_menu?.some((sub) => isActiveRoute('/sicetak' + sub.url || ''));
 
-          return (
-            <div key={menu.menu_code}>
-              <button
-                className={cN(
-                  `flex h-[3rem] items-center gap-2 overflow-hidden py-2 text-sm font-medium transition-all hover:border-l-4 hover:border-l-[#F68833] hover:bg-sidebarBgHover justify-between w-full p-2`,
-                  {
-                    'border-l-4 border-l-[#F68833] bg-sidebarBgHover text-white': isActive,
-                  }
+            return (
+              <div key={menu.menu_code}>
+                <button
+                  className={cN(
+                    `flex h-[3rem] items-center gap-2 overflow-hidden py-2 text-sm font-medium transition-all hover:border-l-4 hover:border-l-[#F68833] hover:bg-sidebarBgHover justify-between w-full p-2`,
+                    {
+                      'border-l-4 border-l-[#F68833] bg-sidebarBgHover text-white': isActive,
+                    }
+                  )}
+                  onClick={() => handleMenuClick(menu)}
+                >
+                  <div className="flex items-center space-x-2">
+                    <span className="text-white">
+                      {menu.menu_code === 'm-sicetak-dashboard-documents' ? <Newspaper /> : <User />}
+                    </span>
+                    <span className="text-white">{menu.menu_name}</span>
+                  </div>
+                  {menu.sub_menu && (
+                    <span className="text-white">{isOpen ? <ChevronDown /> : <ChevronRight />}</span>
+                  )}
+                </button>
+                {isOpen && menu.sub_menu && (
+                  <div>
+                    {menu.sub_menu.map((sub) => (
+                      <a
+                        key={sub.menu_id}
+                        href={'/sicetak' + sub.url}
+                        className={cN(
+                          `block py-[0.95rem] pl-9 text-[0.875rem] capitalize hover:border-l-4 hover:border-l-[#F68833] hover:bg-sidebarBgHover transition-all`,
+                          {
+                            'bg-sidebarBgHover border-l-4 border-l-[#F68833] text-white': isActiveRoute(
+                              '/sicetak' + sub.url
+                            ),
+                          }
+                        )}
+                      >
+                        {sub.menu_name}
+                      </a>
+                    ))}
+                  </div>
                 )}
-                onClick={() => handleMenuClick(menu)}
-              >
-                <div className="flex items-center space-x-2">
-                  <span className="text-white">
-                    {menu.menu_code === 'm-sicetak-dashboard-documents' ? <Newspaper /> : <User />}
-                  </span>
-                  <span className="text-white">{menu.menu_name}</span>
-                </div>
-                {menu.sub_menu && (
-                  <span className="text-white">{isOpen ? <ChevronDown /> : <ChevronRight />}</span>
-                )}
-              </button>
-              {isOpen && menu.sub_menu && (
-                <div>
-                  {menu.sub_menu.map((sub) => (
-                    <a
-                      key={sub.menu_id}
-                      href={'/sicetak' + sub.url}
-                      className={cN(
-                        `block py-[0.95rem] pl-9 text-[0.875rem] capitalize hover:border-l-4 hover:border-l-[#F68833] hover:bg-sidebarBgHover transition-all`,
-                        {
-                          'bg-sidebarBgHover border-l-4 border-l-[#F68833] text-white': isActiveRoute(
-                            '/sicetak' + sub.url
-                          ),
-                        }
-                      )}
-                    >
-                      {sub.menu_name}
-                    </a>
-                  ))}
-                </div>
-              )}
-              <Separator color="#15374C" className="bg-slate-500 my-2" />
-            </div>
-          );
-        })}
+                <Separator color="#15374C" className="bg-slate-500 my-2" />
+              </div>
+            );
+          })}
       </div>
       <ScrollArea className="h-72 w-48 rounded-md border mx-auto my-2 bg-white text-zinc-950">
         <div className="p-4">
