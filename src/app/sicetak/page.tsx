@@ -12,6 +12,7 @@ const IndexPage = () => {
       const { data, success } = await authorizeMutation();
       if (success && data?.authorize) {
         window.location.href = "/sicetak/dashboard/documents";
+        return;
       }
       window.location.href = process.env.NEXT_PUBLIC_IN_TOOLS_SIGN_IN_URL ?? "/";
     } catch (error) {

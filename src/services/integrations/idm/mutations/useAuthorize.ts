@@ -15,7 +15,6 @@ export function useAuthorize() {
       }
       if (data.data?.token && data?.data?.authorize) {
         localStorage.setItem(LS_TOKEN, encryptLS(data.data?.token));
-        
       } else {
         localStorage.removeItem(LS_TOKEN);
         console.error("Error authorizing user");

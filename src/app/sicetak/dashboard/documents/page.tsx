@@ -148,7 +148,7 @@ const DocumentPage = () => {
           {/* sub categories container */}
           <Show when={Boolean(subcategories)}>
             <section className="max-h-dvh w-full border-r-2 border-gray-300 bg-white lg:w-[20%]">
-              <h1 className='text-lg font-bold capitalize my-1 p-2 border-b border-gray-300'>Sub Kategori</h1>
+              <h1 className='text-lg font-bold capitalize mt-1 p-2 border-b border-gray-300'>Sub Kategori</h1>
               <Show when={subcategories?.length > 0} fallback={<p className='p-3 text-lg font-medium'>Not Found</p>}>
                 {subcategories?.map((subcategory) => (
                   <TooltipProvider key={subcategory?.code}>
