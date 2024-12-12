@@ -3,6 +3,7 @@
 'use client';
 
 import NoDataIcon from '@/assets/icons/ic-no-data.svg';
+import ClientOnly from '@/components/elements/ClientOnly';
 import Show from '@/components/elements/Show';
 import PageContainer from '@/components/layout/PageContainer';
 import ToolTip from '@/components/ToolTip';
@@ -82,102 +83,63 @@ const DocumentPage = () => {
 
   return (
     <PageContainer scrollable>
-      <div className="flex min-h-[35rem] w-full flex-grow flex-col items-stretch rounded-md border border-gray-300 text-xs">
-        {/* header */}
-        <section className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-tl-md rounded-tr-md border-b border-gray-300 bg-[#173E55] px-4 py-2">
-          {/* Filter */}
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-5">
-            <div className="relative w-full md:w-auto">
-              <Search className="absolute left-2 top-[0.45rem]" color="gray" size={18} />
-              <Input
-                value={documentQuery || ''}
-                className="h-8 w-full bg-white pl-8 md:w-96"
-                placeholder="Search..."
-                onChange={(e) => setDocumentQuery(e.target.value)}
-              />
+      <ClientOnly>
+        <div className="flex min-h-[35rem] w-full flex-grow flex-col items-stretch rounded-md border border-gray-300 text-xs">
+          {/* header */}
+          <section className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-tl-md rounded-tr-md border-b border-gray-300 bg-[#173E55] px-4 py-2">
+            {/* Filter */}
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-5">
+              <div className="relative w-full md:w-auto">
+                <Search className="absolute left-2 top-[0.45rem]" color="gray" size={18} />
+                <Input
+                  value={documentQuery || ''}
+                  className="h-8 w-full bg-white pl-8 md:w-96"
+                  placeholder="Search..."
+                  onChange={(e) => setDocumentQuery(e.target.value)}
+                />
+              </div>
+              <Link className='items-end' href="/sicetak/dashboard/documents/print">
+                <Button>
+                  Cetak isi
+                </Button>
+              </Link>
             </div>
-            <Link className='items-end' href="/sicetak/dashboard/documents/print">
-              <Button>
-                Cetak isi
-              </Button>
-            </Link>
-          </div>
-        </section>
-        <main className="flex flex-grow flex-col lg:flex-row">
-          {/* categories */}
-          <section className="max-h-dvh w-full border-r-2 border-gray-300 bg-white lg:w-[20%]">
-            <h1 className='text-lg font-bold capitalize mt-1 p-2 border-b border-gray-300'>Kategori</h1>
-            <Show when={categoriesLoading}>
-              Loading...
-            </Show>
-            <Show when={Boolean(categories?.data)}>
-              {categories?.data?.sort((a, b) => a.name.localeCompare(b.name)).map((category) => (
-                <TooltipProvider key={category?.code}>
-                  <Tooltip>
-                    <TooltipTrigger className="w-full">
-                      <div
-                        onClick={() =>
-                          setSelectedCategory(category?.code)
-                        }
-                        className={cN(
-                          `flex min-h-[3rem] w-full items-center justify-between border-b border-gray-300 bg-white px-4 py-2 transition-all hover:border-l-4 hover:border-l-[#173E55] hover:bg-background`,
-                          {
-                            'border-l-4 border-l-[#173E55] bg-background':
-                              selectedCategory === category?.code
-                          }
-                        )}
-                      >
-                        <p
-                          className={cN(`text-sm font-semibold capitalize`, {
-                            'line-clamp-1': category?.name.length > 17
-                          })}
-                        >
-                          {(category?.name?.toString().length ?? 0) > 18
-                            ? category?.name.split("_").join(" ").substring(0, 17) + '...'
-                            : category?.name.split("_").join(" ")}
-                        </p>
-                        <TooltipContent>
-                          <p>{category?.name.split("_").join(" ")}</p>
-                        </TooltipContent>
-                      </div>
-                    </TooltipTrigger>
-                  </Tooltip>
-                </TooltipProvider>
-              ))}
-            </Show>
           </section>
-          {/* sub categories container */}
-          <Show when={Boolean(subcategories)}>
+          <main className="flex flex-grow flex-col lg:flex-row">
+            {/* categories */}
             <section className="max-h-dvh w-full border-r-2 border-gray-300 bg-white lg:w-[20%]">
-              <h1 className='text-lg font-bold capitalize mt-1 p-2 border-b border-gray-300'>Sub Kategori</h1>
-              <Show when={subcategories?.length > 0} fallback={<p className='p-3 text-lg font-medium'>Not Found</p>}>
-                {subcategories?.map((subcategory) => (
-                  <TooltipProvider key={subcategory?.code}>
+              <h1 className='text-lg font-bold capitalize mt-1 p-2 border-b border-gray-300'>Kategori</h1>
+              <Show when={categoriesLoading}>
+                Loading...
+              </Show>
+              <Show when={Boolean(categories?.data)}>
+                {categories?.data?.sort((a, b) => a.name.localeCompare(b.name)).map((category) => (
+                  <TooltipProvider key={category?.code}>
                     <Tooltip>
                       <TooltipTrigger className="w-full">
                         <div
                           onClick={() =>
-                            setSubCategoryCode(subcategory?.code)
+                            setSelectedCategory(category?.code)
                           }
                           className={cN(
                             `flex min-h-[3rem] w-full items-center justify-between border-b border-gray-300 bg-white px-4 py-2 transition-all hover:border-l-4 hover:border-l-[#173E55] hover:bg-background`,
                             {
                               'border-l-4 border-l-[#173E55] bg-background':
-                                subCategoryCode === subcategory?.code
+                                selectedCategory === category?.code
                             }
                           )}
                         >
                           <p
                             className={cN(`text-sm font-semibold capitalize`, {
-                              'line-clamp-1': subcategory?.name.length > 17
+                              'line-clamp-1': category?.name.length > 17
                             })}
                           >
-                            {(subcategory?.name?.toString().length ?? 0) > 18
-                              ? subcategory?.name.split("_").join(" ").substring(0, 17) + '...'
-                              : subcategory?.name.split("_").join(" ")}
+                            {(category?.name?.toString().length ?? 0) > 18
+                              ? category?.name.split("_").join(" ").substring(0, 17) + '...'
+                              : category?.name.split("_").join(" ")}
                           </p>
                           <TooltipContent>
-                            <p>{subcategory?.name.split("_").join(" ")}</p>
+                            <p>{category?.name.split("_").join(" ")}</p>
                           </TooltipContent>
                         </div>
                       </TooltipTrigger>
@@ -186,85 +148,126 @@ const DocumentPage = () => {
                 ))}
               </Show>
             </section>
-          </Show>
-          <section className="min-h-max flex-1 overflow-x-scroll px-4">
-            <div className="flex w-full flex-col gap-4 px-2 py-2">
-              <div className="w-full overflow-auto rounded-b-md border-b">
-                <Table className="w-full border-collapse">
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="px-4 py-2 text-left">Nama Dokumen</TableHead>
-                      <TableHead className="px-4 py-2 text-center">Perorangan</TableHead>
-                      <TableHead className="px-4 py-2 text-center">Perusahaan</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <Show when={documentsLoading}>
+            {/* sub categories container */}
+            <Show when={Boolean(subcategories)}>
+              <section className="max-h-dvh w-full border-r-2 border-gray-300 bg-white lg:w-[20%]">
+                <h1 className='text-lg font-bold capitalize mt-1 p-2 border-b border-gray-300'>Sub Kategori</h1>
+                <Show when={subcategories?.length > 0} fallback={<p className='p-3 text-lg font-medium'>Not Found</p>}>
+                  {subcategories?.map((subcategory) => (
+                    <TooltipProvider key={subcategory?.code}>
+                      <Tooltip>
+                        <TooltipTrigger className="w-full">
+                          <div
+                            onClick={() =>
+                              setSubCategoryCode(subcategory?.code)
+                            }
+                            className={cN(
+                              `flex min-h-[3rem] w-full items-center justify-between border-b border-gray-300 bg-white px-4 py-2 transition-all hover:border-l-4 hover:border-l-[#173E55] hover:bg-background`,
+                              {
+                                'border-l-4 border-l-[#173E55] bg-background':
+                                  subCategoryCode === subcategory?.code
+                              }
+                            )}
+                          >
+                            <p
+                              className={cN(`text-sm font-semibold capitalize`, {
+                                'line-clamp-1': subcategory?.name.length > 17
+                              })}
+                            >
+                              {(subcategory?.name?.toString().length ?? 0) > 18
+                                ? subcategory?.name.split("_").join(" ").substring(0, 17) + '...'
+                                : subcategory?.name.split("_").join(" ")}
+                            </p>
+                            <TooltipContent>
+                              <p>{subcategory?.name.split("_").join(" ")}</p>
+                            </TooltipContent>
+                          </div>
+                        </TooltipTrigger>
+                      </Tooltip>
+                    </TooltipProvider>
+                  ))}
+                </Show>
+              </section>
+            </Show>
+            <section className="min-h-max flex-1 overflow-x-scroll px-4">
+              <div className="flex w-full flex-col gap-4 px-2 py-2">
+                <div className="w-full overflow-auto rounded-b-md border-b">
+                  <Table className="w-full border-collapse">
+                    <TableHeader>
                       <TableRow>
-                        <TableCell colSpan={3}>
-                          <Skeleton className='w-full h-12' />
-                        </TableCell>
+                        <TableHead className="px-4 py-2 text-left">Nama Dokumen</TableHead>
+                        <TableHead className="px-4 py-2 text-center">Perorangan</TableHead>
+                        <TableHead className="px-4 py-2 text-center">Perusahaan</TableHead>
                       </TableRow>
-                    </Show>
-                    <Show when={!documentsLoading && !!documents?.data && subCategoryCode !== ""}>
-                      {documents?.data?.map((document) => (
-                        <TableRow key={document.code} className="hover:bg-gray-50">
-                          {/* Document Name */}
-                          <TableCell className="p-3 border-b border-gray-300 min-w-[20rem]">
-                            {document.name ?? 'N/A'}
-                          </TableCell>
-
-                          {/* Perorangan Actions */}
-                          <TableCell className="p-3 border-b border-gray-300 text-center">
-                            <div className="flex items-center justify-evenly gap-x-2">
-                              {document.type_document?.perorangan.map((file) => (
-                                <ToolTip key={file.document_code} title="Download Template Perorangan">
-                                  <DownloadCloud
-                                    size={24}
-                                    onClick={() => handleDownloadTemplate(file.document_code)}
-                                    className="cursor-pointer text-gray-700 hover:text-blue-600"
-                                  />
-                                </ToolTip>
-                              ))}
-                            </div>
-                          </TableCell>
-
-                          {/* Perusahaan Actions */}
-                          <TableCell className="p-3 border-b border-gray-300 text-center">
-                            <div className="flex items-center justify-evenly gap-x-2">
-                              {document.type_document?.perusahaan.map((file) => (
-                                <ToolTip key={file.document_code} title="Download Template Perusahaan">
-                                  <DownloadCloud
-                                    size={24}
-                                    onClick={() => handleDownloadTemplate(file.document_code)}
-                                    className="cursor-pointer text-gray-700 hover:text-blue-600"
-                                  />
-                                </ToolTip>
-                              ))}
-                            </div>
+                    </TableHeader>
+                    <TableBody>
+                      <Show when={documentsLoading}>
+                        <TableRow>
+                          <TableCell colSpan={3}>
+                            <Skeleton className='w-full h-12' />
                           </TableCell>
                         </TableRow>
-                      ))}
-                    </Show>
-                    <Show when={!documents?.data}>
-                      <div className='grid place-content-center p-4'>
-                        <NoDataIcon />
-                      </div>
-                    </Show>
-                  </TableBody>
-                </Table>
+                      </Show>
+                      <Show when={!documentsLoading && !!documents?.data && subCategoryCode !== ""}>
+                        {documents?.data?.map((document) => (
+                          <TableRow key={document.code} className="hover:bg-gray-50">
+                            {/* Document Name */}
+                            <TableCell className="p-3 border-b border-gray-300 min-w-[20rem]">
+                              {document.name ?? 'N/A'}
+                            </TableCell>
+
+                            {/* Perorangan Actions */}
+                            <TableCell className="p-3 border-b border-gray-300 text-center">
+                              <div className="flex items-center justify-evenly gap-x-2">
+                                {document.type_document?.perorangan.map((file) => (
+                                  <ToolTip key={file.document_code} title="Download Template Perorangan">
+                                    <DownloadCloud
+                                      size={24}
+                                      onClick={() => handleDownloadTemplate(file.document_code)}
+                                      className="cursor-pointer text-gray-700 hover:text-blue-600"
+                                    />
+                                  </ToolTip>
+                                ))}
+                              </div>
+                            </TableCell>
+
+                            {/* Perusahaan Actions */}
+                            <TableCell className="p-3 border-b border-gray-300 text-center">
+                              <div className="flex items-center justify-evenly gap-x-2">
+                                {document.type_document?.perusahaan.map((file) => (
+                                  <ToolTip key={file.document_code} title="Download Template Perusahaan">
+                                    <DownloadCloud
+                                      size={24}
+                                      onClick={() => handleDownloadTemplate(file.document_code)}
+                                      className="cursor-pointer text-gray-700 hover:text-blue-600"
+                                    />
+                                  </ToolTip>
+                                ))}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </Show>
+                      <Show when={!documents?.data}>
+                        <div className='grid place-content-center p-4'>
+                          <NoDataIcon />
+                        </div>
+                      </Show>
+                    </TableBody>
+                  </Table>
+                </div>
               </div>
-            </div>
-          </section>
-        </main>
-      </div>
-      <Modal
-        title={modalState.title}
-        description={modalState.description}
-        isOpen={modalState.isOpen}
-        onClose={closeModal}
-        type={modalState.type}
-      />
+            </section>
+          </main>
+        </div>
+        <Modal
+          title={modalState.title}
+          description={modalState.description}
+          isOpen={modalState.isOpen}
+          onClose={closeModal}
+          type={modalState.type}
+        />
+      </ClientOnly>
     </PageContainer>
   );
 };
