@@ -26,17 +26,14 @@ export type Document = {
   updated_at: string;
 }
 
-type UploadResponse = {
-  success: boolean;
-  message: string;
-};
-
 export async function uploadDocument(formData: FormData): Promise<Response> {
-  return apiResolver<UploadResponse>(() =>
+  const token = decryptLS(localStorage.getItem(LS_TOKEN) as string);
+  return apiResolver<Response>(() =>
     axios.post('/upload', formData, {
       method: 'POST',
       headers: {
-        'Content-Type': 'multipart/form-data'
+        'Content-Type': 'multipart/form-data',
+        "DT-SMSF-Token": token,
       },
       signal: newAbortSignal(FIFTEEN_SECONDS)
     })

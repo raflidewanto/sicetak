@@ -3,10 +3,10 @@
 'use client';
 
 import NoDataIcon from '@/assets/icons/ic-no-data.svg';
+import CategorySkeleton from '@/components/CategorySkeleton';
 import ClientOnly from '@/components/elements/ClientOnly';
 import Show from '@/components/elements/Show';
 import PageContainer from '@/components/layout/PageContainer';
-import Loader from '@/components/Loader';
 import ToolTip from '@/components/ToolTip';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -111,9 +111,7 @@ const DocumentPage = () => {
             <section className="max-h-dvh w-full border-r-2 border-gray-300 bg-white lg:w-[20%]">
               <h1 className='text-lg font-bold capitalize mt-1 p-2 border-b border-gray-300'>Kategori</h1>
               <Show when={categoriesLoading}>
-                <div className='flex items-center justify-center mt-6'>
-                  <Loader />
-                </div>
+                <CategorySkeleton />
               </Show>
               <Show when={Boolean(categories?.data)}>
                 {categories?.data?.sort((a, b) => a.name.localeCompare(b.name)).map((category) => (
@@ -150,7 +148,7 @@ const DocumentPage = () => {
                   </TooltipProvider>
                 ))}
               </Show>
-              <Show when={!categoriesLoading && (!categories?.data || categories == null )}>
+              <Show when={!categoriesLoading && (!categories?.data || categories == null)}>
                 <div className='grid place-content-center p-4'>
                   <NoDataIcon />
                 </div>
@@ -160,11 +158,15 @@ const DocumentPage = () => {
             <Show when={Boolean(subcategories)}>
               <section className="max-h-dvh w-full border-r-2 border-gray-300 bg-white lg:w-[20%]">
                 <h1 className='text-lg font-bold capitalize mt-1 p-2 border-b border-gray-300'>Sub Kategori</h1>
-                <Show when={subcategories?.length > 0} fallback={(
+                <Show when={categoriesLoading}>
+                  <CategorySkeleton />
+                </Show>
+                <Show when={!categoriesLoading && !subcategories?.length}>
                   <div className='grid place-content-center p-4'>
                     <NoDataIcon />
                   </div>
-                )}>
+                </Show>
+                <Show when={subcategories?.length > 0 && !categoriesLoading}>
                   {subcategories?.map((subcategory) => (
                     <TooltipProvider key={subcategory?.code}>
                       <Tooltip>
@@ -213,6 +215,11 @@ const DocumentPage = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
+                      <Show when={(!documents?.data || documents == null) && (!categoriesLoading && !documentsLoading)}>
+                        <div className='grid place-content-center p-4'>
+                          <NoDataIcon />
+                        </div>
+                      </Show>
                       <Show when={!!documentError}>
                         <TableRow>
                           <TableCell colSpan={3}>
@@ -220,14 +227,16 @@ const DocumentPage = () => {
                           </TableCell>
                         </TableRow>
                       </Show>
-                      <Show when={documentsLoading}>
+                      <Show when={documentsLoading || categoriesLoading}>
                         <TableRow>
                           <TableCell colSpan={3}>
-                            <Skeleton className='w-full h-12' />
+                            {Array.from({ length: 3 }).map((_, i) => (
+                              <Skeleton key={i} className='w-full h-12 my-1' />
+                            ))}
                           </TableCell>
                         </TableRow>
                       </Show>
-                      <Show when={!documentsLoading && !!documents?.data && subCategoryCode !== ""}>
+                      <Show when={!documentsLoading && !!documents?.data && subCategoryCode !== "" && !categoriesLoading}>
                         {documents?.data?.map((document) => (
                           <TableRow key={document.code} className="hover:bg-gray-50">
                             {/* Document Name */}
@@ -266,11 +275,6 @@ const DocumentPage = () => {
                             </TableCell>
                           </TableRow>
                         ))}
-                      </Show>
-                      <Show when={!documents?.data || documents == null}>
-                        <div className='grid place-content-center p-4'>
-                          <NoDataIcon />
-                        </div>
                       </Show>
                     </TableBody>
                   </Table>

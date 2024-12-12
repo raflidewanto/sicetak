@@ -1,8 +1,10 @@
 'use client';
 
 import Show from '@/components/elements/Show';
+import UploadedFileIcon from '@/assets/icons/ic-uploaded-file.svg';
 import UploadSection from '@/components/forms/UploadSection';
 import PageContainer from '@/components/layout/PageContainer';
+import ToolTip from '@/components/ToolTip';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
@@ -21,21 +23,18 @@ import { Switch } from '@/components/ui/Switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { Textarea } from '@/components/ui/Textarea';
 import { useModal } from '@/hooks/useModal';
-import { usePDFJS } from '@/hooks/usePdfjs';
 import { useCategories } from '@/services/categories/queries/useCategories';
 import { useSubCategoriesByCategory } from '@/services/categories/queries/useSubCategoriesByCategory';
 import { useUploadDoc } from '@/services/documents/mutations/useUploadDocument';
-import { bracketPlaceholder } from '@/types';
 import { getErrorMessage } from '@/utils/error';
-import { extractBracketCoordinates } from '@/utils/pdf';
 import { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { X } from 'lucide-react';
 
 const AddNewDocumentPage = () => {
   const { data: categories } = useCategories();
   const router = useRouter();
-  // master data
   const [fileName, setFileName] = useState<string>('');
   const [fileDescription, setFileDescription] = useState<string>('');
   const [fileCategory, setFileCategory] = useState<string>('');
@@ -43,43 +42,17 @@ const AddNewDocumentPage = () => {
   const [release, setRelease] = useState<boolean>(false);
   const [active, setActive] = useState<boolean>(false);
 
-  // corporate file
-  const [corporateFile, setCorporateFile] = useState<File | null>(null);
-  const [corporateCoordinates, setCorporateCoordinates] = useState<bracketPlaceholder[]>([]);
-
-  // individual file
-  const [individualFile, setIndividualFile] = useState<File | null>(null);
-  const [individualCoordinates, setIndividualCoordinates] = useState<bracketPlaceholder[]>([]);
+  // file state
+  const [individualCode, setIndividualCode] = useState<string>('');
+  const [corporateCode, setCorporateCode] = useState<string>('');
 
   const { openModal, closeModal, modalState } = useModal();
   const { data: subCategories } = useSubCategoriesByCategory(fileCategory);
   const uploadMutation = useUploadDoc();
 
-  const onLoadFile = async (pdfjs: any, file: File | null, setCoordinates: React.Dispatch<React.SetStateAction<bracketPlaceholder[]>>) => {
-    if (!file) return;
-
-    const handleCoordinates = (coordinates: bracketPlaceholder[]) => {
-      setCoordinates(coordinates);
-    };
-    await extractBracketCoordinates(pdfjs, file, handleCoordinates);
-  };
-
-  usePDFJS((pdfjs: any) => onLoadFile(pdfjs, corporateFile, setCorporateCoordinates), [corporateFile]);
-  usePDFJS((pdfjs: any) => onLoadFile(pdfjs, individualFile, setIndividualCoordinates), [individualFile]);
-
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     const formData = new FormData();
-    formData.append('corporate_file', corporateFile as Blob);
-    formData.append('individual_file', individualFile as Blob);
-    formData.append('document_name', fileName);
-    formData.append('description', fileDescription);
-    formData.append('category_code', fileCategory);
-    formData.append('subcategory_code', fileSubCategory);
-    formData.append('corporate_placeholders', JSON.stringify(corporateCoordinates));
-    formData.append('individual_placeholders', JSON.stringify(individualCoordinates));
-    formData.append('active', active.valueOf().toString());
-    formData.append('release', release.valueOf().toString());
 
     uploadMutation.mutate(formData, {
       onSuccess: (data) => {
@@ -113,7 +86,7 @@ const AddNewDocumentPage = () => {
     <PageContainer scrollable>
       <Card>
         <CardContent className="p-5">
-          <form onSubmit={handleSubmit}>
+          <form id="save-document-form" onSubmit={handleSubmit}>
             <h1 className="text-lg font-bold capitalize">Tambah Dokumen</h1>
             <section className="space-y-4 py-4">
               <div>
@@ -121,6 +94,7 @@ const AddNewDocumentPage = () => {
                   Nama File
                 </Label>
                 <Input
+                  form='save-document-form'
                   id="file-name"
                   placeholder="Value"
                   required
@@ -132,7 +106,7 @@ const AddNewDocumentPage = () => {
               {/* category & subcategory */}
               <div className="grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2">
                 <section className="w-full space-y-2">
-                  <Label className="block text-sm font-medium text-gray-700">Kategori</Label>
+                  <Label form='save-document-form' className="block text-sm font-medium text-gray-700">Kategori</Label>
                   <Select
                     value={fileCategory}
                     required
@@ -206,11 +180,57 @@ const AddNewDocumentPage = () => {
                 </TabsList>
 
                 <TabsContent value="corporate">
-                  <UploadSection file={corporateFile} setFile={setCorporateFile} type="corporate" />
+                  <Show when={corporateCode.split(" ").length > 0} fallback={(
+                    <div className={`
+                        flex flex-row items-center 
+                        justify-between gap-x-3 
+                        my-2 rounded-lg border 
+                        border-[#2665E5] bg-white p-[0.625rem]`
+                    }>
+                      <section className="flex flex-row items-center gap-x-2">
+                        <UploadedFileIcon />
+                        <p className="text-sm text-[#2665E5]">File</p>
+                      </section>
+                      <section>
+                        <ToolTip title='Hapus Dokumen'>
+                          <X
+                            size={20}
+                            onClick={() => setIndividualCode("")}
+                            className="cursor-pointer text-[#2665E5] transition-all hover:text-red-500"
+                          />
+                        </ToolTip>
+                      </section>
+                    </div>
+                  )}>
+                    <UploadSection type="corporate" setDocumentCode={setCorporateCode} />
+                  </Show>
                 </TabsContent>
 
                 <TabsContent value="individual">
-                  <UploadSection file={individualFile} setFile={setIndividualFile} type="individual" />
+                  <Show when={individualCode.split(" ").length > 0} fallback={(
+                    <div className={`
+                      flex flex-row items-center 
+                      justify-between gap-x-3 
+                      my-2 rounded-lg border 
+                      border-[#2665E5] bg-white p-[0.625rem]`
+                    }>
+                      <section className="flex flex-row items-center gap-x-2">
+                        <UploadedFileIcon />
+                        <p className="text-sm text-[#2665E5]">File</p>
+                      </section>
+                      <section>
+                        <ToolTip title='Hapus Dokumen'>
+                          <X
+                            size={20}
+                            onClick={() => setIndividualCode("")}
+                            className="cursor-pointer text-[#2665E5] transition-all hover:text-red-500"
+                          />
+                        </ToolTip>
+                      </section>
+                    </div>
+                  )}>
+                    <UploadSection type="individual" setDocumentCode={setIndividualCode} />
+                  </Show>
                 </TabsContent>
               </Tabs>
             </div>
@@ -254,7 +274,7 @@ const AddNewDocumentPage = () => {
               <Button variant="ghost" type="button" className="border border-gray-300 bg-white" onClick={() => router.back()}>
                 Kembali
               </Button>
-              <Button type="submit" className="bg-orange-500 text-white">
+              <Button form='save-document-form' type="submit" className="bg-orange-500 text-white">
                 Simpan
               </Button>
             </div>

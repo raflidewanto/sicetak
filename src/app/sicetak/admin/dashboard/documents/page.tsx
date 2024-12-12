@@ -6,7 +6,7 @@ const AdminDashboard = dynamic(() => import('@/components/admin/AdminDashboard')
 const AdminPage = () => {
   return (
     <PageContainer scrollable>
-      <div className="flex min-h-[35rem] w-full flex-grow flex-col items-stretch rounded-md border border-gray-300 text-xs">
+      <div className="flex min-h-[35rem] max-h-fit w-full flex-grow flex-col items-stretch rounded-md border border-gray-300 text-xs">
         <AdminDashboard />
       </div>
     </PageContainer>

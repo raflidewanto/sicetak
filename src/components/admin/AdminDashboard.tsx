@@ -2,30 +2,30 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 "use client";
 
-import { DOCUMENT_NAME_QUERY, LS_USER_ROLES, Roles } from '@/constants/data';
 import NoDataIcon from '@/assets/icons/ic-no-data.svg';
+import { DOCUMENT_NAME_QUERY, LS_USER_ROLES, Roles } from '@/constants/data';
 import { useDebounceValue } from '@/hooks/useDebounceValue';
 import { useModal } from '@/hooks/useModal';
+import { cN } from '@/lib/utils';
 import { useCategories } from '@/services/categories/queries/useCategories';
 import { CategoryDTOResponse } from '@/services/categories/types';
 import { useDocuments } from '@/services/documents/queries/useDocuments';
 import { decryptLS } from '@/utils/crypto';
 import { getErrorMessage } from '@/utils/error';
 import { DownloadCloud, Edit2Icon, Printer, PrinterIcon, Search } from 'lucide-react';
-import { useQueryState } from 'nuqs';
-import React, { Suspense, useEffect, useState } from 'react';
-import { Input } from '../ui/Input';
 import Link from 'next/link';
-import { Button } from '../ui/Button';
-import Show from '../elements/Show';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
-import { cN } from '@/lib/utils';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/Table';
+import { useQueryState } from 'nuqs';
+import { Suspense, useEffect, useState } from 'react';
+import CategorySkeleton from '../CategorySkeleton';
 import ClientOnly from '../elements/ClientOnly';
-import { Skeleton } from '../ui/Skeleton';
+import Show from '../elements/Show';
 import ToolTip from '../ToolTip';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
 import { Modal } from '../ui/Modal';
-import Loader from '../Loader';
+import { Skeleton } from '../ui/Skeleton';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/Table';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
 
 const AdminDashboard = () => {
   // UI states
@@ -97,7 +97,7 @@ const AdminDashboard = () => {
   return (
     <div>
       {/* header */}
-      < section className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-tl-md rounded-tr-md border-b border-gray-300 bg-[#173E55] px-4 py-2" >
+      <section className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-tl-md rounded-tr-md border-b border-gray-300 bg-[#173E55] px-4 py-2" >
         {/* Filter */}
         <div className="flex flex-wrap items-center justify-between w-full gap-x-2 gap-y-5" >
           <div className="relative w-full md:w-auto">
@@ -121,9 +121,7 @@ const AdminDashboard = () => {
         <section className="max-h-dvh w-full border-r-2 border-gray-300 bg-white lg:w-[20%]">
           <h1 className='text-base font-bold capitalize mt-1 p-2 border-b border-gray-300'>Kategori</h1>
           <Show when={categoriesLoading}>
-            <div className='flex items-center justify-center mt-6'>
-              <Loader />
-            </div>
+            <CategorySkeleton />
           </Show>
           <Show when={!categoriesLoading && (!categories?.data || categories == null)}>
             <div className='grid place-content-center p-4'>
@@ -170,11 +168,15 @@ const AdminDashboard = () => {
         <Show when={Boolean(subcategories)}>
           <section className="max-h-dvh w-full border-r-2 border-gray-300 bg-white lg:w-[20%]">
             <h1 className='text-base font-bold capitalize mt-1 p-2 border-b border-gray-300'>Sub Kategori</h1>
-            <Show when={subcategories?.length > 0} fallback={(
+            <Show when={categoriesLoading}>
+              <CategorySkeleton />
+            </Show>
+            <Show when={!categoriesLoading && !subcategories?.length}>
               <div className='grid place-content-center p-4'>
                 <NoDataIcon />
               </div>
-            )}>
+            </Show>
+            <Show when={subcategories?.length > 0}>
               {subcategories?.map((subcategory) => (
                 <TooltipProvider key={subcategory?.code}>
                   <Tooltip>
@@ -232,10 +234,12 @@ const AdminDashboard = () => {
                         </TableCell>
                       </TableRow>
                     </Show>
-                    <Show when={documentsLoading}>
+                    <Show when={documentsLoading || categoriesLoading}>
                       <TableRow>
-                        <TableCell colSpan={3}>
-                          <Skeleton className='w-full h-12' />
+                        <TableCell colSpan={4}>
+                          {Array.from({ length: 3 }).map((_, i) => (
+                            <Skeleton key={i} className='w-full h-12 my-1' />
+                          ))}
                         </TableCell>
                       </TableRow>
                     </Show>
@@ -313,12 +317,10 @@ const AdminDashboard = () => {
                         </TableRow>
                       ))}
                     </Show>
-                    <Show when={!documents?.data && !documentsLoading}>
-                      <TableRow className='grid place-content-center p-4'>
-                        <TableCell colSpan={3}>
-                          <NoDataIcon />
-                        </TableCell>
-                      </TableRow>
+                    <Show when={(!documents?.data || documents == null) && (!categoriesLoading && !documentsLoading)}>
+                      <div className='grid place-content-center p-4'>
+                        <NoDataIcon />
+                      </div>
                     </Show>
                   </TableBody>
                 </Table>
