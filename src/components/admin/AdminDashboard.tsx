@@ -25,6 +25,7 @@ import ClientOnly from '../elements/ClientOnly';
 import { Skeleton } from '../ui/Skeleton';
 import ToolTip from '../ToolTip';
 import { Modal } from '../ui/Modal';
+import Loader from '../Loader';
 
 const AdminDashboard = () => {
   // UI states
@@ -43,7 +44,7 @@ const AdminDashboard = () => {
 
   const [subCategoryCode, setSubCategoryCode] = useState(subcategories?.[0]?.code ?? "");
 
-  const { data: documents, isLoading: documentsLoading } = useDocuments(subCategoryCode, documentDebouncedQuery ?? "");
+  const { data: documents, isLoading: documentsLoading, error: documentError } = useDocuments(subCategoryCode, documentDebouncedQuery ?? "");
 
   useEffect(() => {
     if (categories && (categories?.data?.length ?? 0) > 0) {
@@ -120,7 +121,14 @@ const AdminDashboard = () => {
         <section className="max-h-dvh w-full border-r-2 border-gray-300 bg-white lg:w-[20%]">
           <h1 className='text-base font-bold capitalize mt-1 p-2 border-b border-gray-300'>Kategori</h1>
           <Show when={categoriesLoading}>
-            Loading...
+            <div className='flex items-center justify-center mt-6'>
+              <Loader />
+            </div>
+          </Show>
+          <Show when={!categoriesLoading && (!categories?.data || categories == null)}>
+            <div className='grid place-content-center p-4'>
+              <NoDataIcon />
+            </div>
           </Show>
           <Show when={Boolean(categories?.data)}>
             {categories?.data?.sort((a, b) => a.name.localeCompare(b.name)).map((category) => (
@@ -162,7 +170,11 @@ const AdminDashboard = () => {
         <Show when={Boolean(subcategories)}>
           <section className="max-h-dvh w-full border-r-2 border-gray-300 bg-white lg:w-[20%]">
             <h1 className='text-base font-bold capitalize mt-1 p-2 border-b border-gray-300'>Sub Kategori</h1>
-            <Show when={subcategories?.length > 0} fallback={<p className='p-3 text-lg font-medium'>Not Found</p>}>
+            <Show when={subcategories?.length > 0} fallback={(
+              <div className='grid place-content-center p-4'>
+                <NoDataIcon />
+              </div>
+            )}>
               {subcategories?.map((subcategory) => (
                 <TooltipProvider key={subcategory?.code}>
                   <Tooltip>
@@ -213,6 +225,13 @@ const AdminDashboard = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
+                    <Show when={!!documentError}>
+                      <TableRow>
+                        <TableCell colSpan={3}>
+                          <p>{getErrorMessage(documentError)}</p>
+                        </TableCell>
+                      </TableRow>
+                    </Show>
                     <Show when={documentsLoading}>
                       <TableRow>
                         <TableCell colSpan={3}>

@@ -6,6 +6,7 @@ import NoDataIcon from '@/assets/icons/ic-no-data.svg';
 import ClientOnly from '@/components/elements/ClientOnly';
 import Show from '@/components/elements/Show';
 import PageContainer from '@/components/layout/PageContainer';
+import Loader from '@/components/Loader';
 import ToolTip from '@/components/ToolTip';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -43,7 +44,7 @@ const DocumentPage = () => {
 
   const [subCategoryCode, setSubCategoryCode] = useState(subcategories?.[0]?.code ?? "");
 
-  const { data: documents, isLoading: documentsLoading } = useDocuments(subCategoryCode, documentDebouncedQuery ?? "");
+  const { data: documents, isLoading: documentsLoading, error: documentError } = useDocuments(subCategoryCode, documentDebouncedQuery ?? "");
 
   useEffect(() => {
     if (categories && (categories?.data?.length ?? 0) > 0) {
@@ -110,7 +111,9 @@ const DocumentPage = () => {
             <section className="max-h-dvh w-full border-r-2 border-gray-300 bg-white lg:w-[20%]">
               <h1 className='text-lg font-bold capitalize mt-1 p-2 border-b border-gray-300'>Kategori</h1>
               <Show when={categoriesLoading}>
-                Loading...
+                <div className='flex items-center justify-center mt-6'>
+                  <Loader />
+                </div>
               </Show>
               <Show when={Boolean(categories?.data)}>
                 {categories?.data?.sort((a, b) => a.name.localeCompare(b.name)).map((category) => (
@@ -147,12 +150,21 @@ const DocumentPage = () => {
                   </TooltipProvider>
                 ))}
               </Show>
+              <Show when={!categoriesLoading && (!categories?.data || categories == null )}>
+                <div className='grid place-content-center p-4'>
+                  <NoDataIcon />
+                </div>
+              </Show>
             </section>
             {/* sub categories container */}
             <Show when={Boolean(subcategories)}>
               <section className="max-h-dvh w-full border-r-2 border-gray-300 bg-white lg:w-[20%]">
                 <h1 className='text-lg font-bold capitalize mt-1 p-2 border-b border-gray-300'>Sub Kategori</h1>
-                <Show when={subcategories?.length > 0} fallback={<p className='p-3 text-lg font-medium'>Not Found</p>}>
+                <Show when={subcategories?.length > 0} fallback={(
+                  <div className='grid place-content-center p-4'>
+                    <NoDataIcon />
+                  </div>
+                )}>
                   {subcategories?.map((subcategory) => (
                     <TooltipProvider key={subcategory?.code}>
                       <Tooltip>
@@ -201,6 +213,13 @@ const DocumentPage = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
+                      <Show when={!!documentError}>
+                        <TableRow>
+                          <TableCell colSpan={3}>
+                            <p>{getErrorMessage(documentError)}</p>
+                          </TableCell>
+                        </TableRow>
+                      </Show>
                       <Show when={documentsLoading}>
                         <TableRow>
                           <TableCell colSpan={3}>
@@ -248,7 +267,7 @@ const DocumentPage = () => {
                           </TableRow>
                         ))}
                       </Show>
-                      <Show when={!documents?.data}>
+                      <Show when={!documents?.data || documents == null}>
                         <div className='grid place-content-center p-4'>
                           <NoDataIcon />
                         </div>
