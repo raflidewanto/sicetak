@@ -9,7 +9,7 @@ export type CategoryDTOResponse = {
   code: string;
   name: string;
   status: string;
-  document: DocumentDTO[];
+  description: string;
   sub_categories: CategoryDTOResponse[];
 };
 

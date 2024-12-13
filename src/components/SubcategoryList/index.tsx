@@ -4,20 +4,19 @@ import NoDataIcon from "@/assets/icons/ic-no-data.svg";
 import Show from "@/components/elements/Show";
 import { Button } from "@/components/ui/Button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
-import { useSubCategoriesByCategory } from "@/services/categories/queries/useSubCategoriesByCategory";
+import { CategoryDTOResponse } from "@/services/categories/types";
 import { Edit } from "lucide-react";
 import Link from "next/link";
 
 type SubCategoriesListProps = {
   categoryCode: string
+  subcategories: CategoryDTOResponse[] | [];
   search?: string
   active?: string
 }
 
 const SubCategoriesList = (props: SubCategoriesListProps) => {
-  const { categoryCode, active, search } = props;
-
-  const { data: subCategories, isPending, isError } = useSubCategoriesByCategory(categoryCode, search, active);
+  const { categoryCode, subcategories } = props;
 
   return (
     <div className="py-4">
@@ -29,35 +28,22 @@ const SubCategoriesList = (props: SubCategoriesListProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          <Show when={!subCategories?.success}>
-            <TableRow className="p-4 grid place-items-center min-w-full">
-              {subCategories?.message === "database empty" ? (
-                <TableCell colSpan={2}>
-                  <NoDataIcon />
-                </TableCell>
-              ) : (
-                <TableCell colSpan={2}>
-                  <p>{subCategories?.message ?? "Something went wrong"}</p>
-                </TableCell>
-              )}
-            </TableRow>
+          <Show when={subcategories?.length === 0}>
+            <div className="p-4 grid place-items-center">
+              <NoDataIcon />
+            </div>
           </Show>
-          <Show when={!isPending && isError}>
-            Something went wrong
-          </Show>
-          <Show when={subCategories?.data?.length === 0 && !isPending}>
-            <NoDataIcon />
-          </Show>
-          <Show when={Boolean(subCategories?.data) && (subCategories?.data?.length ?? 0) > 0 && !isPending && !isError}>
-            {subCategories?.data?.map(subcategory => (
-              <TableRow key={subcategory?.category_code}>
-                <TableCell className="capitalize">
-                  {subcategory.subcategory_name?.replaceAll("_", " ")}
+          <Show when={subcategories?.length > 0}>
+            {subcategories?.map(subcategory => (
+              <TableRow key={subcategory?.code}>
+                <TableCell className="capitalize flex flex-col items-start justify-center gap-y-2 p-4">
+                  {subcategory.name?.replaceAll("_", " ")}
+                  <p className="text-sm text-gray-500">{subcategory.description}</p>
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end space-x-4">
                     <Link
-                      href={`/sicetak/admin/dashboard/categories/subcategories/${subcategory?.subcategory_code}/edit?category-code=${categoryCode}`}
+                      href={`/sicetak/admin/dashboard/categories/subcategories/${subcategory?.code}/edit?category-code=${categoryCode}`}
                     >
                       <Button variant="ghost" size="sm">
                         <Edit className="h-4 w-4 text-orange-500" />

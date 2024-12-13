@@ -59,8 +59,9 @@ const CategoriesPage = () => {
                 <TableBody>
                   {categoriesData?.data?.map(category => (
                     <TableRow key={category?.code}>
-                      <TableCell className="capitalize">
+                      <TableCell className="capitalize flex flex-col items-start justify-center gap-y-2 p-4">
                         {category.name?.replaceAll("_", " ")}
+                        <p className="text-sm text-gray-500">{category.description}</p>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end space-x-4">

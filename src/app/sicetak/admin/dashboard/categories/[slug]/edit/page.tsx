@@ -1,6 +1,7 @@
 "use client";
 
 import Show from "@/components/elements/Show";
+import CryptoJS from "crypto-js";
 import SubCategoriesList from "@/components/SubcategoryList";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -15,7 +16,7 @@ import { ACTIVE_QUERY, LS_TOKEN, SUBCATEGORY_QUERY } from "@/constants/data";
 import { useDebounceValue } from "@/hooks/useDebounceValue";
 import { useModal } from "@/hooks/useModal";
 import { useUpdateCategory } from "@/services/categories/mutations/useUpdateCategory";
-import { useCategoryByCode } from "@/services/categories/queries/useCategories";
+import { useCategories } from "@/services/categories/queries/useCategories";
 import { decryptLS } from "@/utils/crypto";
 import { getErrorMessage } from "@/utils/error";
 import { AxiosError } from "axios";
@@ -27,7 +28,7 @@ import { useEffect, useState } from "react";
 
 const EditCategoryPage = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { data: category, isLoading: loadingCategory } = useCategoryByCode(slug);
+  const { data: category, isLoading: loadingCategory } = useCategories(undefined, slug);
   const router = useRouter();
   const [token, setToken] = useState("");
 
@@ -39,9 +40,9 @@ const EditCategoryPage = () => {
   const [debouncedActive] = useDebounceValue(active, 1000);
 
   // form states
-  const [categoryName, setCategoryName] = useState(category?.data?.name ?? "");
-  const [categoryDescription, setCategoryDescription] = useState(category?.data?.status ?? "");
-  const [categoryStatus, setCategoryStatus] = useState<"1" | "0">(category?.data?.status ? "1" : "0");
+  const [categoryName, setCategoryName] = useState(category?.data?.[0]?.name ?? "");
+  const [categoryDescription, setCategoryDescription] = useState(category?.data?.[0]?.description ?? "");
+  const [categoryStatus, setCategoryStatus] = useState<"1" | "0">(category?.data?.[0]?.status ? "1" : "0");
 
   const updateCategoryMutation = useUpdateCategory();
 
@@ -49,12 +50,18 @@ const EditCategoryPage = () => {
   const { closeModal, openModal, modalState } = useModal();
 
   useEffect(() => {
-    setCategoryName(category?.data?.name ?? "");
-    setCategoryDescription(category?.data?.status ?? "");
+    setCategoryName(category?.data?.[0]?.name ?? "");
+    setCategoryDescription(category?.data?.[0]?.description ?? "");
+    setCategoryStatus(category?.data?.[0]?.status ? "1" : "0");
   }, [category]);
 
   useEffect(() => {
-    setToken(decryptLS(localStorage.getItem(LS_TOKEN) as string));
+    if (typeof window !== "undefined") {
+      const tokenStr = localStorage.getItem(LS_TOKEN);
+      if (tokenStr) {
+        setToken(decryptLS(tokenStr));
+      }
+    }
   }, []);
 
   function handleUpdateCategory(e: React.FormEvent<HTMLFormElement>) {
@@ -63,19 +70,20 @@ const EditCategoryPage = () => {
       openModal("Error", "Invalid token", "error");
       return;
     }
-    if (!categoryName || !categoryDescription) {
+    if (!categoryName || !categoryStatus || !categoryDescription) {
       openModal("Warning", "Please fill all fields", "warning");
       return;
     }
     const date = moment().format('YYYY-MM-DD HH:mm:ss');
-    const stringToSign = `${decryptLS(token)}${categoryName}${date}`;
+    const stringToSign = `${token}${slug}${date}`;
     const cryptoKey = process.env.NEXT_PUBLIC_CRYPTO_KEY as string;
+    
     updateCategoryMutation.mutate({
       code: slug,
       name: categoryName,
       desc: categoryDescription,
       status: categoryStatus,
-      datetime: moment().format('YYYY-MM-DD HH:mm:ss'),
+      datetime: date,
       signature: CryptoJS.HmacSHA256(stringToSign, cryptoKey).toString(),
     }, {
       onSuccess: (data) => {
@@ -160,8 +168,8 @@ const EditCategoryPage = () => {
                       fallback={<Skeleton className="w-full h-10" />}
                     >
                       <Textarea
-                        id="description"
-                        placeholder="Description"
+                        id="category-description"
+                        placeholder="Nama Kategori"
                         value={categoryDescription}
                         onChange={e => setCategoryDescription(e.target.value)}
                         className="mt-1"
@@ -219,6 +227,7 @@ const EditCategoryPage = () => {
                 </Link>
               </section>
               <SubCategoriesList
+                subcategories={category?.data?.[0]?.sub_categories ?? []}
                 categoryCode={slug}
                 search={debouncedSearch ?? ""}
                 active={debouncedActive ?? ""}

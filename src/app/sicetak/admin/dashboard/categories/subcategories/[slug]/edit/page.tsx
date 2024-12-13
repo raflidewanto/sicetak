@@ -1,5 +1,6 @@
 'use client';
 
+import NoDataIcon from '@/assets/icons/ic-no-data.svg';
 import Show from '@/components/elements/Show';
 import PageContainer from '@/components/layout/PageContainer';
 import { Button } from '@/components/ui/Button';
@@ -11,52 +12,57 @@ import { Switch } from '@/components/ui/Switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { Textarea } from '@/components/ui/Textarea';
-import { CATEGORY_CODE_QUERY } from '@/constants/data';
+import { CATEGORY_CODE_QUERY, LS_TOKEN } from '@/constants/data';
 import { useModal } from '@/hooks/useModal';
-import { useCategories, useCategoryByCode } from '@/services/categories/queries/useCategories';
-import { useDocumentBySubcategory } from '@/services/documents/queries/useDocuments';
-import { useUpdateSubCategory } from '@/services/subcategories/mutations/useUpdateSubCategory';
-import { useSubCategory } from '@/services/subcategories/queries/useSubcategories';
+import { useUpdateCategory } from '@/services/categories/mutations/useUpdateCategory';
+import { useCategories } from '@/services/categories/queries/useCategories';
+import { useDocuments } from '@/services/documents/queries/useDocuments';
+import { decryptLS } from '@/utils/crypto';
 import { getErrorMessage } from '@/utils/error';
 import { AxiosError } from 'axios';
+import CryptoJS from 'crypto-js';
 import { Edit } from 'lucide-react';
+import moment from 'moment';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useQueryState } from 'nuqs';
 import { useEffect, useState } from 'react';
-import NoDataIcon from '@/assets/icons/ic-no-data.svg';
 
 const EditSubCategoryPage = () => {
   const router = useRouter();
+  const [token, setToken] = useState<string>("");
   const { slug: subcategoryCode } = useParams<{ slug: string }>();
   const [categoryCode,] = useQueryState(CATEGORY_CODE_QUERY);
-  const { data: subcategory } = useSubCategory(subcategoryCode);
-  const { data: defaultCategory } = useCategoryByCode(categoryCode ?? "");
+  const { data: subcategory } = useCategories(undefined, subcategoryCode);
   const { data: categories } = useCategories();
-  const { data: documents } = useDocumentBySubcategory(subcategoryCode);
+  const { data: documents } = useDocuments(subcategoryCode);
+
+  // mutations
+  const updateSubcategoryMutation = useUpdateCategory();
 
   // form  states
-  const [subcategoryName, setSubcategoryName] = useState(subcategory?.data?.subcategory_name ?? "");
-  const [subcategoryActive, setSubcategoryActive] = useState(subcategory?.data?.subcategory_active ?? false);
-  const [selectedCategory, setSelectedCategory] = useState<string>(subcategory?.data?.category_code ?? "");
-  const [subcategoryDescription, setSubcategoryDescription] = useState(subcategory?.data?.subcategory_desc ?? "");
+  const [subcategoryName, setSubcategoryName] = useState(subcategory?.data?.[0]?.name ?? "");
+  const [subcategoryActive, setSubcategoryActive] = useState(subcategory?.data?.[0]?.status ?? "0");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [subcategoryDescription, setSubcategoryDescription] = useState(subcategory?.data?.[0]?.description ?? "");
 
   const { closeModal, openModal, modalState } = useModal();
 
   useEffect(() => {
-    setSubcategoryName(subcategory?.data?.subcategory_name ?? "");
-    setSubcategoryActive(subcategory?.data?.subcategory_active ?? false);
-    setSelectedCategory(subcategory?.data?.category_code ?? "");
-    setSubcategoryDescription(subcategory?.data?.subcategory_desc ?? "");
-  }, [subcategory]);
+    setSubcategoryName(subcategory?.data?.[0]?.name ?? "");
+    setSubcategoryActive(subcategory?.data?.[0]?.status ?? "0");
+    setSelectedCategory(categories?.data?.find(c => c.code === categoryCode)?.code ?? "");
+    setSubcategoryDescription(subcategory?.data?.[0]?.description ?? "");
+  }, [subcategory, categoryCode, categories]);
 
   useEffect(() => {
-    if (defaultCategory?.data?.code) {
-      setSelectedCategory(defaultCategory.data.code);
+    if (typeof window !== "undefined") {
+      const tokenStr = localStorage.getItem(LS_TOKEN);
+      if (tokenStr) {
+        setToken(decryptLS(tokenStr));
+      }
     }
-  }, [defaultCategory]);
-
-  const updateSubcategoryMutation = useUpdateSubCategory();
+  }, []);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -64,11 +70,17 @@ const EditSubCategoryPage = () => {
       openModal("Error", "Invalid category", "error");
       return;
     }
+    const date = moment().format("YYYY-MM-DD HH:mm:ss");
+    const cryptoKey = process.env.NEXT_PUBLIC_CRYPTO_KEY as string;
+    const message = `${token}${subcategoryCode}${date}`;
     updateSubcategoryMutation.mutate({
-      category_code: categoryCode,
-      subcategory_code: subcategoryCode,
-      subcategory_name: subcategoryName,
-      subcategory_desc: subcategoryDescription,
+      code: subcategoryCode,
+      signature: CryptoJS.HmacSHA256(message, cryptoKey).toString(),
+      name: subcategoryName,
+      desc: subcategoryDescription,
+      status: subcategoryActive === "1" ? "1" : "0",
+      datetime: date,
+      category_code: selectedCategory,
     }, {
       onSuccess: (data) => {
         if (!data.success) {
@@ -120,7 +132,7 @@ const EditSubCategoryPage = () => {
                         id="subcategory-name"
                         placeholder="Value"
                         className="mt-1 capitalize"
-                        value={subcategoryName.replaceAll("_", " ")}
+                        value={subcategoryName}
                         onChange={e => setSubcategoryName(e.target.value)}
                       />
                     </div>
@@ -136,7 +148,8 @@ const EditSubCategoryPage = () => {
                           <SelectValue
                             className='capitalize'
                             placeholder="Pilih Kategori"
-                            aria-label={selectedCategory?.replaceAll("_", " ")} />
+                            aria-label={selectedCategory?.replaceAll("_", " ")}
+                          />
                         </SelectTrigger>
                         <SelectContent>
                           <Show when={(categories?.data?.length ?? 0) > 0}>
@@ -174,9 +187,9 @@ const EditSubCategoryPage = () => {
                     </label>
                     <Switch
                       id="status"
-                      onCheckedChange={v => setSubcategoryActive(v)}
+                      onCheckedChange={v => setSubcategoryActive(v ? "1" : "0")}
                       placeholder="Status"
-                      checked={subcategoryActive.valueOf()}
+                      checked={subcategoryActive === "1"}
                       className="mt-1"
                     />
                   </div>
@@ -207,13 +220,13 @@ const EditSubCategoryPage = () => {
                     <Show when={Boolean(documents?.data?.length)}>
                       <TableBody>
                         {documents?.data?.map(doc => (
-                          <TableRow key={doc?.document_code}>
+                          <TableRow key={doc?.code}>
                             <TableCell className="capitalize">
                               {doc?.name?.replaceAll("_", " ")}
                             </TableCell>
                             <TableCell className="text-right">
                               <div className="flex items-center justify-end space-x-4">
-                                <Link href={`/sicetak/admin/dashboard/documents/${doc?.document_code}/edit`}>
+                                <Link href={`/sicetak/admin/dashboard/documents/${doc?.code}/edit`}>
                                   <Button variant="ghost" size="sm">
                                     <Edit className="h-4 w-4 text-orange-500" />
                                   </Button>

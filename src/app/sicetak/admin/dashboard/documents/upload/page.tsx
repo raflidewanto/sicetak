@@ -35,8 +35,8 @@ import { X } from 'lucide-react';
 const AddNewDocumentPage = () => {
   const { data: categories } = useCategories();
   const router = useRouter();
-  const [fileName, setFileName] = useState<string>('');
-  const [fileDescription, setFileDescription] = useState<string>('');
+  const [, setFileName] = useState<string>('');
+  const [, setFileDescription] = useState<string>('');
   const [fileCategory, setFileCategory] = useState<string>('');
   const [fileSubCategory, setFileSubCategory] = useState<string>('');
   const [release, setRelease] = useState<boolean>(false);
@@ -57,7 +57,7 @@ const AddNewDocumentPage = () => {
     uploadMutation.mutate(formData, {
       onSuccess: (data) => {
         if (data.success) {
-          window.location.href = '/sicetak/dashboard/documents';
+          window.location.href = '/sicetak/admin/dashboard/documents';
           return;
         }
         openModal("Error", `Error updating the placeholder: ${data.message}`, 'error');
